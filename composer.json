@@ -1,0 +1,16 @@
+{
+  "name": "aztecweb/wp-browser",
+  "description": "Codeception module for WooCommerce acceptance tests.",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Aztec\\WPBrowser\\": "src/"
+    }
+  },
+  "require": {
+    "php": ">=7.4",
+    "codeception/codeception": "^5.0",
+    "lucatume/wp-browser": "^4.0"
+  }
+}
