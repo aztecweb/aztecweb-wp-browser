@@ -1,5 +1,5 @@
 {
-  "name": "aztecweb/wp-browser",
+  "name": "aztecweb/aztecweb-wp-browser",
   "description": "Codeception module for WooCommerce acceptance tests.",
   "type": "library",
   "license": "MIT",
