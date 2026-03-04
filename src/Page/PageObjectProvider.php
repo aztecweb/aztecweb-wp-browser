@@ -23,4 +23,5 @@ class PageObjectProvider
 
         return $this->pageInstances['cart'];
     }
+
 }
