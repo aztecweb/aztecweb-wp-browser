@@ -1,0 +1,41 @@
+# Codeception Acceptance Suite Configuration
+#
+# Run acceptance tests against WordPress with WooCommerce
+
+actor: AcceptanceTester
+modules:
+    enabled:
+        - WPDb
+        - WPWebDriver
+        - \Aztec\WPBrowser\Tests\Support\Helper\Acceptance
+        - \Aztec\WPBrowser\AztecWPBrowser
+    config:
+        WPDb:
+            dsn: 'mysql:host=%DB_HOST%;dbname=%DB_NAME%'
+            user: '%DB_USER%'
+            password: '%DB_PASSWORD%'
+            populator: 'mysql -u $user -p$password -h $host $dbname < $dump'
+            dump: 'tests/_data/dump.sql'
+            populate: false
+            cleanup: false
+            waitlock: 10
+            url: '%WP_URL%'
+            tablePrefix: '%DB_TABLE_PREFIX%'
+        WPWebDriver:
+            url: '%WP_URL%'
+            browser: chrome
+            host: '%CHROME_HOST%'
+            port: '%CHROME_PORT%'
+            window_size: 1200x800
+            adminUsername: '%WP_ADMIN_USER%'
+            adminPassword: '%WP_ADMIN_PASSWORD%'
+            adminPath: /wp-admin
+            capabilities:
+                chromeOptions:
+                    args: ["--headless", "--disable-gpu", "--no-sandbox"]
+        AztecWPBrowser:
+            pageObjects: []
+step_decorators:
+    - \Codeception\Step\ConditionalAssertion
+    - \Codeception\Step\TryTo
+    - \Codeception\Step\Retry

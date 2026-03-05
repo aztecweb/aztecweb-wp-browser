@@ -1,0 +1,20 @@
+# Test Environment
+.env
+tests/_output/*
+!tests/_output/.gitkeep
+
+# WooCommerce installation
+woocommerce/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Composer
+/vendor/

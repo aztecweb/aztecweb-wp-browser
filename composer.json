@@ -8,8 +8,13 @@
       "Aztec\\WPBrowser\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Aztec\\WPBrowser\\Tests\\": "tests/"
+    }
+  },
   "require": {
-    "php": ">=7.4",
+    "php": "^8.0",
     "codeception/codeception": "^5.0",
     "lucatume/wp-browser": "^4.0"
   }
