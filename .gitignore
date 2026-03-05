@@ -1,5 +1,6 @@
 # Test Environment
 .env
+.env.local
 tests/_output/*
 !tests/_output/.gitkeep
 

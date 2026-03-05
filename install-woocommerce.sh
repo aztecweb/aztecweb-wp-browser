@@ -28,8 +28,10 @@ fi
 
 echo "Extracting WooCommerce..."
 rm -rf "${WOOCOMMERCE_DIR}"
-mkdir -p "${WOOCOMMERCE_DIR}"
-unzip -q /tmp/woocommerce.zip -d "${WOOCOMMERCE_DIR}"
+# Extract to temp dir first, then move (zip contains woocommerce/ folder inside)
+unzip -q /tmp/woocommerce.zip -d /tmp/woo-extract
+mv /tmp/woo-extract/woocommerce "${WOOCOMMERCE_DIR}"
+rm -rf /tmp/woo-extract
 
 if [ $? -ne 0 ]; then
     echo "Failed to extract WooCommerce"

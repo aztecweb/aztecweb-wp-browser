@@ -1,8 +1,11 @@
+# Test Environment - For running Codeception tests
+# Usage: docker compose -f docker-compose.test.yml up
+
 services:
   # WordPress + WooCommerce
   wordpress:
     image: wordpress:6.8-php8.2-apache
-    container_name: aztecwp_wordpress
+    container_name: aztecwp_test_wordpress
     ports:
       - "8080:80"
     environment:
@@ -12,7 +15,7 @@ services:
       WORDPRESS_DB_PASSWORD: wordpress
       WORDPRESS_TABLE_PREFIX: wp_
     volumes:
-      - wordpress_data:/var/www/html
+      - wordpress_test_data:/var/www/html
       - ./woocommerce:/var/www/html/wp-content/plugins/woocommerce
       - ./tests/_data:/var/www/html/wp-content/uploads
     depends_on:
@@ -23,7 +26,7 @@ services:
   # MySQL Database
   db:
     image: mysql:8.0
-    container_name: aztecwp_db
+    container_name: aztecwp_test_db
     ports:
       - "3306:3306"
     environment:
@@ -32,14 +35,14 @@ services:
       MYSQL_USER: wordpress
       MYSQL_PASSWORD: wordpress
     volumes:
-      - db_data:/var/lib/mysql
+      - db_test_data:/var/lib/mysql
     networks:
       - testnet
 
   # Chrome for browser testing
   chrome:
     image: selenium/standalone-chrome:latest
-    container_name: aztecwp_chrome
+    container_name: aztecwp_test_chrome
     ports:
       - "4444:4444"
       - "7900:7900"  # VNC for debugging
@@ -52,12 +55,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.test
-    container_name: aztecwp_php
+    container_name: aztecwp_test_php
     ports:
       - "9003:9003"  # Xdebug port
     volumes:
       - .:/app
-      - wordpress_data:/var/www/html:ro
+      - wordpress_test_data:/var/www/html:ro
       - ./woocommerce:/var/www/html/wp-content/plugins/woocommerce:ro
     working_dir: /app
     depends_on:
@@ -80,8 +83,8 @@ services:
       - "host.docker.internal:host-gateway"
 
 volumes:
-  wordpress_data:
-  db_data:
+  wordpress_test_data:
+  db_test_data:
 
 networks:
   testnet:
