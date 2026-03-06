@@ -1,4 +1,4 @@
-<?php  //[STAMP] f68cd8b499b934c6b645aaa59fd80be6
+<?php  //[STAMP] 2db65ce3735bdd4d2ec364606b9160ce
 // phpcs:ignoreFile
 namespace Aztec\WPBrowser\Tests\Support\_generated;
 

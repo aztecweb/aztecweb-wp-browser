@@ -17,7 +17,7 @@ modules:
             populator: 'mysql -u $user -p$password -h $host $dbname < $dump'
             dump: 'tests/_data/dump.sql'
             populate: false
-            cleanup: false
+            cleanup: true
             waitlock: 10
             url: '%WP_URL%'
             tablePrefix: '%DB_TABLE_PREFIX%'

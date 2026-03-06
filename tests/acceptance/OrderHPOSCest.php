@@ -8,6 +8,11 @@ use Aztec\WPBrowser\Tests\Support\AcceptanceTester;
 
 class OrderHPOSCest
 {
+    public function _before(AcceptanceTester $I): void
+    {
+        $I->haveOptionInDatabase('woocommerce_custom_orders_table_enabled', 'yes');
+    }
+
     public function testHaveOrderInDatabase(AcceptanceTester $I): void
     {
         $orderId = $I->haveOrderInDatabase([

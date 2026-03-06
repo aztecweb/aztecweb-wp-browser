@@ -26,7 +26,6 @@ class AztecWPBrowser extends Module
 
     private ?WooCommerceConfig $wooCommerceConfig = null;
     private ?PageObjectProvider $pageObjectProvider = null;
-    private ?OrderStorageInterface $orderStorage = null;
 
     protected array $config = [
         'pageObjects' => []
@@ -68,13 +67,9 @@ class AztecWPBrowser extends Module
 
     protected function orderStorage(): OrderStorageInterface
     {
-        if ($this->orderStorage === null) {
-            $this->orderStorage = $this->isHPOSEnabled()
-                ? new HPOSOrderStorage($this->wpDb())
-                : new LegacyOrderStorage($this->wpDb());
-        }
-
-        return $this->orderStorage;
+        return $this->isHPOSEnabled()
+            ? new HPOSOrderStorage($this->wpDb())
+            : new LegacyOrderStorage($this->wpDb());
     }
 
     private function isHPOSEnabled(): bool
