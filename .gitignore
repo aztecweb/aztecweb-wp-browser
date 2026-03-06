@@ -8,6 +8,10 @@ tests/_output/*
 woocommerce/
 storefront/
 
+# WordPress data directories
+wordpress_data/
+wordpress_data_test/
+
 # IDE
 .idea/
 .vscode/
