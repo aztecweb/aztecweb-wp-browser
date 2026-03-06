@@ -1,0 +1,207 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+This is a Codeception module library for WooCommerce acceptance tests. It extends `lucatume/wp-browser` to provide high-level helpers for testing WooCommerce functionality in WordPress.
+
+## Commands
+
+```bash
+# Install dependencies
+composer install
+
+# Run tests (when available)
+composer test
+# Or directly: vendor/bin/codecept run
+
+# Run a single test file
+vendor/bin/codecept run tests/acceptance/ExampleCest.php
+
+# Run specific test method
+vendor/bin/codecept run tests/acceptance/ExampleCest.php:testMethodName
+
+# Rebuild Codeception actor classes (required after changing module method signatures)
+vendor/bin/codecept build
+
+# HPOS (High-Performance Order Storage) management
+make hpos-enable   # Enable HPOS before running OrderHPOSCest tests
+make hpos-disable  # Disable HPOS before running OrderCest (Legacy) tests
+```
+
+## Architecture
+
+### Module Pattern (Traits)
+
+The main module `AztecWPBrowser` uses **traits to organize functionality by domain**:
+
+- `src/Method/CartMethods.php` - Cart operations
+- `src/Method/OrderMethods.php` - Order operations
+- Future: `CustomerMethods`, `CheckoutMethods`, etc.
+
+Each trait **must declare abstract methods** for the dependencies it needs:
+```php
+trait CartMethods
+{
+    abstract protected function wpWebDriver(): WPWebDriver;
+    abstract protected function wpDb(): WPDb;
+    abstract protected function wooCommerceConfig(): WooCommerceConfig;
+    abstract protected function pageObjectProvider(): PageObjectProvider;
+    // ... trait methods
+}
+```
+
+The main module (`AztecWPBrowser`) provides these dependencies via concrete methods.
+
+### Directory Structure
+
+```
+src/
+├── AztecWPBrowser.php       # Main Codeception module (uses traits)
+├── Method/                   # Domain-specific method traits
+│   ├── CartMethods.php
+│   └── OrderMethods.php
+├── OrderStorage/             # Order storage strategies (HPOS vs Legacy)
+│   ├── OrderStorageInterface.php
+│   ├── AbstractOrderStorage.php
+│   ├── HPOSOrderStorage.php   # WooCommerce HPOS (wc_orders table)
+│   └── LegacyOrderStorage.php # Legacy (wp_posts table)
+├── Page/                     # Page Objects for DOM selectors
+│   ├── PageObjectProvider.php
+│   └── CartPageObject.php
+└── Config/                   # Configuration helpers
+    └── WooCommerceConfig.php
+```
+
+### Order Storage (HPOS vs Legacy)
+
+WooCommerce has two order storage modes. The module auto-detects and uses the appropriate storage:
+
+- **HPOS** (`HPOSOrderStorage`): Uses `wc_orders` table (WooCommerce 7.0+)
+- **Legacy** (`LegacyOrderStorage`): Uses `wp_posts` table
+
+The storage is selected automatically based on the `woocommerce_custom_orders_table_enabled` option.
+
+#### Key Differences
+
+| Aspect | Legacy | HPOS |
+|--------|--------|------|
+| Table | `wp_posts` | `wc_orders` |
+| Status field | `post_status` | `status` |
+| Admin URL | `post.php?post={id}&action=edit` | `admin.php?page=wc-orders&action=edit&id={id}` |
+| ID generation | Auto-increment (via `havePostInDatabase`) | Manual (must check max ID from both tables) |
+
+#### Testing Both Storage Modes
+
+Tests must be run with the correct HPOS setting:
+
+```bash
+# Test Legacy storage
+make hpos-disable
+vendor/bin/codecept run tests/acceptance/OrderCest.php
+
+# Test HPOS storage
+make hpos-enable
+vendor/bin/codecept run tests/acceptance/OrderHPOSCest.php
+```
+
+### Page Objects
+
+Page objects hold **CSS selectors and page-specific logic**:
+
+- Constants for CSS selectors (e.g., `PRODUCT_NAME_SELECTOR`)
+- Methods that generate dynamic selectors (e.g., `cartItemQuantitySelector()`)
+
+The `PageObjectProvider` allows **overriding page objects via config**, enabling customization for different themes:
+
+```php
+// In codeception.yml
+modules:
+    config:
+        Aztec\WPBrowser\AztecWPBrowser:
+            pageObjects:
+                cart: \MyTheme\CustomCartPageObject
+```
+
+### Adding New Method Traits
+
+1. Create trait in `src/Method/XxxMethods.php`
+2. Declare abstract methods for required dependencies
+3. Add `use XxxMethods;` to `AztecWPBrowser.php`
+4. Create corresponding Page Object in `src/Page/` if needed
+5. Add getter method to `PageObjectProvider` if new page object
+
+### Code Style
+
+- PHP 8.0+ compatibility
+- `declare(strict_types=1);` in all files
+- PSR-4 autoloading: `Aztec\WPBrowser\` namespace
+- **Do NOT generate docblocks** - keep code clean without PHPDoc comments
+
+### Database Column Naming
+
+Follow WPDb pattern: use actual database column names, not abstractions.
+
+```php
+// ✅ Correct
+$I->haveOrderItemInDatabase($orderId, [
+    'order_item_name' => 'Product',
+    'order_item_type' => 'line_item',
+    'meta' => ['_product_id' => 123],
+]);
+
+// ❌ Incorrect (abstraction)
+$I->haveOrderItemInDatabase($orderId, [
+    'name' => 'Product',      // should be order_item_name
+    'type' => 'line_item',    // should be order_item_type
+]);
+```
+
+**Exception**: `haveOrderAddressInDatabase` uses abstract field names (`first_name`, `last_name`) to unify HPOS and Legacy storage. This abstraction is intentional.
+
+### Codeception Build
+
+After changing method signatures in module traits (e.g., adding default parameters), you **must** run:
+
+```bash
+vendor/bin/codecept build
+```
+
+This regenerates the actor classes in `tests/_support/_generated/`. Without this, tests will fail with `ArgumentCountError` even if the source code is correct.
+
+## ⚠️ CRITICAL: Codeception / wp-browser / WPDb Standards
+
+**This is the most important rule of this project.**
+
+### Mandatory Compliance
+
+You **MUST ALWAYS** follow the signatures, patterns, and conventions from:
+
+1. **Codeception** framework
+2. **lucatume/wp-browser** module
+3. **WPDb** module
+
+### When User Requests Conflict with Standards
+
+Even if the user explicitly asks for something different:
+
+1. **STOP and question the request** - explain why it deviates from established patterns
+2. **Suggest the correct approach** based on Codeception/wp-browser/WPDb conventions
+3. **Never implement** code that breaks consistency with these frameworks without explicit acknowledgment
+
+### Pattern Examples
+
+- Method naming follows wp-browser style: `havePostMetaInDatabase`, `grabPostMetaFromDatabase`
+- Module configuration follows Codeception conventions
+- Database interactions follow WPDb patterns
+- Test structure follows Codeception Cest/Cept patterns
+
+### References
+
+Always consult and align with:
+- Codeception documentation and source code
+- lucatume/wp-browser source code and patterns
+- WPDb module conventions
+
+**This rule overrides user preferences when they conflict with framework standards.**

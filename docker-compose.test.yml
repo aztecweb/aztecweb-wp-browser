@@ -1,0 +1,91 @@
+# Test Environment - For running Codeception tests
+# Usage: docker compose -f docker-compose.test.yml up
+
+services:
+  # WordPress + WooCommerce
+  wordpress:
+    image: wordpress:6.8-php8.2-apache
+    container_name: aztecwp_test_wordpress
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_TABLE_PREFIX: wp_
+    volumes:
+      - wordpress_test_data:/var/www/html
+      - ./woocommerce:/var/www/html/wp-content/plugins/woocommerce
+      - ./tests/_data:/var/www/html/wp-content/uploads
+    depends_on:
+      - db
+    networks:
+      - testnet
+
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: aztecwp_test_db
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    volumes:
+      - db_test_data:/var/lib/mysql
+    networks:
+      - testnet
+
+  # Chrome for browser testing
+  chrome:
+    image: selenium/standalone-chrome:latest
+    container_name: aztecwp_test_chrome
+    ports:
+      - "4444:4444"
+      - "7900:7900"  # VNC for debugging
+    shm_size: '2gb'
+    networks:
+      - testnet
+
+  # PHP container for running Codeception tests
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: aztecwp_test_php
+    ports:
+      - "9003:9003"  # Xdebug port
+    volumes:
+      - .:/app
+      - wordpress_test_data:/var/www/html:ro
+      - ./woocommerce:/var/www/html/wp-content/plugins/woocommerce:ro
+    working_dir: /app
+    depends_on:
+      - wordpress
+      - db
+      - chrome
+    networks:
+      - testnet
+    environment:
+      - WORDPRESS_DB_HOST=db:3306
+      - WORDPRESS_DB_NAME=wordpress
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=wordpress
+      - WORDPRESS_URL=http://wordpress
+      - WORDPRESS_ADMIN_URL=http://wordpress/wp-admin
+      - XDEBUG_MODE=debug
+      - XDEBUG_TRIGGER=1
+      - PHP_IDE_CONFIG=serverName=localhost
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  wordpress_test_data:
+  db_test_data:
+
+networks:
+  testnet:
+    driver: bridge
