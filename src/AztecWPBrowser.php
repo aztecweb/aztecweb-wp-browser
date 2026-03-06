@@ -7,6 +7,7 @@ namespace Aztec\WPBrowser;
 use Aztec\WPBrowser\Config\WooCommerceConfig;
 use Aztec\WPBrowser\Method\CartMethods;
 use Aztec\WPBrowser\Method\OrderMethods;
+use Aztec\WPBrowser\Method\ProductMethods;
 use Aztec\WPBrowser\OrderStorage\HPOSOrderStorage;
 use Aztec\WPBrowser\OrderStorage\LegacyOrderStorage;
 use Aztec\WPBrowser\OrderStorage\OrderStorageInterface;
@@ -19,6 +20,7 @@ class AztecWPBrowser extends Module
 {
     use CartMethods;
     use OrderMethods;
+    use ProductMethods;
 
     private ?WooCommerceConfig $wooCommerceConfig = null;
     private ?PageObjectProvider $pageObjectProvider = null;

@@ -93,14 +93,4 @@ trait CartMethods
 
         $this->wpWebDriver()->seeElement($this->pageObjectProvider()->cartPage()::EMPTY_CART_SELECTOR);
     }
-
-    public function haveProductInDatabase(array $data): int
-    {
-        $productData = array_merge(['post_type' => 'product', 'post_status' => 'publish'], $data);
-        $productId   = $this->wpDb()->havePostInDatabase($productData);
-
-        $this->wpDb()->havePostMetaInDatabase($productId, '_price', '100');
-
-        return $productId;
-    }
 }
