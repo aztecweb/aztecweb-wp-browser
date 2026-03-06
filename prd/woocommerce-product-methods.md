@@ -37,9 +37,9 @@
 > Como desenvolvedor de testes, quero associar um produto a uma categoria para testar filtros e listagens.
 
 **Acceptance Criteria**:
-- Método `haveProductWithCategory(int $productId, int $categoryId): void`
+- Método `haveProductCategoryRelationshipInDatabase(int $productId, int $categoryId): void`
 - Usa `wp_term_relationships` internamente
-- Atualiza contagem de produtos na categoria (`count` em `wp_term_taxonomy`)
+- Wrapper para `WPDb::haveTermRelationshipInDatabase()`
 
 #### US3: Criar produto com dados customizados
 > Como desenvolvedor de testes, quero criar um produto com dados específicos para cenários de teste variados.
@@ -64,15 +64,15 @@
 > Como desenvolvedor de testes, quero consultar metadados de um produto para verificar configurações.
 
 **Acceptance Criteria**:
-- Método `grabProductMeta(int $productId, string $key, bool $single = false): mixed`
+- Método `grabProductMetaFromDatabase(int $productId, string $key, bool $single = false): mixed`
 - Retorna valor do metadado
-- Wrapper para `get_post_meta()` ou WPDb equivalente
+- Wrapper para `WPDb::grabPostMetaFromDatabase()`
 
 #### US6: Verificar produto em categoria
 > Como desenvolvedor de testes, quero verificar se um produto está associado a uma categoria.
 
 **Acceptance Criteria**:
-- Método `seeProductInCategory(int $productId, int $categoryId): void`
+- Método `seeProductInCategoryInDatabase(int $productId, int $categoryId): void`
 - Faz assertion verificando `wp_term_relationships`
 - Falha o teste se relacionamento não existir
 
@@ -80,15 +80,15 @@
 > Como desenvolvedor de testes, quero verificar se a contagem de produtos na categoria está correta.
 
 **Acceptance Criteria**:
-- Método `seeProductCategoryCount(int $categoryId, int $expectedCount): void`
-- Verifica campo `count` em `wp_term_taxonomy`
-- Falha o teste se contagem não bater
+- Usar método padrão do Codeception: `seeNumRecords($expectedCount, $tableName, $criteria)`
+- Verifica quantidade de registros em `wp_term_relationships`
+- **Nota**: Método customizado removido em favor do padrão Codeception/WPDb
 
 #### US8: Consultar categorias do produto
 > Como desenvolvedor de testes, quero obter todas as categorias de um produto.
 
 **Acceptance Criteria**:
-- Método `grabProductCategories(int $productId): array`
+- Método `grabProductCategoriesFromDatabase(int $productId): array`
 - Retorna array de `term_taxonomy_id`
 - Consulta `wp_term_relationships`
 
@@ -96,9 +96,8 @@
 > Como desenvolvedor de testes, quero associar um produto a várias categorias de uma vez.
 
 **Acceptance Criteria**:
-- Método `haveProductInCategories(int $productId, array $categoryIds): void`
-- Itera sobre array de IDs chamando `haveProductWithCategory()`
-- Atualiza contagem de cada categoria
+- Método `haveProductInCategoriesInDatabase(int $productId, array $categoryIds): void`
+- Itera sobre array de IDs chamando `haveProductCategoryRelationshipInDatabase()`
 
 ### Non-Goals
 
@@ -124,15 +123,15 @@ src/
 
 | Método | Chama WPDb | Observações |
 |--------|-----------|-------------|
-| `haveProductCategoryInDatabase` | `haveTermInDatabase()` | Retorna apenas `term_id` (não array) |
-| `haveProductWithCategory` | `haveTermRelationshipInDatabase()` + `updateInDatabase()` | Incrementa `count` na taxonomy |
+| `haveProductCategoryInDatabase` | `haveTermInDatabase()` | Retorna `term_id`; define `count` em `wp_term_taxonomy` |
+| `haveProductCategoryRelationshipInDatabase` | `haveTermRelationshipInDatabase()` | Wrapper direto |
 | `haveProductInDatabase` | `havePostInDatabase()` | Move de CartMethods |
 | `haveProductMetaInDatabase` | `havePostMetaInDatabase()` | Wrapper direto |
-| `grabProductMeta` | `grabPostMetaFromDatabase()` ou `get_post_meta()` | Retorna valor(es) do meta |
-| `seeProductInCategory` | `seeInDatabase()` | Assertion em `wp_term_relationships` |
-| `seeProductCategoryCount` | `grabFromDatabase()` + `assertEquals()` | Verifica campo `count` |
-| `grabProductCategories` | `grabColumnFromDatabase()` | Retorna array de IDs |
-| `haveProductInCategories` | `haveProductWithCategory()` (loop) | Atualiza contagem de cada categoria |
+| `grabProductMetaFromDatabase` | `grabPostMetaFromDatabase()` | Retorna valor(es) do meta |
+| `seeProductInCategoryInDatabase` | `seeInDatabase()` | Assertion em `wp_term_relationships` |
+| `grabProductCategoriesFromDatabase` | `grabColumnFromDatabase()` | Retorna array de IDs |
+| `haveProductInCategoriesInDatabase` | `haveProductCategoryRelationshipInDatabase()` (loop) | Convenience method |
+| `seeNumRecords` (padrão Codeception) | - | Usar para verificar contagem de registros |
 
 ### Mapeamento de Tabelas
 
@@ -161,12 +160,12 @@ trait ProductMethods
     /**
      * Associa um produto a uma categoria.
      */
-    public function haveProductWithCategory(int $productId, int $categoryId): void;
+    public function haveProductCategoryRelationshipInDatabase(int $productId, int $categoryId): void;
 
     /**
      * Associa um produto a múltiplas categorias.
      */
-    public function haveProductInCategories(int $productId, array $categoryIds): void;
+    public function haveProductInCategoriesInDatabase(int $productId, array $categoryIds): void;
 
     /**
      * Cria um produto WooCommerce no banco de dados.
@@ -183,24 +182,22 @@ trait ProductMethods
     /**
      * Consulta metadados de um produto.
      */
-    public function grabProductMeta(int $productId, string $key, bool $single = false): mixed;
+    public function grabProductMetaFromDatabase(int $productId, string $key, bool $single = false): mixed;
 
     /**
      * Retorna todas as categorias de um produto.
      */
-    public function grabProductCategories(int $productId): array;
+    public function grabProductCategoriesFromDatabase(int $productId): array;
 
     // ==================== ASSERTION METHODS ====================
 
     /**
      * Verifica se produto está associado a uma categoria.
      */
-    public function seeProductInCategory(int $productId, int $categoryId): void;
+    public function seeProductInCategoryInDatabase(int $productId, int $categoryId): void;
 
-    /**
-     * Verifica contagem de produtos na categoria.
-     */
-    public function seeProductCategoryCount(int $categoryId, int $expectedCount): void;
+    // Nota: Para verificar contagem, usar seeNumRecords() do Codeception:
+    // $I->seeNumRecords($expectedCount, $I->grabTermRelationshipsTableName(), ['term_taxonomy_id' => $categoryId]);
 }
 ```
 
@@ -232,7 +229,7 @@ public function haveProductInDatabase(array $data): int
 
 ### Product Category Count
 
-Ao usar `haveProductWithCategory()`, o campo `count` em `wp_term_taxonomy` deve ser incrementado. WPDb pode não fazer isso automaticamente - verificar comportamento.
+O campo `count` em `wp_term_taxonomy` é definido na criação da categoria via `haveProductCategoryInDatabase()` com valor padrão `0`. Não é incrementado automaticamente ao criar relacionamentos - se necessário, usar `seeNumRecords()` para verificar quantidade de produtos na categoria.
 
 ---
 
@@ -242,8 +239,8 @@ Ao usar `haveProductWithCategory()`, o campo `count` em `wp_term_taxonomy` deve 
 
 | Risco | Probabilidade | Mitigação |
 |-------|--------------|-----------|
-| WPDb não atualiza `count` da taxonomy | Média | Incrementar manualmente ou verificar documentação |
-| Conflito de nomenclatura com WPDb existente | Baixa | Nomes são específicos: `haveProductCategoryInDatabase` vs `haveTermInDatabase` |
+| ~~WPDb não atualiza `count` da taxonomy~~ | ~~Média~~ | **Resolvido**: `count` definido na criação da categoria; usar `seeNumRecords()` para verificar quantidade |
+| ~~Conflito de nomenclatura com WPDb existente~~ | ~~Baixa~~ | **Resolvido**: Nomes seguem padrão WPDb: `have*InDatabase`, `grab*FromDatabase`, `see*InDatabase` |
 
 ### Phased Rollout
 
@@ -252,13 +249,14 @@ Ao usar `haveProductWithCategory()`, o campo `count` em `wp_term_taxonomy` deve 
 - 4 métodos básicos de criação
 - Testes de aceitação
 
-**Fase 2 - Consulta e Assertion** (Esta implementação):
-- `grabProductMeta()`
-- `grabProductCategories()`
-- `seeProductInCategory()`
-- `seeProductCategoryCount()`
-- `haveProductInCategories()`
+**Fase 2 - Consulta e Assertion** (Concluído):
+- `grabProductMetaFromDatabase()`
+- `grabProductCategoriesFromDatabase()`
+- `seeProductInCategoryInDatabase()`
+- `haveProductCategoryRelationshipInDatabase()`
+- `haveProductInCategoriesInDatabase()`
 - Testes de aceitação para novos métodos
+- **Removido**: `seeProductCategoryCount()` - usar `seeNumRecords()` padrão do Codeception
 
 **Fase 3 - Melhorias Futuras**:
 - `haveVariableProductInDatabase()`
