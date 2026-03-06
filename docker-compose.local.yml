@@ -16,8 +16,6 @@ services:
       WORDPRESS_TABLE_PREFIX: wp_
     volumes:
       - wordpress_local_data:/var/www/html
-      - ./woocommerce:/var/www/html/wp-content/plugins/woocommerce
-      - ./tests/_data:/var/www/html/wp-content/uploads
     depends_on:
       - db
     networks:
@@ -50,7 +48,6 @@ services:
     volumes:
       - .:/app
       - wordpress_local_data:/var/www/html
-      - ./woocommerce:/var/www/html/wp-content/plugins/woocommerce
     working_dir: /app
     depends_on:
       - wordpress

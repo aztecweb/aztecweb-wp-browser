@@ -52,8 +52,17 @@ wp core install \
     --skip-email \
     --allow-root
 
+echo "=== Copying WooCommerce and Storefront files... ==="
+rm -rf "$WP_PATH/wp-content/plugins/woocommerce"
+rm -rf "$WP_PATH/wp-content/themes/storefront"
+cp -r /app/woocommerce "$WP_PATH/wp-content/plugins/"
+cp -r /app/storefront "$WP_PATH/wp-content/themes/"
+
 echo "=== Activating WooCommerce... ==="
 wp plugin activate woocommerce --allow-root
+
+echo "=== Activating Storefront theme... ==="
+wp theme activate storefront --allow-root
 
 echo "=== Enabling HPOS (High-Performance Order Storage)... ==="
 wp wc hpos sync --allow-root
@@ -61,6 +70,7 @@ wp wc hpos enable --allow-root
 
 echo "=== Running WooCommerce setup wizard (Brazilian configuration)... ==="
 wp option update woocommerce_demo_store "no" --allow-root
+wp option update woocommerce_coming_soon "no" --allow-root
 wp option update woocommerce_store_address "Av. Paulista, 1000" --allow-root
 wp option update woocommerce_store_city "São Paulo" --allow-root
 wp option update woocommerce_default_country "BR:SP" --allow-root
@@ -71,6 +81,9 @@ wp option update woocommerce_price_decimal_sep "," --allow-root
 wp option update woocommerce_price_num_decimals "2" --allow-root
 wp option update woocommerce_weight_unit "kg" --allow-root
 wp option update woocommerce_dimension_unit "cm" --allow-root
+
+echo "=== Enabling Cash on Delivery payment method... ==="
+wp wc payment_gateway update cod --enabled=true --user=1 --allow-root
 
 echo "=== Creating realistic course products... ==="
 

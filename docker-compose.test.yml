@@ -16,8 +16,6 @@ services:
       WORDPRESS_TABLE_PREFIX: wp_
     volumes:
       - wordpress_test_data:/var/www/html
-      - ./woocommerce:/var/www/html/wp-content/plugins/woocommerce
-      - ./tests/_data:/var/www/html/wp-content/uploads
     depends_on:
       - db
     networks:
@@ -60,8 +58,7 @@ services:
       - "9003:9003"  # Xdebug port
     volumes:
       - .:/app
-      - wordpress_test_data:/var/www/html:ro
-      - ./woocommerce:/var/www/html/wp-content/plugins/woocommerce:ro
+      - wordpress_test_data:/var/www/html
     working_dir: /app
     depends_on:
       - wordpress
@@ -74,8 +71,12 @@ services:
       - WORDPRESS_DB_NAME=wordpress
       - WORDPRESS_DB_USER=wordpress
       - WORDPRESS_DB_PASSWORD=wordpress
-      - WORDPRESS_URL=http://wordpress
-      - WORDPRESS_ADMIN_URL=http://wordpress/wp-admin
+      - WORDPRESS_URL=http://aztecwp_test_wordpress
+      - WORDPRESS_ADMIN_URL=http://aztecwp_test_wordpress/wp-admin
+      - WP_URL=http://aztecwp_test_wordpress
+      - WP_DOMAIN=aztecwp_test_wordpress
+      - CHROME_HOST=aztecwp_test_chrome
+      - CHROME_PORT=4444
       - XDEBUG_MODE=debug
       - XDEBUG_TRIGGER=1
       - PHP_IDE_CONFIG=serverName=localhost

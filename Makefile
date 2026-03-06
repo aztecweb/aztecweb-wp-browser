@@ -53,7 +53,7 @@ test-shell: ## Open a shell in the TEST PHP container
 
 test-clean: ## Clean up TEST environment
 	$(DC_TEST) down -v
-	rm -rf woocommerce
+	rm -rf woocommerce storefront
 
 test-db-dump: ## Create a database dump for tests
 	$(DC_TEST) exec db mysqldump -u wordpress -pwordpress wordpress > tests/_data/dump.sql
@@ -103,7 +103,7 @@ local-shell: ## Open a shell in the LOCAL PHP container
 
 local-clean: ## Clean up LOCAL environment
 	$(DC_LOCAL) down -v
-	rm -rf woocommerce
+	rm -rf woocommerce storefront
 
 local-db-dump: ## Create a database dump from LOCAL environment
 	$(DC_LOCAL) exec db mysqldump -u wordpress -pwordpress wordpress > tests/_data/dump.local.sql
