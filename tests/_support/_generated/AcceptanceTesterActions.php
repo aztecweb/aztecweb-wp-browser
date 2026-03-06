@@ -1,4 +1,4 @@
-<?php  //[STAMP] 17e8eeb5f758ba90085484a8c13a45d2
+<?php  //[STAMP] f68cd8b499b934c6b645aaa59fd80be6
 // phpcs:ignoreFile
 namespace Aztec\WPBrowser\Tests\Support\_generated;
 
@@ -15611,6 +15611,692 @@ trait AcceptanceTesterActions
         $retryNum      = $this->retryNum ?? 1;
         $retryInterval = $this->retryInterval ?? 200;
         return $this->getScenario()->runStep(new \Codeception\Step\Retry('clearCart', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::amOnCheckoutPage()
+     */
+    public function amOnCheckoutPage(): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Condition('amOnCheckoutPage', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::fillCheckoutField()
+     */
+    public function fillCheckoutField(string $field, string $value): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('fillCheckoutField', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::fillCheckoutField()
+     */
+    public function tryToFillCheckoutField(string $field, string $value): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('fillCheckoutField', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes fillCheckoutField and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::fillCheckoutField()
+     */
+    public function retryFillCheckoutField(string $field, string $value) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('fillCheckoutField', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::fillCheckoutForm()
+     */
+    public function fillCheckoutForm(array $data): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('fillCheckoutForm', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::fillCheckoutForm()
+     */
+    public function tryToFillCheckoutForm(array $data): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('fillCheckoutForm', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes fillCheckoutForm and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::fillCheckoutForm()
+     */
+    public function retryFillCheckoutForm(array $data) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('fillCheckoutForm', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::selectPaymentMethod()
+     */
+    public function selectPaymentMethod(string $methodId): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('selectPaymentMethod', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::selectPaymentMethod()
+     */
+    public function tryToSelectPaymentMethod(string $methodId): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('selectPaymentMethod', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes selectPaymentMethod and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::selectPaymentMethod()
+     */
+    public function retrySelectPaymentMethod(string $methodId) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('selectPaymentMethod', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seePaymentMethodAvailable()
+     */
+    public function seePaymentMethodAvailable(string $methodId): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seePaymentMethodAvailable', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seePaymentMethodAvailable()
+     */
+    public function canSeePaymentMethodAvailable(string $methodId): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seePaymentMethodAvailable', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seePaymentMethodAvailable()
+     */
+    public function tryToSeePaymentMethodAvailable(string $methodId): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seePaymentMethodAvailable', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seePaymentMethodAvailable and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seePaymentMethodAvailable()
+     */
+    public function retrySeePaymentMethodAvailable(string $methodId) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seePaymentMethodAvailable', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeePaymentMethodAvailable()
+     */
+    public function dontSeePaymentMethodAvailable(string $methodId): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('dontSeePaymentMethodAvailable', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeePaymentMethodAvailable()
+     */
+    public function cantSeePaymentMethodAvailable(string $methodId): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('dontSeePaymentMethodAvailable', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeePaymentMethodAvailable()
+     */
+    public function tryToDontSeePaymentMethodAvailable(string $methodId): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('dontSeePaymentMethodAvailable', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes dontSeePaymentMethodAvailable and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeePaymentMethodAvailable()
+     */
+    public function retryDontSeePaymentMethodAvailable(string $methodId) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('dontSeePaymentMethodAvailable', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seePaymentMethodSelected()
+     */
+    public function seePaymentMethodSelected(string $methodId): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seePaymentMethodSelected', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seePaymentMethodSelected()
+     */
+    public function canSeePaymentMethodSelected(string $methodId): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seePaymentMethodSelected', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seePaymentMethodSelected()
+     */
+    public function tryToSeePaymentMethodSelected(string $methodId): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seePaymentMethodSelected', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seePaymentMethodSelected and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seePaymentMethodSelected()
+     */
+    public function retrySeePaymentMethodSelected(string $methodId) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seePaymentMethodSelected', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::placeOrder()
+     */
+    public function placeOrder(): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('placeOrder', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::placeOrder()
+     */
+    public function tryToPlaceOrder(): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('placeOrder', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes placeOrder and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::placeOrder()
+     */
+    public function retryPlaceOrder() {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('placeOrder', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::applyCouponOnCheckout()
+     */
+    public function applyCouponOnCheckout(string $couponCode): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('applyCouponOnCheckout', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::applyCouponOnCheckout()
+     */
+    public function tryToApplyCouponOnCheckout(string $couponCode): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('applyCouponOnCheckout', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes applyCouponOnCheckout and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::applyCouponOnCheckout()
+     */
+    public function retryApplyCouponOnCheckout(string $couponCode) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('applyCouponOnCheckout', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponApplied()
+     */
+    public function seeCouponApplied(string $couponCode): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeCouponApplied', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponApplied()
+     */
+    public function canSeeCouponApplied(string $couponCode): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeCouponApplied', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponApplied()
+     */
+    public function tryToSeeCouponApplied(string $couponCode): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeCouponApplied', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeCouponApplied and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponApplied()
+     */
+    public function retrySeeCouponApplied(string $couponCode) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeCouponApplied', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCouponApplied()
+     */
+    public function dontSeeCouponApplied(string $couponCode): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('dontSeeCouponApplied', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCouponApplied()
+     */
+    public function cantSeeCouponApplied(string $couponCode): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeCouponApplied', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCouponApplied()
+     */
+    public function tryToDontSeeCouponApplied(string $couponCode): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('dontSeeCouponApplied', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes dontSeeCouponApplied and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCouponApplied()
+     */
+    public function retryDontSeeCouponApplied(string $couponCode) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('dontSeeCouponApplied', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponError()
+     */
+    public function seeCouponError(?string $message = NULL): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeCouponError', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponError()
+     */
+    public function canSeeCouponError(?string $message = NULL): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeCouponError', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponError()
+     */
+    public function tryToSeeCouponError(?string $message = NULL): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeCouponError', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeCouponError and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponError()
+     */
+    public function retrySeeCouponError(?string $message = NULL) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeCouponError', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCheckoutError()
+     */
+    public function seeCheckoutError(?string $message = NULL): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeCheckoutError', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCheckoutError()
+     */
+    public function canSeeCheckoutError(?string $message = NULL): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeCheckoutError', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCheckoutError()
+     */
+    public function tryToSeeCheckoutError(?string $message = NULL): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeCheckoutError', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeCheckoutError and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCheckoutError()
+     */
+    public function retrySeeCheckoutError(?string $message = NULL) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeCheckoutError', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCheckoutError()
+     */
+    public function dontSeeCheckoutError(?string $message = NULL): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('dontSeeCheckoutError', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCheckoutError()
+     */
+    public function cantSeeCheckoutError(?string $message = NULL): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeCheckoutError', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCheckoutError()
+     */
+    public function tryToDontSeeCheckoutError(?string $message = NULL): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('dontSeeCheckoutError', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes dontSeeCheckoutError and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCheckoutError()
+     */
+    public function retryDontSeeCheckoutError(?string $message = NULL) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('dontSeeCheckoutError', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderReceived()
+     */
+    public function seeOrderReceived(): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeOrderReceived', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderReceived()
+     */
+    public function canSeeOrderReceived(): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeOrderReceived', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderReceived()
+     */
+    public function tryToSeeOrderReceived(): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeOrderReceived', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeOrderReceived and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderReceived()
+     */
+    public function retrySeeOrderReceived() {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeOrderReceived', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabOrderIdFromOrderReceived()
+     */
+    public function grabOrderIdFromOrderReceived(): int {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabOrderIdFromOrderReceived', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabOrderIdFromOrderReceived and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabOrderIdFromOrderReceived()
+     */
+    public function retryGrabOrderIdFromOrderReceived() {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabOrderIdFromOrderReceived', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCheckoutFieldValue()
+     */
+    public function seeCheckoutFieldValue(string $field, string $value): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeCheckoutFieldValue', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCheckoutFieldValue()
+     */
+    public function canSeeCheckoutFieldValue(string $field, string $value): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeCheckoutFieldValue', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCheckoutFieldValue()
+     */
+    public function tryToSeeCheckoutFieldValue(string $field, string $value): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeCheckoutFieldValue', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeCheckoutFieldValue and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCheckoutFieldValue()
+     */
+    public function retrySeeCheckoutFieldValue(string $field, string $value) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeCheckoutFieldValue', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCheckoutFieldValue()
+     */
+    public function grabCheckoutFieldValue(string $field): string {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabCheckoutFieldValue', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabCheckoutFieldValue and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCheckoutFieldValue()
+     */
+    public function retryGrabCheckoutFieldValue(string $field) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabCheckoutFieldValue', func_get_args(), $retryNum, $retryInterval));
     }
 
  

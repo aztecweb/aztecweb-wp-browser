@@ -10,6 +10,7 @@ class WooCommerceConfig
 {
     private WPDb $wpDb;
     private ?string $cartPageSlug = null;
+    private ?string $checkoutPageSlug = null;
 
     public function __construct(WPDb $wpDb)
     {
@@ -27,5 +28,18 @@ class WooCommerceConfig
         $this->cartPageSlug = '/' . $this->wpDb->grabPostFieldFromDatabase($pageId, 'post_name');
 
         return $this->cartPageSlug;
+    }
+
+    public function checkoutPageSlug(): string
+    {
+        if ($this->checkoutPageSlug !== null) {
+            return $this->checkoutPageSlug;
+        }
+
+        $pageId = intval($this->wpDb->grabOptionFromDatabase('woocommerce_checkout_page_id'));
+
+        $this->checkoutPageSlug = '/' . $this->wpDb->grabPostFieldFromDatabase($pageId, 'post_name');
+
+        return $this->checkoutPageSlug;
     }
 }

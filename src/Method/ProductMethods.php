@@ -62,7 +62,7 @@ trait ProductMethods
 
         $finalMeta = array_merge($defaultMeta, $meta);
         foreach ($finalMeta as $key => $value) {
-            $this->wpDb()->havePostMetaInDatabase($productId, $key, $value);
+            $this->haveProductMetaInDatabase($productId, $key, $value);
         }
 
         return $productId;

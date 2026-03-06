@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\Page;
 
+use Aztec\WPBrowser\Page\CartPageObject;
+use Aztec\WPBrowser\Page\CheckoutPageObject;
+
 class PageObjectProvider
 {
     private array $pageInstances = [];
@@ -22,6 +25,16 @@ class PageObjectProvider
         }
 
         return $this->pageInstances['cart'];
+    }
+
+    public function checkoutPage(): CheckoutPageObject
+    {
+        if ( ! isset($this->pageInstances['checkout'])) {
+            $class                         = $this->pageObjectsConfig['checkout'] ?? CheckoutPageObject::class;
+            $this->pageInstances['checkout'] = new $class();
+        }
+
+        return $this->pageInstances['checkout'];
     }
 
 }

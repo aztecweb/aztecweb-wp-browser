@@ -6,6 +6,7 @@ namespace Aztec\WPBrowser;
 
 use Aztec\WPBrowser\Config\WooCommerceConfig;
 use Aztec\WPBrowser\Method\CartMethods;
+use Aztec\WPBrowser\Method\CheckoutMethods;
 use Aztec\WPBrowser\Method\OrderMethods;
 use Aztec\WPBrowser\Method\ProductMethods;
 use Aztec\WPBrowser\OrderStorage\HPOSOrderStorage;
@@ -19,6 +20,7 @@ use lucatume\WPBrowser\Module\WPWebDriver;
 class AztecWPBrowser extends Module
 {
     use CartMethods;
+    use CheckoutMethods;
     use OrderMethods;
     use ProductMethods;
 
