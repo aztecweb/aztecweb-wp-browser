@@ -36,12 +36,36 @@ trait ProductMethods
 
     public function haveProductInDatabase(array $data = []): int
     {
+        $meta = $data['meta'] ?? [];
+        unset($data['meta']);
+
         $productData = array_merge([
             'post_type' => 'product',
             'post_status' => 'publish',
+            'post_title' => 'Test Product',
         ], $data);
 
-        return $this->wpDb()->havePostInDatabase($productData);
+        $productId = $this->wpDb()->havePostInDatabase($productData);
+
+        $defaultMeta = [
+            '_price' => '10.00',
+            '_regular_price' => '10.00',
+            '_stock_status' => 'instock',
+            '_tax_status' => 'taxable',
+            '_tax_class' => '',
+            '_manage_stock' => 'no',
+            '_backorders' => 'no',
+            '_sold_individually' => 'no',
+            '_virtual' => 'no',
+            '_downloadable' => 'no',
+        ];
+
+        $finalMeta = array_merge($defaultMeta, $meta);
+        foreach ($finalMeta as $key => $value) {
+            $this->wpDb()->havePostMetaInDatabase($productId, $key, $value);
+        }
+
+        return $productId;
     }
 
     public function haveProductMetaInDatabase(int $productId, string $key, mixed $value): int
