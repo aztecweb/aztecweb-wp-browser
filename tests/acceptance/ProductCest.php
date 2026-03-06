@@ -12,6 +12,10 @@ class ProductCest
     {
         $productId = $I->haveProductInDatabase([
             'post_title' => 'Test Product',
+            'meta' => [
+                '_price' => '25.00',
+                '_sku' => 'TEST-SKU-001',
+            ],
         ]);
 
         assert(is_int($productId) && $productId > 0, 'Product ID should be a positive integer');
@@ -21,6 +25,30 @@ class ProductCest
             'post_type' => 'product',
             'post_status' => 'publish',
             'post_title' => 'Test Product',
+        ]);
+
+        $I->seePostMetaInDatabase([
+            'post_id' => $productId,
+            'meta_key' => '_price',
+            'meta_value' => '25.00',
+        ]);
+
+        $I->seePostMetaInDatabase([
+            'post_id' => $productId,
+            'meta_key' => '_sku',
+            'meta_value' => 'TEST-SKU-001',
+        ]);
+
+        $I->seePostMetaInDatabase([
+            'post_id' => $productId,
+            'meta_key' => '_stock_status',
+            'meta_value' => 'instock',
+        ]);
+
+        $I->seePostMetaInDatabase([
+            'post_id' => $productId,
+            'meta_key' => '_tax_status',
+            'meta_value' => 'taxable',
         ]);
     }
 
@@ -200,14 +228,12 @@ class ProductCest
         ]);
     }
 
-    // ==================== Phase 2 Tests ====================
-
     public function testGrabProductMeta(AcceptanceTester $I): void
     {
         $productId = $I->haveProductInDatabase();
-        $I->haveProductMetaInDatabase($productId, '_price', '199.99');
+        $I->haveProductMetaInDatabase($productId, '_custom_test_meta', '199.99');
 
-        $value = $I->grabProductMetaFromDatabase($productId, '_price', true);
+        $value = $I->grabProductMetaFromDatabase($productId, '_custom_test_meta', true);
 
         assert($value === '199.99', 'Product meta value should match');
     }
@@ -215,11 +241,11 @@ class ProductCest
     public function testGrabProductMetaMultiple(AcceptanceTester $I): void
     {
         $productId = $I->haveProductInDatabase();
-        $I->haveProductMetaInDatabase($productId, '_price', '100.00');
-        $I->haveProductMetaInDatabase($productId, '_stock', '25');
+        $I->haveProductMetaInDatabase($productId, '_custom_price', '100.00');
+        $I->haveProductMetaInDatabase($productId, '_custom_stock', '25');
 
-        $price = $I->grabProductMetaFromDatabase($productId, '_price', true);
-        $stock = $I->grabProductMetaFromDatabase($productId, '_stock', true);
+        $price = $I->grabProductMetaFromDatabase($productId, '_custom_price', true);
+        $stock = $I->grabProductMetaFromDatabase($productId, '_custom_stock', true);
 
         assert($price === '100.00', 'Price meta should match');
         assert($stock === '25', 'Stock meta should match');
