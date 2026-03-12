@@ -10,65 +10,41 @@ trait CouponMethods
 {
     abstract protected function wpDb(): WPDb;
 
-    private const POST_DEFAULTS = [
-        'post_type' => 'shop_coupon',
-        'post_status' => 'publish',
-    ];
-
-    private const META_DEFAULTS = [
-        'discount_type' => 'percent',
-        'coupon_amount' => '10.00',
-        'free_shipping' => 'no',
-        'minimum_amount' => '0',
-        'maximum_amount' => '',
-        'usage_limit' => '',
-        'usage_limit_per_user' => '',
-        'limit_usage_to_x_items' => '',
-        'product_ids' => '',
-        'exclude_product_ids' => '',
-        'product_categories' => '',
-        'exclude_product_categories' => '',
-        'expiry_date' => '',
-        'date_expires' => '',
-        'individual_use' => 'no',
-        'usage_count' => '0',
-    ];
-
     public function haveCouponInDatabase(array $data = []): int
     {
         $meta = $data['meta'] ?? [];
         unset($data['meta']);
 
-        // Move coupon-specific fields to meta if they're in the main data array
-        $couponMetaFields = [
-            'discount_type', 'coupon_amount', 'free_shipping', 'minimum_amount', 'maximum_amount',
-            'usage_limit', 'usage_limit_per_user', 'limit_usage_to_x_items', 'product_ids',
-            'exclude_product_ids', 'product_categories', 'exclude_product_categories',
-            'expiry_date', 'date_expires', 'individual_use', 'usage_count'
+        $couponData = array_merge([
+            'post_type' => 'shop_coupon',
+            'post_status' => 'publish',
+            'post_title' => $data['code'] ?? 'coupon',
+            'post_name' => $data['code'] ?? 'coupon',
+        ], $data);
+
+        unset($couponData['code']);
+
+        $couponId = $this->wpDb()->havePostInDatabase($couponData);
+
+        $defaultMeta = [
+            'discount_type' => 'percent',
+            'coupon_amount' => '10.00',
+            'free_shipping' => 'no',
+            'minimum_amount' => '0',
+            'usage_limit' => '',
+            'usage_limit_per_user' => '',
+            'limit_usage_to_x_items' => '',
+            'product_ids' => '',
+            'exclude_product_ids' => '',
+            'product_categories' => '',
+            'exclude_product_categories' => '',
+            'individual_use' => 'no',
+            'usage_count' => '0',
         ];
 
-        foreach ($couponMetaFields as $field) {
-            if (isset($data[$field])) {
-                $meta[$field] = $data[$field];
-                unset($data[$field]);
-            }
-        }
-
-        $couponCode = $data['code'] ?? 'TESTCOUPON';
-        unset($data['code']); // Remove code field as it's handled separately
-
-        $postData = array_merge(self::POST_DEFAULTS, $data);
-        $postData['post_title'] = $couponCode;
-        $postData['post_name'] = $couponCode;
-
-        $couponId = $this->wpDb()->havePostInDatabase($postData);
-
-        $finalMeta = array_merge(self::META_DEFAULTS, $meta);
+        $finalMeta = array_merge($defaultMeta, $meta);
         foreach ($finalMeta as $key => $value) {
-            // Save all meta except explicitly empty strings for optional fields
-            if ($value !== '' || !in_array($key, ['product_ids', 'exclude_product_ids', 'product_categories', 'exclude_product_categories'], true)) {
-                $this->haveCouponMetaInDatabase($couponId, $key, $value);
-            }
+            $this->haveCouponMetaInDatabase($couponId, $key, $value);
         }
 
         return $couponId;
@@ -78,7 +54,7 @@ trait CouponMethods
     {
         $overrides['code'] = $code;
         $overrides['meta']['discount_type'] = 'percent';
-        $overrides['meta']['coupon_amount'] = number_format($percentage, 2, '.', '');
+        $overrides['meta']['coupon_amount'] = $percentage;
 
         return $this->haveCouponInDatabase($overrides);
     }
@@ -87,7 +63,7 @@ trait CouponMethods
     {
         $overrides['code'] = $code;
         $overrides['meta']['discount_type'] = 'fixed_cart';
-        $overrides['meta']['coupon_amount'] = number_format($amount, 2, '.', '');
+        $overrides['meta']['coupon_amount'] = $amount;
 
         return $this->haveCouponInDatabase($overrides);
     }
@@ -96,7 +72,7 @@ trait CouponMethods
     {
         $overrides['code'] = $code;
         $overrides['meta']['discount_type'] = 'fixed_product';
-        $overrides['meta']['coupon_amount'] = number_format($amount, 2, '.', '');
+        $overrides['meta']['coupon_amount'] = $amount;
 
         return $this->haveCouponInDatabase($overrides);
     }
@@ -115,37 +91,21 @@ trait CouponMethods
         $table = $this->wpDb()->grabPostsTableName();
         $coupon = $this->wpDb()->grabFromDatabase($table, 'ID', ['post_title' => $code, 'post_type' => 'shop_coupon']);
 
-        return $coupon === null ? null : (int) $coupon;
+        return $coupon === false ? null : (int) $coupon;
     }
 
     public function seeCouponInDatabase(array $criteria): void
     {
         $table = $this->wpDb()->grabPostsTableName();
 
-        $where = array_merge(['post_type' => 'shop_coupon'], $criteria);
-
-        // Handle 'code' field by converting it to 'post_title'
-        if (isset($where['code'])) {
-            $where['post_title'] = $where['code'];
-            unset($where['code']);
-        }
-
-        $this->wpDb()->seeInDatabase($table, $where);
+        $this->wpDb()->seeInDatabase($table, array_merge($criteria, ['post_type' => 'shop_coupon']));
     }
 
     public function dontSeeCouponInDatabase(array $criteria): void
     {
         $table = $this->wpDb()->grabPostsTableName();
 
-        $where = array_merge(['post_type' => 'shop_coupon'], $criteria);
-
-        // Handle 'code' field by converting it to 'post_title'
-        if (isset($where['code'])) {
-            $where['post_title'] = $where['code'];
-            unset($where['code']);
-        }
-
-        $this->wpDb()->dontSeeInDatabase($table, $where);
+        $this->wpDb()->dontSeeInDatabase($table, array_merge($criteria, ['post_type' => 'shop_coupon']));
     }
 
     public function haveCouponMetaInDatabase(int $couponId, string $metaKey, mixed $metaValue): int

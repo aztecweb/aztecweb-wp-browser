@@ -12,12 +12,14 @@ class CouponCest
     {
         $couponId = $I->haveCouponInDatabase([
             'code' => 'SAVE10',
-            'discount_type' => 'percent',
-            'coupon_amount' => '10.00',
+            'meta' => [
+                'discount_type' => 'percent',
+                'coupon_amount' => '10.00',
+            ],
         ]);
 
         assert(is_int($couponId) && $couponId > 0, 'Coupon ID should be a positive integer');
-        $I->seeCouponInDatabase(['code' => 'SAVE10']);
+        $I->seeCouponInDatabase(['post_title' => 'SAVE10']);
 
         $I->seeCouponMetaInDatabase([
             'post_id' => $couponId,
@@ -37,7 +39,7 @@ class CouponCest
         $couponId = $I->havePercentageCouponInDatabase('PCT20', 20.0);
 
         assert(is_int($couponId) && $couponId > 0, 'Coupon ID should be a positive integer');
-        $I->seeCouponInDatabase(['code' => 'PCT20']);
+        $I->seeCouponInDatabase(['post_title' => 'PCT20']);
 
         $I->seeCouponMetaInDatabase([
             'post_id' => $couponId,
@@ -48,7 +50,7 @@ class CouponCest
         $I->seeCouponMetaInDatabase([
             'post_id' => $couponId,
             'meta_key' => 'coupon_amount',
-            'meta_value' => '20.00',
+            'meta_value' => 20.0,
         ]);
     }
 
@@ -57,7 +59,7 @@ class CouponCest
         $couponId = $I->haveFixedCartCouponInDatabase('FIXED5', 5.00);
 
         assert(is_int($couponId) && $couponId > 0, 'Coupon ID should be a positive integer');
-        $I->seeCouponInDatabase(['code' => 'FIXED5']);
+        $I->seeCouponInDatabase(['post_title' => 'FIXED5']);
 
         $I->seeCouponMetaInDatabase([
             'post_id' => $couponId,
@@ -68,7 +70,7 @@ class CouponCest
         $I->seeCouponMetaInDatabase([
             'post_id' => $couponId,
             'meta_key' => 'coupon_amount',
-            'meta_value' => '5.00',
+            'meta_value' => 5.00,
         ]);
     }
 
@@ -77,7 +79,7 @@ class CouponCest
         $couponId = $I->haveFixedProductCouponInDatabase('PROD10', 10.00);
 
         assert(is_int($couponId) && $couponId > 0, 'Coupon ID should be a positive integer');
-        $I->seeCouponInDatabase(['code' => 'PROD10']);
+        $I->seeCouponInDatabase(['post_title' => 'PROD10']);
 
         $I->seeCouponMetaInDatabase([
             'post_id' => $couponId,
@@ -88,7 +90,7 @@ class CouponCest
         $I->seeCouponMetaInDatabase([
             'post_id' => $couponId,
             'meta_key' => 'coupon_amount',
-            'meta_value' => '10.00',
+            'meta_value' => 10.00,
         ]);
     }
 
@@ -97,7 +99,7 @@ class CouponCest
         $couponId = $I->haveFreeShippingCouponInDatabase('FREESHIP');
 
         assert(is_int($couponId) && $couponId > 0, 'Coupon ID should be a positive integer');
-        $I->seeCouponInDatabase(['code' => 'FREESHIP']);
+        $I->seeCouponInDatabase(['post_title' => 'FREESHIP']);
 
         $I->seeCouponMetaInDatabase([
             'post_id' => $couponId,
@@ -133,8 +135,8 @@ class CouponCest
             'code' => 'EXISTING',
         ]);
 
-        $I->seeCouponInDatabase(['code' => 'EXISTING']);
-        $I->dontSeeCouponInDatabase(['code' => 'MISSING']);
+        $I->seeCouponInDatabase(['post_title' => 'EXISTING']);
+        $I->dontSeeCouponInDatabase(['post_title' => 'MISSING']);
     }
 
     public function testCouponMetaMethods(AcceptanceTester $I): void
@@ -148,7 +150,7 @@ class CouponCest
             ],
         ]);
 
-        $metaValue = $I->grabCouponMetaFromDatabase($couponId, 'minimum_amount');
+        $metaValue = $I->grabCouponMetaFromDatabase($couponId, 'minimum_amount', true);
         assert($metaValue === '50.00', 'Meta value should match expected value');
 
         $I->seeCouponMetaInDatabase([
@@ -197,7 +199,6 @@ class CouponCest
                 'exclude_product_ids' => '4,5',
                 'product_categories' => '6,7',
                 'exclude_product_categories' => '8,9',
-                'expiry_date' => '2025-12-31',
                 'date_expires' => '1735689600',
                 'individual_use' => 'yes',
                 'usage_count' => '0',
@@ -205,7 +206,7 @@ class CouponCest
         ]);
 
         assert(is_int($couponId) && $couponId > 0, 'Coupon ID should be a positive integer');
-        $I->seeCouponInDatabase(['code' => 'FULLMETA']);
+        $I->seeCouponInDatabase(['post_title' => 'FULLMETA']);
 
         foreach ([
             'discount_type' => 'percent',

@@ -1,4 +1,4 @@
-<?php  //[STAMP] 2db65ce3735bdd4d2ec364606b9160ce
+<?php  //[STAMP] 325c304110f70f95d69a50e7c31b16b9
 // phpcs:ignoreFile
 namespace Aztec\WPBrowser\Tests\Support\_generated;
 
@@ -16297,6 +16297,383 @@ trait AcceptanceTesterActions
         $retryNum      = $this->retryNum ?? 1;
         $retryInterval = $this->retryInterval ?? 200;
         return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabCheckoutFieldValue', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::haveCouponInDatabase()
+     */
+    public function haveCouponInDatabase(array $data = []): int {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('haveCouponInDatabase', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::havePercentageCouponInDatabase()
+     */
+    public function havePercentageCouponInDatabase(string $code, float $percentage, array $overrides = []): int {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('havePercentageCouponInDatabase', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::haveFixedCartCouponInDatabase()
+     */
+    public function haveFixedCartCouponInDatabase(string $code, float $amount, array $overrides = []): int {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('haveFixedCartCouponInDatabase', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::haveFixedProductCouponInDatabase()
+     */
+    public function haveFixedProductCouponInDatabase(string $code, float $amount, array $overrides = []): int {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('haveFixedProductCouponInDatabase', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::haveFreeShippingCouponInDatabase()
+     */
+    public function haveFreeShippingCouponInDatabase(string $code, array $overrides = []): int {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('haveFreeShippingCouponInDatabase', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCouponIdByCode()
+     */
+    public function grabCouponIdByCode(string $code): ?int {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabCouponIdByCode', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabCouponIdByCode and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCouponIdByCode()
+     */
+    public function retryGrabCouponIdByCode(string $code) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabCouponIdByCode', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponInDatabase()
+     */
+    public function seeCouponInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeCouponInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponInDatabase()
+     */
+    public function canSeeCouponInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeCouponInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponInDatabase()
+     */
+    public function tryToSeeCouponInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeCouponInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeCouponInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponInDatabase()
+     */
+    public function retrySeeCouponInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeCouponInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCouponInDatabase()
+     */
+    public function dontSeeCouponInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('dontSeeCouponInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCouponInDatabase()
+     */
+    public function cantSeeCouponInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeCouponInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCouponInDatabase()
+     */
+    public function tryToDontSeeCouponInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('dontSeeCouponInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes dontSeeCouponInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCouponInDatabase()
+     */
+    public function retryDontSeeCouponInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('dontSeeCouponInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::haveCouponMetaInDatabase()
+     */
+    public function haveCouponMetaInDatabase(int $couponId, string $metaKey, mixed $metaValue): int {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('haveCouponMetaInDatabase', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCouponMetaFromDatabase()
+     */
+    public function grabCouponMetaFromDatabase(int $couponId, string $key, bool $single = false): mixed {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabCouponMetaFromDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabCouponMetaFromDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCouponMetaFromDatabase()
+     */
+    public function retryGrabCouponMetaFromDatabase(int $couponId, string $key, bool $single = false) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabCouponMetaFromDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponMetaInDatabase()
+     */
+    public function seeCouponMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeCouponMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponMetaInDatabase()
+     */
+    public function canSeeCouponMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeCouponMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponMetaInDatabase()
+     */
+    public function tryToSeeCouponMetaInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeCouponMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeCouponMetaInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponMetaInDatabase()
+     */
+    public function retrySeeCouponMetaInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeCouponMetaInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCouponMetaInDatabase()
+     */
+    public function dontSeeCouponMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('dontSeeCouponMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCouponMetaInDatabase()
+     */
+    public function cantSeeCouponMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeCouponMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCouponMetaInDatabase()
+     */
+    public function tryToDontSeeCouponMetaInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('dontSeeCouponMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes dontSeeCouponMetaInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCouponMetaInDatabase()
+     */
+    public function retryDontSeeCouponMetaInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('dontSeeCouponMetaInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCouponStatus()
+     */
+    public function grabCouponStatus(int $couponId): string {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabCouponStatus', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabCouponStatus and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCouponStatus()
+     */
+    public function retryGrabCouponStatus(int $couponId) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabCouponStatus', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::haveCouponStatus()
+     */
+    public function haveCouponStatus(int $couponId, string $status): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('haveCouponStatus', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponStatus()
+     */
+    public function seeCouponStatus(int $couponId, string $status): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeCouponStatus', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponStatus()
+     */
+    public function canSeeCouponStatus(int $couponId, string $status): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeCouponStatus', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponStatus()
+     */
+    public function tryToSeeCouponStatus(int $couponId, string $status): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeCouponStatus', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeCouponStatus and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponStatus()
+     */
+    public function retrySeeCouponStatus(int $couponId, string $status) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeCouponStatus', func_get_args(), $retryNum, $retryInterval));
     }
 
  
