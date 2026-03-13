@@ -3,6 +3,13 @@
   "description": "Codeception module for WooCommerce acceptance tests.",
   "type": "library",
   "license": "MIT",
+  "config": {
+    "preferred-install": {
+      "codeception/codeception": "source",
+      "lucatume/wp-browser": "source",
+      "*": "dist"
+    }
+  },
   "autoload": {
     "psr-4": {
       "Aztec\\WPBrowser\\": "src/"
