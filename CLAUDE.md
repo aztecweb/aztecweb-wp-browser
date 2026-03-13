@@ -108,20 +108,6 @@ The storage is selected automatically based on the `woocommerce_custom_orders_ta
 | Admin URL | `post.php?post={id}&action=edit` | `admin.php?page=wc-orders&action=edit&id={id}` |
 | ID generation | Auto-increment (via `havePostInDatabase`) | Manual (must check max ID from both tables) |
 
-#### Testing Both Storage Modes
-
-Tests must be run with the correct HPOS setting:
-
-```bash
-# Test Legacy storage
-make hpos-disable
-docker compose -f docker-compose.test.yml exec php vendor/bin/codecept run tests/acceptance/OrderCest.php
-
-# Test HPOS storage
-make hpos-enable
-docker compose -f docker-compose.test.yml exec php vendor/bin/codecept run tests/acceptance/OrderHPOSCest.php
-```
-
 ### Page Objects
 
 Page objects hold **CSS selectors and page-specific logic**:
@@ -155,6 +141,60 @@ modules:
 - PSR-4 autoloading: `Aztec\WPBrowser\` namespace
 - **Do NOT generate docblocks** - keep code clean without PHPDoc comments
 
+### Testing Method Creation Guidelines
+
+When creating new test methods, follow the WPDb/wp-browser signature patterns:
+
+#### Method Types and Signatures
+
+| Method Type | Naming | Return Type | Notes |
+|-------------|---------|-------------|-------|
+| **Create** | `have{Entity}InDatabase` | `int` | Returns ID |
+| **Retrieve (ID)** | `grab{Entity}IdFromDatabase` | `int|false` | Returns ID or false |
+| **Retrieve (Field)** | `grab{Entity}FieldFromDatabase` | `mixed` | Returns field value (use `grabPostFieldFromDatabase`/`grabUserFieldFromDatabase`) |
+| **Verify (Entity)** | `see{Entity}InDatabase` | `void` | Calls `seeInDatabase`/`seePostInDatabase`/`seeUserInDatabase` |
+| **Verify (Meta)** | `see{Entity}MetaInDatabase` | `void` | Calls `seePostMetaInDatabase`/`seeUserMetaInDatabase` with array criteria |
+
+#### Entity Type to WPDb Method Mapping
+
+| Entity | WP Table | See Method | See Meta Method | Grab Field Method |
+|--------|----------|------------|------------------|-------------------|
+| Product | wp_posts | `seePostInDatabase` | `seePostMetaInDatabase(array $criteria)` | `grabPostFieldFromDatabase` |
+| Coupon | wp_posts | `seePostInDatabase` | `seePostMetaInDatabase(array $criteria)` | `grabPostFieldFromDatabase` |
+| Customer | wp_users | `seeUserInDatabase` | `seeUserMetaInDatabase(array $criteria)` | `grabFromDatabase` (no specific method) |
+| Order | wc_orders/wp_posts | `seeInDatabase` (direct on table) | `seeInDatabase` (direct on meta table) | `grabFromDatabase` (via OrderStorage) |
+
+#### Meta Method Implementation Pattern
+
+For posts (Products/Coupons) and users (Customers), use `array $criteria` signature:
+
+```php
+// Pattern for Products/Coupons (posts)
+public function seeProductMetaInDatabase(array $criteria): void
+{
+    $criteria['post_id'] = $criteria['product_id'];
+    unset($criteria['product_id']);
+    $this->wpDb()->seePostMetaInDatabase($criteria);
+}
+
+// Pattern for Customers (users)
+public function seeCustomerMetaInDatabase(array $criteria): void
+{
+    $criteria['user_id'] = $criteria['customer_id'];
+    unset($criteria['customer_id']);
+    $this->wpDb()->seeUserMetaInDatabase($criteria);
+}
+```
+
+#### Key Rules
+
+1. Never manually throw exceptions in `seeXxxInDatabase` - call WPDb/Codeception assertion methods which throw automatically
+2. Never use `assertIsNumeric` in `grabXxxIdFromDatabase` - just return the value or `false`
+3. Always use `array $criteria` for meta methods - WPDb signatures require array, not separate parameters
+4. For posts (Products/Coupons), map `product_id`/`coupon_id` to `post_id`
+5. For users (Customers), map `customer_id` to `user_id`
+6. For field retrieval, use `grabPostFieldFromDatabase`/`grabUserFieldFromDatabase` when available
+
 ### Database Column Naming
 
 Follow WPDb pattern: use actual database column names, not abstractions.
@@ -186,7 +226,7 @@ docker compose -f docker-compose.test.yml exec php vendor/bin/codecept build
 
 This regenerates the actor classes in `tests/_support/_generated/`. Without this, tests will fail with `ArgumentCountError` even if the source code is correct.
 
-## ⚠️ CRITICAL: Codeception / wp-browser / WPDb Standards
+## CRITICAL: Codeception / wp-browser / WPDb Standards
 
 **This is the most important rule of this project.**
 
