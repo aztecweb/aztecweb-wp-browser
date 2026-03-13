@@ -1,4 +1,4 @@
-<?php  //[STAMP] 325c304110f70f95d69a50e7c31b16b9
+<?php  //[STAMP] f5c3bd0e468bd391dcc6c6534bcc0e76
 // phpcs:ignoreFile
 namespace Aztec\WPBrowser\Tests\Support\_generated;
 
@@ -16674,6 +16674,431 @@ trait AcceptanceTesterActions
         $retryNum      = $this->retryNum ?? 1;
         $retryInterval = $this->retryInterval ?? 200;
         return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeCouponStatus', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::haveCustomerInDatabase()
+     */
+    public function haveCustomerInDatabase(array $data = []): int {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('haveCustomerInDatabase', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCustomerFieldFromDatabase()
+     */
+    public function grabCustomerFieldFromDatabase(int $customerId, string $field): mixed {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabCustomerFieldFromDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabCustomerFieldFromDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCustomerFieldFromDatabase()
+     */
+    public function retryGrabCustomerFieldFromDatabase(int $customerId, string $field) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabCustomerFieldFromDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCustomerMeta()
+     */
+    public function grabCustomerMeta(int $customerId, string $key, bool $single = false): mixed {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabCustomerMeta', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabCustomerMeta and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCustomerMeta()
+     */
+    public function retryGrabCustomerMeta(int $customerId, string $key, bool $single = false) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabCustomerMeta', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCustomerBillingAddress()
+     */
+    public function grabCustomerBillingAddress(int $customerId): array {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabCustomerBillingAddress', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabCustomerBillingAddress and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCustomerBillingAddress()
+     */
+    public function retryGrabCustomerBillingAddress(int $customerId) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabCustomerBillingAddress', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCustomerShippingAddress()
+     */
+    public function grabCustomerShippingAddress(int $customerId): array {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabCustomerShippingAddress', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabCustomerShippingAddress and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCustomerShippingAddress()
+     */
+    public function retryGrabCustomerShippingAddress(int $customerId) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabCustomerShippingAddress', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCustomerInDatabase()
+     */
+    public function seeCustomerInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeCustomerInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCustomerInDatabase()
+     */
+    public function canSeeCustomerInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeCustomerInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCustomerInDatabase()
+     */
+    public function tryToSeeCustomerInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeCustomerInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeCustomerInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCustomerInDatabase()
+     */
+    public function retrySeeCustomerInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeCustomerInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCustomerInDatabase()
+     */
+    public function dontSeeCustomerInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('dontSeeCustomerInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCustomerInDatabase()
+     */
+    public function cantSeeCustomerInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeCustomerInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCustomerInDatabase()
+     */
+    public function tryToDontSeeCustomerInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('dontSeeCustomerInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes dontSeeCustomerInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCustomerInDatabase()
+     */
+    public function retryDontSeeCustomerInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('dontSeeCustomerInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::haveCustomerMetaInDatabase()
+     */
+    public function haveCustomerMetaInDatabase(int $customerId, string $metaKey, mixed $metaValue): int {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('haveCustomerMetaInDatabase', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::haveCustomerBillingFieldInDatabase()
+     */
+    public function haveCustomerBillingFieldInDatabase(int $customerId, string $field, mixed $value): int {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('haveCustomerBillingFieldInDatabase', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::haveCustomerShippingFieldInDatabase()
+     */
+    public function haveCustomerShippingFieldInDatabase(int $customerId, string $field, mixed $value): int {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('haveCustomerShippingFieldInDatabase', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCustomerBillingFieldInDatabase()
+     */
+    public function seeCustomerBillingFieldInDatabase(int $customerId, string $field, mixed $value): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeCustomerBillingFieldInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCustomerBillingFieldInDatabase()
+     */
+    public function canSeeCustomerBillingFieldInDatabase(int $customerId, string $field, mixed $value): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeCustomerBillingFieldInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCustomerBillingFieldInDatabase()
+     */
+    public function tryToSeeCustomerBillingFieldInDatabase(int $customerId, string $field, mixed $value): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeCustomerBillingFieldInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeCustomerBillingFieldInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCustomerBillingFieldInDatabase()
+     */
+    public function retrySeeCustomerBillingFieldInDatabase(int $customerId, string $field, mixed $value) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeCustomerBillingFieldInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCustomerShippingFieldInDatabase()
+     */
+    public function seeCustomerShippingFieldInDatabase(int $customerId, string $field, mixed $value): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeCustomerShippingFieldInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCustomerShippingFieldInDatabase()
+     */
+    public function canSeeCustomerShippingFieldInDatabase(int $customerId, string $field, mixed $value): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeCustomerShippingFieldInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCustomerShippingFieldInDatabase()
+     */
+    public function tryToSeeCustomerShippingFieldInDatabase(int $customerId, string $field, mixed $value): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeCustomerShippingFieldInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeCustomerShippingFieldInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCustomerShippingFieldInDatabase()
+     */
+    public function retrySeeCustomerShippingFieldInDatabase(int $customerId, string $field, mixed $value) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeCustomerShippingFieldInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCustomerMetaInDatabase()
+     */
+    public function seeCustomerMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeCustomerMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCustomerMetaInDatabase()
+     */
+    public function canSeeCustomerMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeCustomerMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCustomerMetaInDatabase()
+     */
+    public function tryToSeeCustomerMetaInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeCustomerMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeCustomerMetaInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeCustomerMetaInDatabase()
+     */
+    public function retrySeeCustomerMetaInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeCustomerMetaInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCustomerMetaInDatabase()
+     */
+    public function dontSeeCustomerMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('dontSeeCustomerMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCustomerMetaInDatabase()
+     */
+    public function cantSeeCustomerMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeCustomerMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCustomerMetaInDatabase()
+     */
+    public function tryToDontSeeCustomerMetaInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('dontSeeCustomerMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes dontSeeCustomerMetaInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeCustomerMetaInDatabase()
+     */
+    public function retryDontSeeCustomerMetaInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('dontSeeCustomerMetaInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::amOnMyAccountPage()
+     */
+    public function amOnMyAccountPage(): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Condition('amOnMyAccountPage', func_get_args()));
     }
 
  

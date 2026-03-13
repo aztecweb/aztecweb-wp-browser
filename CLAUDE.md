@@ -12,18 +12,27 @@ This is a Codeception module library for WooCommerce acceptance tests. It extend
 # Install dependencies
 composer install
 
+# Start test environment (required before running tests)
+make test-up
+
+# Stop test environment
+make test-down
+
 # Run tests (when available)
 composer test
 # Or directly: vendor/bin/codecept run
 
+# Run tests via Docker Compose
+docker compose -f docker-compose.test.yml exec php vendor/bin/codecept run tests/acceptance/{nome-arquivo}.php
+
 # Run a single test file
-vendor/bin/codecept run tests/acceptance/ExampleCest.php
+docker compose -f docker-compose.test.yml exec php vendor/bin/codecept run tests/acceptance/ProductCest.php
 
 # Run specific test method
-vendor/bin/codecept run tests/acceptance/ExampleCest.php:testMethodName
+docker compose -f docker-compose.test.yml exec php vendor/bin/codecept run tests/acceptance/ProductCest.php:testMethodName
 
 # Rebuild Codeception actor classes (required after changing module method signatures)
-vendor/bin/codecept build
+docker compose -f docker-compose.test.yml exec php vendor/bin/codecept build
 
 # HPOS (High-Performance Order Storage) management
 make hpos-enable   # Enable HPOS before running OrderHPOSCest tests
@@ -37,8 +46,11 @@ make hpos-disable  # Disable HPOS before running OrderCest (Legacy) tests
 The main module `AztecWPBrowser` uses **traits to organize functionality by domain**:
 
 - `src/Method/CartMethods.php` - Cart operations
+- `src/Method/CheckoutMethods.php` - Checkout operations
+- `src/Method/CouponMethods.php` - Coupon operations
+- `src/Method/CustomerMethods.php` - Customer operations
 - `src/Method/OrderMethods.php` - Order operations
-- Future: `CustomerMethods`, `CheckoutMethods`, etc.
+- `src/Method/ProductMethods.php` - Product operations
 
 Each trait **must declare abstract methods** for the dependencies it needs:
 ```php
@@ -61,7 +73,11 @@ src/
 ├── AztecWPBrowser.php       # Main Codeception module (uses traits)
 ├── Method/                   # Domain-specific method traits
 │   ├── CartMethods.php
-│   └── OrderMethods.php
+│   ├── CheckoutMethods.php
+│   ├── CouponMethods.php
+│   ├── CustomerMethods.php
+│   ├── OrderMethods.php
+│   └── ProductMethods.php
 ├── OrderStorage/             # Order storage strategies (HPOS vs Legacy)
 │   ├── OrderStorageInterface.php
 │   ├── AbstractOrderStorage.php
@@ -99,11 +115,11 @@ Tests must be run with the correct HPOS setting:
 ```bash
 # Test Legacy storage
 make hpos-disable
-vendor/bin/codecept run tests/acceptance/OrderCest.php
+docker compose -f docker-compose.test.yml exec php vendor/bin/codecept run tests/acceptance/OrderCest.php
 
 # Test HPOS storage
 make hpos-enable
-vendor/bin/codecept run tests/acceptance/OrderHPOSCest.php
+docker compose -f docker-compose.test.yml exec php vendor/bin/codecept run tests/acceptance/OrderHPOSCest.php
 ```
 
 ### Page Objects
@@ -165,7 +181,7 @@ $I->haveOrderItemInDatabase($orderId, [
 After changing method signatures in module traits (e.g., adding default parameters), you **must** run:
 
 ```bash
-vendor/bin/codecept build
+docker compose -f docker-compose.test.yml exec php vendor/bin/codecept build
 ```
 
 This regenerates the actor classes in `tests/_support/_generated/`. Without this, tests will fail with `ArgumentCountError` even if the source code is correct.
