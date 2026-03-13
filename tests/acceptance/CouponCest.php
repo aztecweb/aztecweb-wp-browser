@@ -120,13 +120,13 @@ class CouponCest
             'code' => 'TESTCODE',
         ]);
 
-        $grabbedId = $I->grabCouponIdByCode('TESTCODE');
+        $grabbedId = $I->grabCouponIdFromDatabase(['post_name' => 'TESTCODE']);
 
         assert($couponId === $grabbedId, 'Grabbed coupon ID should match created ID');
 
-        $nonExistentId = $I->grabCouponIdByCode('NONEXISTENT');
+        $nonExistentId = $I->grabCouponIdFromDatabase(['post_name' => 'NONEXISTENT']);
 
-        assert($nonExistentId === null, 'Non-existent coupon should return null');
+        assert($nonExistentId === false, 'Non-existent coupon should return false');
     }
 
     public function testCouponAssertions(AcceptanceTester $I): void

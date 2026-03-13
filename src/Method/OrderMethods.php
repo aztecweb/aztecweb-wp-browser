@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Aztec\WPBrowser\Method;
 
 use Aztec\WPBrowser\OrderStorage\OrderStorageInterface;
+use lucatume\WPBrowser\Module\WPDb;
 use lucatume\WPBrowser\Module\WPWebDriver;
 
 trait OrderMethods
 {
     abstract protected function wpWebDriver(): WPWebDriver;
+
+    abstract protected function wpDb(): WPDb;
 
     abstract protected function orderStorage(): OrderStorageInterface;
 
@@ -63,5 +66,98 @@ trait OrderMethods
     public function haveOrderItemMetaInDatabase(int $orderItemId, string $metaKey, mixed $metaValue): int
     {
         return $this->orderStorage()->haveOrderItemMetaInDatabase($orderItemId, $metaKey, $metaValue);
+    }
+
+    public function grabOrderIdFromDatabase(array $criteria): int|false
+    {
+        $mappedCriteria = $this->orderStorage()->mapCriteria($criteria);
+
+        $id = $this->wpDb()->grabFromDatabase(
+            $this->orderStorage()->getTableName(),
+            $this->orderStorage()->getIdColumnName(),
+            $mappedCriteria
+        );
+
+        if ($id === false) {
+            return false;
+        }
+
+        return (int)$id;
+    }
+
+    public function grabOrderItemFromDatabase(array $criteria): array
+    {
+        $items = $this->wpDb()->grabAllFromDatabase(
+            $this->wpDb()->grabPrefixedTableNameFor('woocommerce_order_items'),
+            '*',
+            $criteria
+        );
+
+        return $items;
+    }
+
+    public function seeOrderInDatabase(array $criteria): void
+    {
+        $tableName = $this->orderStorage()->getTableName();
+        $mappedCriteria = $this->orderStorage()->mapCriteria($criteria);
+        $this->wpDb()->seeInDatabase($tableName, $mappedCriteria);
+    }
+
+    public function seeOrderMetaInDatabase(array $criteria): void
+    {
+        $tableName = $this->orderStorage()->getMetaTableName();
+        $this->wpDb()->seeInDatabase($tableName, $criteria);
+    }
+
+    public function seeOrderItemInDatabase(array $criteria): void
+    {
+        $this->wpDb()->seeInDatabase(
+            $this->wpDb()->grabPrefixedTableNameFor('woocommerce_order_items'),
+            $criteria
+        );
+    }
+
+    public function seeOrderItemMetaInDatabase(array $criteria): void
+    {
+        $this->wpDb()->seeInDatabase(
+            $this->wpDb()->grabPrefixedTableNameFor('woocommerce_order_itemmeta'),
+            $criteria
+        );
+    }
+
+    public function seeOrderAddressInDatabase(string $type, array $criteria): void
+    {
+        $prefixedCriteria = [];
+        foreach ($criteria as $key => $value) {
+            if ($key === $this->orderStorage()->getMetaIdColumnName()) {
+                $prefixedCriteria[$this->orderStorage()->getMetaIdColumnName()] = $value;
+            } else {
+                $prefix = '_' . $type . '_';
+                $prefixedKey = str_starts_with($key, $prefix) ? $key : $prefix . $key;
+                $prefixedCriteria[$prefixedKey] = $value;
+            }
+        }
+
+        $this->wpDb()->seeInDatabase(
+            $this->orderStorage()->getMetaTableName(),
+            $prefixedCriteria
+        );
+    }
+
+    public function grabOrderItemsTableName(): string
+    {
+        return $this->wpDb()->grabPrefixedTableNameFor('woocommerce_order_items');
+    }
+
+    public function haveManyOrdersInDatabase(int $count, array $overrides = []): array
+    {
+        $createdIds = [];
+
+        for ($i = 1; $i <= $count; $i++) {
+            $orderId = $this->haveOrderInDatabase($overrides);
+            $createdIds[] = $orderId;
+        }
+
+        return $createdIds;
     }
 }

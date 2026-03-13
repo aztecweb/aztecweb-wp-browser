@@ -23,4 +23,12 @@ interface OrderStorageInterface
     public function haveOrderItemMetaInDatabase(int $orderItemId, string $metaKey, mixed $metaValue): int;
 
     public function getAdminOrderEditUrl(int $orderId): string;
+
+    public function getTableName(): string;
+
+    public function getMetaTableName(): string;
+
+    public function getMetaIdColumnName(): string;
+
+    public function mapCriteria(array $criteria): array;
 }

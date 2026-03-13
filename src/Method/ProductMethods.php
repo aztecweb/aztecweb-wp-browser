@@ -94,7 +94,7 @@ trait ProductMethods
         );
     }
 
-    public function seeProductInCategoryInDatabase(int $productId, int $categoryId): void
+      public function seeProductInCategoryInDatabase(int $productId, int $categoryId): void
     {
         $this->wpDb()->seeInDatabase(
             $this->wpDb()->grabTermRelationshipsTableName(),
@@ -102,6 +102,91 @@ trait ProductMethods
                 'object_id' => $productId,
                 'term_taxonomy_id' => $categoryId,
             ]
+        );
+    }
+
+    public function grabProductIdFromDatabase(array $criteria): int|false
+    {
+        $criteria['post_type'] = 'product';
+        $id = $this->wpDb()->grabFromDatabase(
+            $this->wpDb()->grabPostsTableName(),
+            'ID',
+            $criteria
+        );
+
+        if ($id === false) {
+            return false;
+        }
+
+        return (int)$id;
+    }
+
+    public function grabProductFieldFromDatabase(int $id, string $field): mixed
+    {
+        return $this->wpDb()->grabPostFieldFromDatabase($id, $field);
+    }
+
+    public function seeProductInDatabase(array $criteria): void
+    {
+        $criteria['post_type'] = 'product';
+        $this->wpDb()->seePostInDatabase($criteria);
+    }
+
+    public function seeProductMetaInDatabase(array $criteria): void
+    {
+        if (isset($criteria['product_id'])) {
+            $criteria['post_id'] = $criteria['product_id'];
+            unset($criteria['product_id']);
+        }
+
+        $this->wpDb()->seePostMetaInDatabase($criteria);
+    }
+
+    public function dontSeeProductInDatabase(array $criteria): void
+    {
+        $criteria['post_type'] = 'product';
+        $this->wpDb()->dontSeePostInDatabase($criteria);
+    }
+
+    public function grabProductsTableName(): string
+    {
+        return $this->wpDb()->grabPostsTableName();
+    }
+
+    public function dontSeeProductMetaInDatabase(array $criteria): void
+    {
+        if (isset($criteria['product_id'])) {
+            $criteria['post_id'] = $criteria['product_id'];
+            unset($criteria['product_id']);
+        }
+
+        $this->wpDb()->dontSeePostMetaInDatabase($criteria);
+    }
+
+    public function haveManyProductsInDatabase(int $count, array $overrides = []): array
+    {
+        $createdIds = [];
+        $baseTitle = $overrides['post_title'] ?? 'Product';
+
+        for ($i = 1; $i <= $count; $i++) {
+            $productData = array_merge($overrides, [
+                'post_title' => $baseTitle . ' ' . $i,
+                'post_name' => strtolower(str_replace(' ', '-', $baseTitle . ' ' . $i)),
+            ]);
+
+            $productId = $this->haveProductInDatabase($productData);
+            $createdIds[] = $productId;
+        }
+
+        return $createdIds;
+    }
+
+    public function grabProductCategoryIdsFromDatabase(int $productId): array
+    {
+        return $this->wpDb()->grabColumnFromDatabase(
+            $this->wpDb()->grabTermRelationshipsTableName(),
+            'term_taxonomy_id',
+            ['object_id' => $productId]
         );
     }
 }

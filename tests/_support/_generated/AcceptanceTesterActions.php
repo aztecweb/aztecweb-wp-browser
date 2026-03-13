@@ -1,4 +1,4 @@
-<?php  //[STAMP] f5c3bd0e468bd391dcc6c6534bcc0e76
+<?php  //[STAMP] d6fb4f94c35576e95e8777389f8591db
 // phpcs:ignoreFile
 namespace Aztec\WPBrowser\Tests\Support\_generated;
 
@@ -16359,31 +16359,6 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      *
-     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCouponIdByCode()
-     */
-    public function grabCouponIdByCode(string $code): ?int {
-        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabCouponIdByCode', func_get_args()));
-    }
-    /**
-     * [!] Method is generated.
-     *
-     * * Executes grabCouponIdByCode and retries on failure.
-     *
-     * Retry number and interval set by $I->retry();
-     *
-     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCouponIdByCode()
-     */
-    public function retryGrabCouponIdByCode(string $code) {
-        $retryNum      = $this->retryNum ?? 1;
-        $retryInterval = $this->retryInterval ?? 200;
-        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabCouponIdByCode', func_get_args(), $retryNum, $retryInterval));
-    }
-
- 
-    /**
-     * [!] Method is generated. Documentation taken from corresponding module.
-     *
-     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::seeCouponInDatabase()
      */
     public function seeCouponInDatabase(array $criteria): void {
@@ -16602,7 +16577,7 @@ trait AcceptanceTesterActions
      *
      * @see \Aztec\WPBrowser\AztecWPBrowser::grabCouponStatus()
      */
-    public function grabCouponStatus(int $couponId): string {
+    public function grabCouponStatus(int $couponId): string|false {
         return $this->getScenario()->runStep(new \Codeception\Step\Action('grabCouponStatus', func_get_args()));
     }
     /**
@@ -16674,6 +16649,31 @@ trait AcceptanceTesterActions
         $retryNum      = $this->retryNum ?? 1;
         $retryInterval = $this->retryInterval ?? 200;
         return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeCouponStatus', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCouponIdFromDatabase()
+     */
+    public function grabCouponIdFromDatabase(array $criteria): int|false {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabCouponIdFromDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabCouponIdFromDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCouponIdFromDatabase()
+     */
+    public function retryGrabCouponIdFromDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabCouponIdFromDatabase', func_get_args(), $retryNum, $retryInterval));
     }
 
  
@@ -17106,6 +17106,31 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCustomerIdFromDatabase()
+     */
+    public function grabCustomerIdFromDatabase(array $criteria): int|false {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabCustomerIdFromDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabCustomerIdFromDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabCustomerIdFromDatabase()
+     */
+    public function retryGrabCustomerIdFromDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabCustomerIdFromDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::haveOrderInDatabase()
      */
     public function haveOrderInDatabase(array $data = []): int {
@@ -17278,6 +17303,317 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabOrderIdFromDatabase()
+     */
+    public function grabOrderIdFromDatabase(array $criteria): int|false {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabOrderIdFromDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabOrderIdFromDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabOrderIdFromDatabase()
+     */
+    public function retryGrabOrderIdFromDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabOrderIdFromDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabOrderItemFromDatabase()
+     */
+    public function grabOrderItemFromDatabase(array $criteria): array {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabOrderItemFromDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabOrderItemFromDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabOrderItemFromDatabase()
+     */
+    public function retryGrabOrderItemFromDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabOrderItemFromDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderInDatabase()
+     */
+    public function seeOrderInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeOrderInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderInDatabase()
+     */
+    public function canSeeOrderInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeOrderInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderInDatabase()
+     */
+    public function tryToSeeOrderInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeOrderInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeOrderInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderInDatabase()
+     */
+    public function retrySeeOrderInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeOrderInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderMetaInDatabase()
+     */
+    public function seeOrderMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeOrderMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderMetaInDatabase()
+     */
+    public function canSeeOrderMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeOrderMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderMetaInDatabase()
+     */
+    public function tryToSeeOrderMetaInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeOrderMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeOrderMetaInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderMetaInDatabase()
+     */
+    public function retrySeeOrderMetaInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeOrderMetaInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderItemInDatabase()
+     */
+    public function seeOrderItemInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeOrderItemInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderItemInDatabase()
+     */
+    public function canSeeOrderItemInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeOrderItemInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderItemInDatabase()
+     */
+    public function tryToSeeOrderItemInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeOrderItemInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeOrderItemInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderItemInDatabase()
+     */
+    public function retrySeeOrderItemInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeOrderItemInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderItemMetaInDatabase()
+     */
+    public function seeOrderItemMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeOrderItemMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderItemMetaInDatabase()
+     */
+    public function canSeeOrderItemMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeOrderItemMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderItemMetaInDatabase()
+     */
+    public function tryToSeeOrderItemMetaInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeOrderItemMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeOrderItemMetaInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderItemMetaInDatabase()
+     */
+    public function retrySeeOrderItemMetaInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeOrderItemMetaInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderAddressInDatabase()
+     */
+    public function seeOrderAddressInDatabase(string $type, array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeOrderAddressInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderAddressInDatabase()
+     */
+    public function canSeeOrderAddressInDatabase(string $type, array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeOrderAddressInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderAddressInDatabase()
+     */
+    public function tryToSeeOrderAddressInDatabase(string $type, array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeOrderAddressInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeOrderAddressInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderAddressInDatabase()
+     */
+    public function retrySeeOrderAddressInDatabase(string $type, array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeOrderAddressInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabOrderItemsTableName()
+     */
+    public function grabOrderItemsTableName(): string {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabOrderItemsTableName', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabOrderItemsTableName and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabOrderItemsTableName()
+     */
+    public function retryGrabOrderItemsTableName() {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabOrderItemsTableName', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::haveManyOrdersInDatabase()
+     */
+    public function haveManyOrdersInDatabase(int $count, array $overrides = []): array {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('haveManyOrdersInDatabase', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::haveProductCategoryInDatabase()
      */
     public function haveProductCategoryInDatabase(string $slug, array $overrides = []): int {
@@ -17421,5 +17757,296 @@ trait AcceptanceTesterActions
         $retryNum      = $this->retryNum ?? 1;
         $retryInterval = $this->retryInterval ?? 200;
         return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeProductInCategoryInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * Retrieve product ID from database based on criteria
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabProductIdFromDatabase()
+     */
+    public function grabProductIdFromDatabase(array $criteria): int|false {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabProductIdFromDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabProductIdFromDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabProductIdFromDatabase()
+     */
+    public function retryGrabProductIdFromDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabProductIdFromDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * Retrieve specific field value from a product
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabProductFieldFromDatabase()
+     */
+    public function grabProductFieldFromDatabase(int $id, string $field): mixed {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabProductFieldFromDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabProductFieldFromDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabProductFieldFromDatabase()
+     */
+    public function retryGrabProductFieldFromDatabase(int $id, string $field) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabProductFieldFromDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * Check if a product exists in database with specific criteria
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeProductInDatabase()
+     */
+    public function seeProductInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeProductInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     * Check if a product exists in database with specific criteria
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeProductInDatabase()
+     */
+    public function canSeeProductInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeProductInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     * Check if a product exists in database with specific criteria
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeProductInDatabase()
+     */
+    public function tryToSeeProductInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeProductInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeProductInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeProductInDatabase()
+     */
+    public function retrySeeProductInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeProductInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * Check if product meta exists in database
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeProductMetaInDatabase()
+     */
+    public function seeProductMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeProductMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     * Check if product meta exists in database
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeProductMetaInDatabase()
+     */
+    public function canSeeProductMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeProductMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     * Check if product meta exists in database
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeProductMetaInDatabase()
+     */
+    public function tryToSeeProductMetaInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeProductMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeProductMetaInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeProductMetaInDatabase()
+     */
+    public function retrySeeProductMetaInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeProductMetaInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * Check if product does not exist in database
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeProductInDatabase()
+     */
+    public function dontSeeProductInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('dontSeeProductInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     * Check if product does not exist in database
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeProductInDatabase()
+     */
+    public function cantSeeProductInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeProductInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     * Check if product does not exist in database
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeProductInDatabase()
+     */
+    public function tryToDontSeeProductInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('dontSeeProductInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes dontSeeProductInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeProductInDatabase()
+     */
+    public function retryDontSeeProductInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('dontSeeProductInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * Get the products table name
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabProductsTableName()
+     */
+    public function grabProductsTableName(): string {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabProductsTableName', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabProductsTableName and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabProductsTableName()
+     */
+    public function retryGrabProductsTableName() {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabProductsTableName', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * Check if product meta does not exist in database
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeProductMetaInDatabase()
+     */
+    public function dontSeeProductMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('dontSeeProductMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     * Check if product meta does not exist in database
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeProductMetaInDatabase()
+     */
+    public function cantSeeProductMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeProductMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     * Check if product meta does not exist in database
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeProductMetaInDatabase()
+     */
+    public function tryToDontSeeProductMetaInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('dontSeeProductMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes dontSeeProductMetaInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeProductMetaInDatabase()
+     */
+    public function retryDontSeeProductMetaInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('dontSeeProductMetaInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * Create multiple products in database
+     * @see \Aztec\WPBrowser\AztecWPBrowser::haveManyProductsInDatabase()
+     */
+    public function haveManyProductsInDatabase(int $count, array $overrides = []): array {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('haveManyProductsInDatabase', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * Retrieve product category IDs from database
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabProductCategoryIdsFromDatabase()
+     */
+    public function grabProductCategoryIdsFromDatabase(int $productId): array {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabProductCategoryIdsFromDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabProductCategoryIdsFromDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabProductCategoryIdsFromDatabase()
+     */
+    public function retryGrabProductCategoryIdsFromDatabase(int $productId) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabProductCategoryIdsFromDatabase', func_get_args(), $retryNum, $retryInterval));
     }
 }

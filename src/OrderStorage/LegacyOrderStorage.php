@@ -85,4 +85,44 @@ class LegacyOrderStorage extends AbstractOrderStorage
     {
         return "post.php?post={$orderId}&action=edit";
     }
+
+    public function getTableName(): string
+    {
+        return $this->wpDb->grabPostsTableName();
+    }
+
+    public function getMetaTableName(): string
+    {
+        return $this->wpDb->grabPostMetaTableName();
+    }
+
+    public function getMetaIdColumnName(): string
+    {
+        return 'post_id';
+    }
+
+    public function mapCriteria(array $criteria): array
+    {
+        $mapped = [];
+
+        // Map HPOS field names to legacy field names
+        foreach ($criteria as $key => $value) {
+            if ($key === 'status') {
+                $mapped['post_status'] = $value;
+            } elseif ($key === 'title') {
+                $mapped['post_title'] = $value;
+            } elseif ($key === 'id') {
+                $mapped['ID'] = $value;
+            } else {
+                $mapped[$key] = $value;
+            }
+        }
+
+        return $mapped;
+    }
+
+    protected function getIdColumnName(): string
+    {
+        return 'ID';
+    }
 }

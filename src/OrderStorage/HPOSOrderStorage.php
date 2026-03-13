@@ -120,4 +120,42 @@ class HPOSOrderStorage extends AbstractOrderStorage
     {
         return "admin.php?page=wc-orders&action=edit&id={$orderId}";
     }
+
+    public function getTableName(): string
+    {
+        return $this->grabOrdersTableName();
+    }
+
+    public function getMetaTableName(): string
+    {
+        return $this->wpDb->grabPostMetaTableName();
+    }
+
+    public function getMetaIdColumnName(): string
+    {
+        return 'order_id';
+    }
+
+    public function mapCriteria(array $criteria): array
+    {
+        $mapped = [];
+
+        // Map legacy field names to HPOS field names
+        foreach ($criteria as $key => $value) {
+            if ($key === 'post_status') {
+                $mapped['status'] = $value;
+            } elseif ($key === 'post_title') {
+                $mapped['title'] = $value;
+            } else {
+                $mapped[$key] = $value;
+            }
+        }
+
+        return $mapped;
+    }
+
+    protected function getIdColumnName(): string
+    {
+        return 'id';
+    }
 }

@@ -18,6 +18,19 @@ abstract class AbstractOrderStorage implements OrderStorageInterface
 
     abstract protected function createOrderRecord(array $data): int;
 
+    abstract protected function getIdColumnName(): string;
+
+    abstract public function getTableName(): string;
+
+    abstract public function getMetaTableName(): string;
+
+    abstract public function getMetaIdColumnName(): string;
+
+    public function mapCriteria(array $criteria): array
+    {
+        return $criteria;
+    }
+
     final public function haveOrderInDatabase(array $data = []): int
     {
         $billing = $data['address']['billing'] ?? [];

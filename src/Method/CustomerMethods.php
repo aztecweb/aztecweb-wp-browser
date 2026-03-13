@@ -168,8 +168,14 @@ trait CustomerMethods
 
     public function seeCustomerMetaInDatabase(array $criteria): void
     {
-        $table = $this->wpDb()->grabUserMetaTableName();
-        $this->wpDb()->seeInDatabase($table, $criteria);
+        // Validate if using customer_id or user_id format
+        if (isset($criteria['customer_id'])) {
+            $criteria['user_id'] = $criteria['customer_id'];
+            unset($criteria['customer_id']);
+        }
+        // If user_id is already set, use it as is
+
+        $this->wpDb()->seeUserMetaInDatabase($criteria);
     }
 
     public function dontSeeCustomerMetaInDatabase(array $criteria): void
@@ -182,5 +188,20 @@ trait CustomerMethods
     public function amOnMyAccountPage(): void
     {
         $this->wpWebDriver()->amOnPage($this->wooCommerceConfig()->myAccountPageSlug());
+    }
+
+    public function grabCustomerIdFromDatabase(array $criteria): int|false
+    {
+        $id = $this->wpDb()->grabFromDatabase(
+            $this->wpDb()->grabUsersTableName(),
+            'ID',
+            $criteria
+        );
+
+        if ($id === false) {
+            return false;
+        }
+
+        return (int)$id;
     }
 }

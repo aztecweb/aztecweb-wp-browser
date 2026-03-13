@@ -86,14 +86,6 @@ trait CouponMethods
         return $this->haveCouponInDatabase($overrides);
     }
 
-    public function grabCouponIdByCode(string $code): ?int
-    {
-        $table = $this->wpDb()->grabPostsTableName();
-        $coupon = $this->wpDb()->grabFromDatabase($table, 'ID', ['post_title' => $code, 'post_type' => 'shop_coupon']);
-
-        return $coupon === false ? null : (int) $coupon;
-    }
-
     public function seeCouponInDatabase(array $criteria): void
     {
         $table = $this->wpDb()->grabPostsTableName();
@@ -120,9 +112,12 @@ trait CouponMethods
 
     public function seeCouponMetaInDatabase(array $criteria): void
     {
-        $table = $this->wpDb()->grabPostMetaTableName();
+        if (isset($criteria['coupon_id'])) {
+            $criteria['post_id'] = $criteria['coupon_id'];
+            unset($criteria['coupon_id']);
+        }
 
-        $this->wpDb()->seeInDatabase($table, $criteria);
+        $this->wpDb()->seePostMetaInDatabase($criteria);
     }
 
     public function dontSeeCouponMetaInDatabase(array $criteria): void
@@ -132,12 +127,12 @@ trait CouponMethods
         $this->wpDb()->dontSeeInDatabase($table, $criteria);
     }
 
-    public function grabCouponStatus(int $couponId): string
+    public function grabCouponStatus(int $couponId): string|false
     {
         $table = $this->wpDb()->grabPostsTableName();
         $status = $this->wpDb()->grabFromDatabase($table, 'post_status', ['ID' => $couponId]);
 
-        return $status ?: '';
+        return $status ?: false;
     }
 
     public function haveCouponStatus(int $couponId, string $status): void
@@ -155,5 +150,21 @@ trait CouponMethods
             'ID' => $couponId,
             'post_status' => $status,
         ]);
+    }
+
+    public function grabCouponIdFromDatabase(array $criteria): int|false
+    {
+        $criteria['post_type'] = 'shop_coupon';
+        $id = $this->wpDb()->grabFromDatabase(
+            $this->wpDb()->grabPostsTableName(),
+            'ID',
+            $criteria
+        );
+
+        if ($id === false) {
+            return false;
+        }
+
+        return (int)$id;
     }
 }
