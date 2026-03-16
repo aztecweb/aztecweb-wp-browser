@@ -31,4 +31,14 @@ interface OrderStorageInterface
     public function getMetaIdColumnName(): string;
 
     public function mapCriteria(array $criteria): array;
+
+    public function mapMetaCriteria(array $criteria): array;
+
+    public function mapAddressCriteria(string $type, array $criteria): array;
+
+    public function seeAddressInDatabase(string $addressType, array $criteria): void;
+
+    public function getIdColumnName(): string;
+
+    public function getOrderAddressTableName(): string;
 }

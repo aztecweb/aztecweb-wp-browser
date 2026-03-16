@@ -71,6 +71,7 @@ class HPOSOrderStorage extends AbstractOrderStorage
 
     public function haveOrderMetaInDatabase(int $orderId, string $metaKey, mixed $metaValue): int
     {
+
         return $this->wpDb->havePostmetaInDatabase($orderId, $metaKey, $metaValue);
     }
 
@@ -154,8 +155,36 @@ class HPOSOrderStorage extends AbstractOrderStorage
         return $mapped;
     }
 
-    protected function getIdColumnName(): string
+    public function mapAddressCriteria(string $type, array $criteria): array
+    {
+        $mapped = $criteria;
+        $mapped['address_type'] = $type;
+        return $mapped;
+    }
+
+    public function seeAddressInDatabase(string $addressType, array $criteria): void
+    {
+        $mapped = $this->mapAddressCriteria($addressType, $criteria);
+        $this->wpDb->seeInDatabase($this->grabOrderAddressesTableName(), $mapped);
+    }
+
+    public function mapMetaCriteria(array $criteria): array
+    {
+        $mapped = $criteria;
+        if (isset($mapped['order_id'])) {
+            $mapped['post_id'] = $mapped['order_id'];
+            unset($mapped['order_id']);
+        }
+        return $mapped;
+    }
+
+    public function getIdColumnName(): string
     {
         return 'id';
+    }
+
+    public function getOrderAddressTableName(): string
+    {
+        return $this->grabOrderAddressesTableName();
     }
 }

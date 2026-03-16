@@ -17,11 +17,18 @@ class CustomerNewMethodsCest
         ]);
 
         // Test finding existing customer by user_login
-        $grabbedId = $I->grabCustomerIdFromDatabase('testcustomer');
+        $grabbedId = $I->grabCustomerIdFromDatabase(['user_login' => 'testcustomer']);
+        assert($userId === $grabbedId);
+
+        // Test with multiple criteria
+        $grabbedId = $I->grabCustomerIdFromDatabase([
+            'user_login' => 'testcustomer',
+            'user_email' => 'test@example.com',
+        ]);
         assert($userId === $grabbedId);
 
         // Test non-existent customer
-        $notFound = $I->grabCustomerIdFromDatabase('nonexistent');
+        $notFound = $I->grabCustomerIdFromDatabase(['user_login' => 'nonexistent']);
         assert($notFound === false);
     }
 

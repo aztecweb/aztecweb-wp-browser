@@ -121,8 +121,51 @@ class LegacyOrderStorage extends AbstractOrderStorage
         return $mapped;
     }
 
-    protected function getIdColumnName(): string
+    public function mapAddressCriteria(string $type, array $criteria): array
+    {
+        $mapped = [];
+        $prefix = '_' . $type . '_';
+
+        foreach ($criteria as $key => $value) {
+            $prefixedKey = str_starts_with($key, $prefix) ? $key : $prefix . $key;
+            $mapped[$prefixedKey] = $value;
+        }
+
+        return $mapped;
+    }
+
+    public function seeAddressInDatabase(string $addressType, array $criteria): void
+    {
+        $mapped = $this->mapAddressCriteria($addressType, $criteria);
+
+        foreach ($mapped as $metaKey => $metaValue) {
+            $this->wpDb->seeInDatabase(
+                $this->getMetaTableName(),
+                [
+                    'meta_key' => $metaKey,
+                    'meta_value' => $metaValue,
+                ]
+            );
+        }
+    }
+
+    public function mapMetaCriteria(array $criteria): array
+    {
+        $mapped = $criteria;
+        if (isset($mapped['order_id'])) {
+            $mapped['post_id'] = $mapped['order_id'];
+            unset($mapped['order_id']);
+        }
+        return $mapped;
+    }
+
+    public function getIdColumnName(): string
     {
         return 'ID';
+    }
+
+    public function getOrderAddressTableName(): string
+    {
+        return $this->getMetaTableName();
     }
 }

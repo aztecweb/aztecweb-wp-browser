@@ -120,6 +120,19 @@ class CheckoutCest
         $I->seePaymentMethodAvailable('cod');
     }
 
+    public function testDontSeePaymentMethodAvailable(AcceptanceTester $I): void
+    {
+        $productId = $I->haveProductInDatabase([
+            'post_title' => 'Test Product',
+        ]);
+
+        $I->addProductToCart($productId);
+
+        $I->amOnCheckoutPage();
+
+        $I->dontSeePaymentMethodAvailable('nonexistent_payment_method');
+    }
+
     public function testSeePaymentMethodSelected(AcceptanceTester $I): void
     {
         $productId = $I->haveProductInDatabase([

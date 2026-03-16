@@ -159,4 +159,50 @@ class ProductNewMethodsCest
         assert(is_array($categoryIds));
         assert(in_array($categoryId, $categoryIds));
     }
+
+    public function testDontSeeProductInDatabase(AcceptanceTester $I): void
+    {
+        // Create a product
+        $productId = $I->haveProductInDatabase([
+            'post_title' => 'Existing Product',
+        ]);
+
+        // Should not see non-existent product
+        $I->dontSeeProductInDatabase(['post_title' => 'Nonexistent Product']);
+
+        // Should not see existing product with wrong criteria
+        $I->dontSeeProductInDatabase([
+            'ID' => $productId,
+            'post_title' => 'Wrong Title',
+        ]);
+
+        // Should not see product with wrong status
+        $I->dontSeeProductInDatabase([
+            'ID' => $productId,
+            'post_status' => 'draft',
+        ]);
+    }
+
+    public function testDontSeeProductMetaInDatabase(AcceptanceTester $I): void
+    {
+        $productId = $I->haveProductInDatabase([
+            'post_title' => 'Product for Dont See Test',
+        ]);
+
+        // Add meta
+        $I->haveProductMetaInDatabase($productId, '_existing_meta', 'existing_value');
+
+        // Should not see non-existent meta
+        $I->dontSeeProductMetaInDatabase([
+            'product_id' => $productId,
+            'meta_key' => '_nonexistent_meta',
+        ]);
+
+        // Should not see meta with wrong value
+        $I->dontSeeProductMetaInDatabase([
+            'product_id' => $productId,
+            'meta_key' => '_existing_meta',
+            'meta_value' => 'wrong_value',
+        ]);
+    }
 }

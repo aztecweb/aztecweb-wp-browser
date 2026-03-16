@@ -106,7 +106,8 @@ trait OrderMethods
     public function seeOrderMetaInDatabase(array $criteria): void
     {
         $tableName = $this->orderStorage()->getMetaTableName();
-        $this->wpDb()->seeInDatabase($tableName, $criteria);
+        $mappedCriteria = $this->orderStorage()->mapMetaCriteria($criteria);
+        $this->wpDb()->seeInDatabase($tableName, $mappedCriteria);
     }
 
     public function seeOrderItemInDatabase(array $criteria): void
@@ -125,23 +126,25 @@ trait OrderMethods
         );
     }
 
+    public function dontSeeOrderItemInDatabase(array $criteria): void
+    {
+        $this->wpDb()->dontSeeInDatabase(
+            $this->wpDb()->grabPrefixedTableNameFor('woocommerce_order_items'),
+            $criteria
+        );
+    }
+
+    public function dontSeeOrderItemMetaInDatabase(array $criteria): void
+    {
+        $this->wpDb()->dontSeeInDatabase(
+            $this->wpDb()->grabPrefixedTableNameFor('woocommerce_order_itemmeta'),
+            $criteria
+        );
+    }
+
     public function seeOrderAddressInDatabase(string $type, array $criteria): void
     {
-        $prefixedCriteria = [];
-        foreach ($criteria as $key => $value) {
-            if ($key === $this->orderStorage()->getMetaIdColumnName()) {
-                $prefixedCriteria[$this->orderStorage()->getMetaIdColumnName()] = $value;
-            } else {
-                $prefix = '_' . $type . '_';
-                $prefixedKey = str_starts_with($key, $prefix) ? $key : $prefix . $key;
-                $prefixedCriteria[$prefixedKey] = $value;
-            }
-        }
-
-        $this->wpDb()->seeInDatabase(
-            $this->orderStorage()->getMetaTableName(),
-            $prefixedCriteria
-        );
+        $this->orderStorage()->seeAddressInDatabase($type, $criteria);
     }
 
     public function grabOrderItemsTableName(): string

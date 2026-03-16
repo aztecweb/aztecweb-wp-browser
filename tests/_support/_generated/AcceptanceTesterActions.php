@@ -1,4 +1,4 @@
-<?php  //[STAMP] d6fb4f94c35576e95e8777389f8591db
+<?php  //[STAMP] cd8c6554a9f544dabbe5a55b9cc0329b
 // phpcs:ignoreFile
 namespace Aztec\WPBrowser\Tests\Support\_generated;
 
@@ -17533,6 +17533,96 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeOrderItemInDatabase()
+     */
+    public function dontSeeOrderItemInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('dontSeeOrderItemInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeOrderItemInDatabase()
+     */
+    public function cantSeeOrderItemInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeOrderItemInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeOrderItemInDatabase()
+     */
+    public function tryToDontSeeOrderItemInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('dontSeeOrderItemInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes dontSeeOrderItemInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeOrderItemInDatabase()
+     */
+    public function retryDontSeeOrderItemInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('dontSeeOrderItemInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeOrderItemMetaInDatabase()
+     */
+    public function dontSeeOrderItemMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('dontSeeOrderItemMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeOrderItemMetaInDatabase()
+     */
+    public function cantSeeOrderItemMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeOrderItemMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeOrderItemMetaInDatabase()
+     */
+    public function tryToDontSeeOrderItemMetaInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('dontSeeOrderItemMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes dontSeeOrderItemMetaInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeOrderItemMetaInDatabase()
+     */
+    public function retryDontSeeOrderItemMetaInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('dontSeeOrderItemMetaInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::seeOrderAddressInDatabase()
      */
     public function seeOrderAddressInDatabase(string $type, array $criteria): void {
@@ -17763,7 +17853,7 @@ trait AcceptanceTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Retrieve product ID from database based on criteria
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::grabProductIdFromDatabase()
      */
     public function grabProductIdFromDatabase(array $criteria): int|false {
@@ -17788,7 +17878,7 @@ trait AcceptanceTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Retrieve specific field value from a product
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::grabProductFieldFromDatabase()
      */
     public function grabProductFieldFromDatabase(int $id, string $field): mixed {
@@ -17813,7 +17903,7 @@ trait AcceptanceTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Check if a product exists in database with specific criteria
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::seeProductInDatabase()
      */
     public function seeProductInDatabase(array $criteria): void {
@@ -17823,7 +17913,7 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Conditional Assertion: Test won't be stopped on fail
-     * Check if a product exists in database with specific criteria
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::seeProductInDatabase()
      */
     public function canSeeProductInDatabase(array $criteria): void {
@@ -17833,7 +17923,7 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Test won't be stopped on fail. Error won't be logged 
-     * Check if a product exists in database with specific criteria
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::seeProductInDatabase()
      */
     public function tryToSeeProductInDatabase(array $criteria): bool {
@@ -17858,7 +17948,7 @@ trait AcceptanceTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Check if product meta exists in database
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::seeProductMetaInDatabase()
      */
     public function seeProductMetaInDatabase(array $criteria): void {
@@ -17868,7 +17958,7 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Conditional Assertion: Test won't be stopped on fail
-     * Check if product meta exists in database
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::seeProductMetaInDatabase()
      */
     public function canSeeProductMetaInDatabase(array $criteria): void {
@@ -17878,7 +17968,7 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Test won't be stopped on fail. Error won't be logged 
-     * Check if product meta exists in database
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::seeProductMetaInDatabase()
      */
     public function tryToSeeProductMetaInDatabase(array $criteria): bool {
@@ -17903,7 +17993,7 @@ trait AcceptanceTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Check if product does not exist in database
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeProductInDatabase()
      */
     public function dontSeeProductInDatabase(array $criteria): void {
@@ -17913,7 +18003,7 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Conditional Assertion: Test won't be stopped on fail
-     * Check if product does not exist in database
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeProductInDatabase()
      */
     public function cantSeeProductInDatabase(array $criteria): void {
@@ -17923,7 +18013,7 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Test won't be stopped on fail. Error won't be logged 
-     * Check if product does not exist in database
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeProductInDatabase()
      */
     public function tryToDontSeeProductInDatabase(array $criteria): bool {
@@ -17948,7 +18038,7 @@ trait AcceptanceTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Get the products table name
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::grabProductsTableName()
      */
     public function grabProductsTableName(): string {
@@ -17973,7 +18063,7 @@ trait AcceptanceTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Check if product meta does not exist in database
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeProductMetaInDatabase()
      */
     public function dontSeeProductMetaInDatabase(array $criteria): void {
@@ -17983,7 +18073,7 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Conditional Assertion: Test won't be stopped on fail
-     * Check if product meta does not exist in database
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeProductMetaInDatabase()
      */
     public function cantSeeProductMetaInDatabase(array $criteria): void {
@@ -17993,7 +18083,7 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Test won't be stopped on fail. Error won't be logged 
-     * Check if product meta does not exist in database
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeProductMetaInDatabase()
      */
     public function tryToDontSeeProductMetaInDatabase(array $criteria): bool {
@@ -18018,7 +18108,7 @@ trait AcceptanceTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Create multiple products in database
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::haveManyProductsInDatabase()
      */
     public function haveManyProductsInDatabase(int $count, array $overrides = []): array {
@@ -18029,7 +18119,7 @@ trait AcceptanceTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Retrieve product category IDs from database
+     *
      * @see \Aztec\WPBrowser\AztecWPBrowser::grabProductCategoryIdsFromDatabase()
      */
     public function grabProductCategoryIdsFromDatabase(int $productId): array {
