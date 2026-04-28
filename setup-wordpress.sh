@@ -61,6 +61,16 @@ cp -r /app/storefront "$WP_PATH/wp-content/themes/"
 echo "=== Activating WooCommerce... ==="
 wp plugin activate woocommerce --allow-root
 
+if [ -d "/app/woocommerce-subscriptions" ]; then
+    echo "=== Copying WooCommerce Subscriptions... ==="
+    rm -rf "$WP_PATH/wp-content/plugins/woocommerce-subscriptions"
+    cp -r /app/woocommerce-subscriptions "$WP_PATH/wp-content/plugins/"
+    echo "=== Activating WooCommerce Subscriptions... ==="
+    wp plugin activate woocommerce-subscriptions --allow-root
+else
+    echo "=== WooCommerce Subscriptions not found (optional, skipping) ==="
+fi
+
 echo "=== Activating Storefront theme... ==="
 wp theme activate storefront --allow-root
 

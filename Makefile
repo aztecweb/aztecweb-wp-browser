@@ -1,6 +1,6 @@
 .PHONY: help build up down install-woo init setup test test-acceptance shell clean db-dump hpos-enable hpos-disable
 .PHONY: local-build local-up local-down local-init local-setup local-shell local-clean
-.PHONY: test-build test-up test-down test-init test-setup test-shell test-clean
+.PHONY: test-build test-up test-down test-init test-setup test-shell test-clean test-install-subscriptions
 
 # ===========================================
 # TEST ENVIRONMENT (for running Codeception tests)
@@ -22,6 +22,10 @@ test-up: ## Start TEST environment
 
 test-down: ## Stop TEST environment
 	$(DC_TEST) down
+
+test-install-subscriptions: ## Install WooCommerce Subscriptions (requires woocommerce-subscriptions.zip)
+	chmod +x install-woocommerce-subscriptions.sh
+	./install-woocommerce-subscriptions.sh
 
 test-install-woo: ## Download and install WooCommerce for TEST environment
 	chmod +x install-woocommerce.sh
