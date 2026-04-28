@@ -1,4 +1,4 @@
-<?php  //[STAMP] 0c09a544627ec39db0ccbc56a9ac125a
+<?php  //[STAMP] 15f301637dbc0af3b81fe91023494a24
 // phpcs:ignoreFile
 namespace Aztec\WPBrowser\Tests\Support\_generated;
 
@@ -18567,5 +18567,120 @@ trait AcceptanceTesterActions
         $retryNum      = $this->retryNum ?? 1;
         $retryInterval = $this->retryInterval ?? 200;
         return $this->getScenario()->runStep(new \Codeception\Step\Retry('dontSeeSubscriptionInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeSubscriptionMetaInDatabase()
+     */
+    public function dontSeeSubscriptionMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('dontSeeSubscriptionMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeSubscriptionMetaInDatabase()
+     */
+    public function cantSeeSubscriptionMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeSubscriptionMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeSubscriptionMetaInDatabase()
+     */
+    public function tryToDontSeeSubscriptionMetaInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('dontSeeSubscriptionMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes dontSeeSubscriptionMetaInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeSubscriptionMetaInDatabase()
+     */
+    public function retryDontSeeSubscriptionMetaInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('dontSeeSubscriptionMetaInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::suspendSubscription()
+     */
+    public function suspendSubscription(int $subscriptionId): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('suspendSubscription', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::suspendSubscription()
+     */
+    public function tryToSuspendSubscription(int $subscriptionId): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('suspendSubscription', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes suspendSubscription and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::suspendSubscription()
+     */
+    public function retrySuspendSubscription(int $subscriptionId) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('suspendSubscription', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::pendingCancelSubscription()
+     */
+    public function pendingCancelSubscription(int $subscriptionId): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('pendingCancelSubscription', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::pendingCancelSubscription()
+     */
+    public function tryToPendingCancelSubscription(int $subscriptionId): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('pendingCancelSubscription', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes pendingCancelSubscription and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::pendingCancelSubscription()
+     */
+    public function retryPendingCancelSubscription(int $subscriptionId) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('pendingCancelSubscription', func_get_args(), $retryNum, $retryInterval));
     }
 }

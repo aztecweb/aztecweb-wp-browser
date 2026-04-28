@@ -231,6 +231,38 @@ class SubscriptionCest
         ]);
     }
 
+    public function testDontSeeSubscriptionMetaInDatabase(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase();
+
+        $I->dontSeeSubscriptionMetaInDatabase([
+            'subscription_id' => $subscriptionId,
+            'meta_key' => '_nonexistent_meta_key',
+        ]);
+    }
+
+    public function testSuspendSubscription(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->suspendSubscription($subscriptionId);
+
+        $I->seeSubscriptionStatus($subscriptionId, 'wc-on-hold');
+    }
+
+    public function testPendingCancelSubscription(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->pendingCancelSubscription($subscriptionId);
+
+        $I->seeSubscriptionStatus($subscriptionId, 'wc-pending-cancel');
+    }
+
     public function testHaveSubscriptionProductInDatabase(AcceptanceTester $I): void
     {
         $productId = $I->haveSubscriptionProductInDatabase();

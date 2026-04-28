@@ -140,6 +140,23 @@ trait SubscriptionMethods
         $this->wpDb()->dontSeeInDatabase($tableName, $mappedCriteria);
     }
 
+    public function dontSeeSubscriptionMetaInDatabase(array $criteria): void
+    {
+        $tableName = $this->subscriptionStorage()->getMetaTableName();
+        $mappedCriteria = $this->subscriptionStorage()->mapMetaCriteria($criteria);
+        $this->wpDb()->dontSeeInDatabase($tableName, $mappedCriteria);
+    }
+
+    public function suspendSubscription(int $subscriptionId): void
+    {
+        $this->haveSubscriptionStatus($subscriptionId, 'wc-on-hold');
+    }
+
+    public function pendingCancelSubscription(int $subscriptionId): void
+    {
+        $this->haveSubscriptionStatus($subscriptionId, 'wc-pending-cancel');
+    }
+
     private function grabOrCreateProductTypeTerm(string $productType): int
     {
         $termsTable = $this->wpDb()->grabPrefixedTableNameFor('terms');

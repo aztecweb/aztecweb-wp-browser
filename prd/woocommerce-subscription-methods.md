@@ -66,6 +66,7 @@ The following methods were renamed to comply with `lucatume/wp-browser` naming c
 - `seeSubscriptionMetaInDatabase(array $criteria): void` — supports `subscription_id` key (maps to `post_id`)
 - `seeSubscriptionStatus(int $subscriptionId, string $status): void`
 - `dontSeeSubscriptionInDatabase(array $criteria): void`
+- `dontSeeSubscriptionMetaInDatabase(array $criteria): void` — supports `subscription_id` key (maps to `post_id`)
 
 ### Update
 
@@ -73,6 +74,8 @@ The following methods were renamed to comply with `lucatume/wp-browser` naming c
 - `cancelSubscription(int $subscriptionId): void` → sets `wc-cancelled`
 - `reactivateSubscription(int $subscriptionId): void` → sets `wc-active`
 - `expireSubscription(int $subscriptionId): void` → sets `wc-expired`
+- `suspendSubscription(int $subscriptionId): void` → sets `wc-on-hold`
+- `pendingCancelSubscription(int $subscriptionId): void` → sets `wc-pending-cancel`
 
 ## Installation Infrastructure
 
