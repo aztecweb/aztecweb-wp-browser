@@ -4,37 +4,17 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\OrderStorage;
 
-use lucatume\WPBrowser\Module\WPDb;
-
-abstract class AbstractOrderStorage implements OrderStorageInterface
+trait OrderTrait
 {
-    public function __construct(
-        protected WPDb $wpDb
-    ) {}
-
     abstract protected function grabOrderItemsTableName(): string;
 
     abstract protected function grabOrderItemMetaTableName(): string;
 
     abstract protected function createOrderRecord(array $data): int;
 
-    abstract public function getIdColumnName(): string;
+    abstract public function haveOrderAddressInDatabase(int $orderId, string $addressType, array $data): int;
 
-    abstract public function getTableName(): string;
-
-    abstract public function getMetaTableName(): string;
-
-    abstract public function getMetaIdColumnName(): string;
-
-    public function mapCriteria(array $criteria): array
-    {
-        return $criteria;
-    }
-
-    public function mapAddressCriteria(string $type, array $criteria): array
-    {
-        return $criteria;
-    }
+    abstract public function haveOrderMetaInDatabase(int $orderId, string $metaKey, mixed $metaValue): int;
 
     final public function haveOrderInDatabase(array $data = []): int
     {
@@ -68,17 +48,13 @@ abstract class AbstractOrderStorage implements OrderStorageInterface
 
     public function haveOrderItemInDatabase(int $orderId, array $data = []): int
     {
-        $name = $data['order_item_name'] ?? 'Item';
-        $type = $data['order_item_type'] ?? 'line_item';
         $meta = $data['meta'] ?? [];
 
-        $itemRow = [
+        $orderItemId = $this->wpDb->haveInDatabase($this->grabOrderItemsTableName(), [
             'order_id' => $orderId,
-            'order_item_name' => $name,
-            'order_item_type' => $type,
-        ];
-
-        $orderItemId = $this->wpDb->haveInDatabase($this->grabOrderItemsTableName(), $itemRow);
+            'order_item_name' => $data['order_item_name'] ?? 'Item',
+            'order_item_type' => $data['order_item_type'] ?? 'line_item',
+        ]);
 
         foreach ($meta as $metaKey => $metaValue) {
             $this->haveOrderItemMetaInDatabase($orderItemId, $metaKey, $metaValue);

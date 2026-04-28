@@ -4,8 +4,17 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\OrderStorage;
 
-class LegacyOrderStorage extends AbstractOrderStorage
+use Aztec\WPBrowser\Storage\AbstractLegacyStorage;
+
+class LegacyOrderStorage extends AbstractLegacyStorage implements OrderStorageInterface
 {
+    use OrderTrait;
+
+    protected function getEntityIdKey(): string
+    {
+        return 'order_id';
+    }
+
     protected function grabOrderItemsTableName(): string
     {
         return $this->wpDb->grabTablePrefix() . 'woocommerce_order_items';
@@ -18,36 +27,30 @@ class LegacyOrderStorage extends AbstractOrderStorage
 
     protected function createOrderRecord(array $data): int
     {
-        $orderData = array_merge([
+        return $this->wpDb->havePostInDatabase(array_merge([
             'post_type' => 'shop_order',
             'post_status' => 'wc-pending',
-        ], $data);
-
-        return $this->wpDb->havePostInDatabase($orderData);
+        ], $data));
     }
 
     public function haveOrderMetaInDatabase(int $orderId, string $metaKey, mixed $metaValue): int
     {
-        return $this->wpDb->havePostmetaInDatabase($orderId, $metaKey, $metaValue);
+        return $this->haveEntityMetaInDatabase($orderId, $metaKey, $metaValue);
     }
 
     public function grabOrderMeta(int $orderId, string $key, bool $single = false): mixed
     {
-        return $this->wpDb->grabPostMetaFromDatabase($orderId, $key, $single);
+        return $this->grabEntityMeta($orderId, $key, $single);
     }
 
     public function grabOrderStatus(int $orderId): string
     {
-        return $this->wpDb->grabPostFieldFromDatabase($orderId, 'post_status');
+        return $this->grabEntityStatus($orderId);
     }
 
     public function haveOrderStatus(int $orderId, string $newStatus): void
     {
-        $this->wpDb->updateInDatabase(
-            $this->wpDb->grabPostsTableName(),
-            ['post_status' => $newStatus],
-            ['ID' => $orderId]
-        );
+        $this->haveEntityStatus($orderId, $newStatus);
     }
 
     public function haveOrderAddressInDatabase(int $orderId, string $addressType, array $data): int
@@ -86,39 +89,13 @@ class LegacyOrderStorage extends AbstractOrderStorage
         return "post.php?post={$orderId}&action=edit";
     }
 
-    public function getTableName(): string
-    {
-        return $this->wpDb->grabPostsTableName();
-    }
-
-    public function getMetaTableName(): string
-    {
-        return $this->wpDb->grabPostMetaTableName();
-    }
-
-    public function getMetaIdColumnName(): string
-    {
-        return 'post_id';
-    }
-
     public function mapCriteria(array $criteria): array
     {
-        $mapped = [];
-
-        // Map HPOS field names to legacy field names
+        $prepped = [];
         foreach ($criteria as $key => $value) {
-            if ($key === 'status') {
-                $mapped['post_status'] = $value;
-            } elseif ($key === 'title') {
-                $mapped['post_title'] = $value;
-            } elseif ($key === 'id') {
-                $mapped['ID'] = $value;
-            } else {
-                $mapped[$key] = $value;
-            }
+            $prepped[$key === 'title' ? 'post_title' : $key] = $value;
         }
-
-        return $mapped;
+        return parent::mapCriteria($prepped);
     }
 
     public function mapAddressCriteria(string $type, array $criteria): array
@@ -127,8 +104,7 @@ class LegacyOrderStorage extends AbstractOrderStorage
         $prefix = '_' . $type . '_';
 
         foreach ($criteria as $key => $value) {
-            $prefixedKey = str_starts_with($key, $prefix) ? $key : $prefix . $key;
-            $mapped[$prefixedKey] = $value;
+            $mapped[str_starts_with($key, $prefix) ? $key : $prefix . $key] = $value;
         }
 
         return $mapped;
@@ -136,32 +112,17 @@ class LegacyOrderStorage extends AbstractOrderStorage
 
     public function seeAddressInDatabase(string $addressType, array $criteria): void
     {
-        $mapped = $this->mapAddressCriteria($addressType, $criteria);
-
-        foreach ($mapped as $metaKey => $metaValue) {
+        foreach ($this->mapAddressCriteria($addressType, $criteria) as $metaKey => $metaValue) {
             $this->wpDb->seeInDatabase(
                 $this->getMetaTableName(),
-                [
-                    'meta_key' => $metaKey,
-                    'meta_value' => $metaValue,
-                ]
+                ['meta_key' => $metaKey, 'meta_value' => $metaValue]
             );
         }
     }
 
-    public function mapMetaCriteria(array $criteria): array
+    public function getMetaIdColumnName(): string
     {
-        $mapped = $criteria;
-        if (isset($mapped['order_id'])) {
-            $mapped['post_id'] = $mapped['order_id'];
-            unset($mapped['order_id']);
-        }
-        return $mapped;
-    }
-
-    public function getIdColumnName(): string
-    {
-        return 'ID';
+        return 'post_id';
     }
 
     public function getOrderAddressTableName(): string

@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\OrderStorage;
 
-class HPOSOrderStorage extends AbstractOrderStorage
+use Aztec\WPBrowser\Storage\AbstractHPOSStorage;
+
+class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterface
 {
-    private function grabOrdersTableName(): string
+    use OrderTrait;
+
+    protected function getEntityIdKey(): string
     {
-        return $this->wpDb->grabTablePrefix() . 'wc_orders';
+        return 'order_id';
     }
 
     private function grabOrderAddressesTableName(): string
@@ -28,9 +32,9 @@ class HPOSOrderStorage extends AbstractOrderStorage
 
     protected function createOrderRecord(array $data): int
     {
-        $orderId = $this->generateOrderId();
+        $orderId = $this->generateId();
 
-        $defaults = [
+        $orderData = array_merge([
             'id' => $orderId,
             'status' => 'wc-pending',
             'currency' => 'USD',
@@ -48,55 +52,38 @@ class HPOSOrderStorage extends AbstractOrderStorage
             'ip_address' => '',
             'user_agent' => '',
             'customer_note' => '',
-        ];
+        ], $data);
 
-        $orderData = array_merge($defaults, $data);
         $orderData['id'] = $orderId;
 
-        $this->wpDb->haveInDatabase($this->grabOrdersTableName(), $orderData);
+        $this->wpDb->haveInDatabase($this->grabWcOrdersTableName(), $orderData);
 
         return $orderId;
     }
 
-    private function generateOrderId(): int
-    {
-        $ordersTable = $this->grabOrdersTableName();
-        $postsTable = $this->wpDb->grabPostsTableName();
-
-        $maxOrderId = $this->wpDb->grabLatestEntryByFromDatabase($ordersTable, 'id');
-        $maxPostId = $this->wpDb->grabLatestEntryByFromDatabase($postsTable, 'ID');
-
-        return max($maxOrderId, $maxPostId) + 1;
-    }
-
     public function haveOrderMetaInDatabase(int $orderId, string $metaKey, mixed $metaValue): int
     {
-
-        return $this->wpDb->havePostmetaInDatabase($orderId, $metaKey, $metaValue);
+        return $this->haveEntityMetaInDatabase($orderId, $metaKey, $metaValue);
     }
 
     public function grabOrderMeta(int $orderId, string $key, bool $single = false): mixed
     {
-        return $this->wpDb->grabPostMetaFromDatabase($orderId, $key, $single);
+        return $this->grabEntityMeta($orderId, $key, $single);
     }
 
     public function grabOrderStatus(int $orderId): string
     {
-        return $this->wpDb->grabFromDatabase($this->grabOrdersTableName(), 'status', ['id' => $orderId]);
+        return $this->grabEntityStatus($orderId);
     }
 
     public function haveOrderStatus(int $orderId, string $newStatus): void
     {
-        $this->wpDb->updateInDatabase(
-            $this->grabOrdersTableName(),
-            ['status' => $newStatus],
-            ['id' => $orderId]
-        );
+        $this->haveEntityStatus($orderId, $newStatus);
     }
 
     public function haveOrderAddressInDatabase(int $orderId, string $addressType, array $data): int
     {
-        $defaults = [
+        return $this->wpDb->haveInDatabase($this->grabOrderAddressesTableName(), array_merge([
             'order_id' => $orderId,
             'address_type' => $addressType,
             'first_name' => '',
@@ -110,11 +97,7 @@ class HPOSOrderStorage extends AbstractOrderStorage
             'country' => '',
             'email' => '',
             'phone' => '',
-        ];
-
-        $addressData = array_merge($defaults, $data);
-
-        return $this->wpDb->haveInDatabase($this->grabOrderAddressesTableName(), $addressData);
+        ], $data));
     }
 
     public function getAdminOrderEditUrl(int $orderId): string
@@ -122,26 +105,9 @@ class HPOSOrderStorage extends AbstractOrderStorage
         return "admin.php?page=wc-orders&action=edit&id={$orderId}";
     }
 
-    public function getTableName(): string
-    {
-        return $this->grabOrdersTableName();
-    }
-
-    public function getMetaTableName(): string
-    {
-        return $this->wpDb->grabPostMetaTableName();
-    }
-
-    public function getMetaIdColumnName(): string
-    {
-        return 'order_id';
-    }
-
     public function mapCriteria(array $criteria): array
     {
         $mapped = [];
-
-        // Map legacy field names to HPOS field names
         foreach ($criteria as $key => $value) {
             if ($key === 'post_status') {
                 $mapped['status'] = $value;
@@ -151,7 +117,6 @@ class HPOSOrderStorage extends AbstractOrderStorage
                 $mapped[$key] = $value;
             }
         }
-
         return $mapped;
     }
 
@@ -164,23 +129,15 @@ class HPOSOrderStorage extends AbstractOrderStorage
 
     public function seeAddressInDatabase(string $addressType, array $criteria): void
     {
-        $mapped = $this->mapAddressCriteria($addressType, $criteria);
-        $this->wpDb->seeInDatabase($this->grabOrderAddressesTableName(), $mapped);
+        $this->wpDb->seeInDatabase(
+            $this->grabOrderAddressesTableName(),
+            $this->mapAddressCriteria($addressType, $criteria)
+        );
     }
 
-    public function mapMetaCriteria(array $criteria): array
+    public function getMetaIdColumnName(): string
     {
-        $mapped = $criteria;
-        if (isset($mapped['order_id'])) {
-            $mapped['post_id'] = $mapped['order_id'];
-            unset($mapped['order_id']);
-        }
-        return $mapped;
-    }
-
-    public function getIdColumnName(): string
-    {
-        return 'id';
+        return 'order_id';
     }
 
     public function getOrderAddressTableName(): string
