@@ -1,4 +1,4 @@
-<?php  //[STAMP] cd8c6554a9f544dabbe5a55b9cc0329b
+<?php  //[STAMP] 0c09a544627ec39db0ccbc56a9ac125a
 // phpcs:ignoreFile
 namespace Aztec\WPBrowser\Tests\Support\_generated;
 
@@ -18138,5 +18138,434 @@ trait AcceptanceTesterActions
         $retryNum      = $this->retryNum ?? 1;
         $retryInterval = $this->retryInterval ?? 200;
         return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabProductCategoryIdsFromDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::haveSubscriptionInDatabase()
+     */
+    public function haveSubscriptionInDatabase(array $data = []): int {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('haveSubscriptionInDatabase', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::haveSubscriptionMetaInDatabase()
+     */
+    public function haveSubscriptionMetaInDatabase(int $subscriptionId, string $key, mixed $value): int {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('haveSubscriptionMetaInDatabase', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::haveSubscriptionProductInDatabase()
+     */
+    public function haveSubscriptionProductInDatabase(array $data = []): int {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('haveSubscriptionProductInDatabase', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabSubscriptionIdFromDatabase()
+     */
+    public function grabSubscriptionIdFromDatabase(array $criteria): int|false {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabSubscriptionIdFromDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabSubscriptionIdFromDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabSubscriptionIdFromDatabase()
+     */
+    public function retryGrabSubscriptionIdFromDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabSubscriptionIdFromDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabSubscriptionFieldFromDatabase()
+     */
+    public function grabSubscriptionFieldFromDatabase(int $id, string $field): mixed {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabSubscriptionFieldFromDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabSubscriptionFieldFromDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabSubscriptionFieldFromDatabase()
+     */
+    public function retryGrabSubscriptionFieldFromDatabase(int $id, string $field) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabSubscriptionFieldFromDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabSubscriptionMetaFromDatabase()
+     */
+    public function grabSubscriptionMetaFromDatabase(int $subscriptionId, string $key, bool $single = false): mixed {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabSubscriptionMetaFromDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabSubscriptionMetaFromDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabSubscriptionMetaFromDatabase()
+     */
+    public function retryGrabSubscriptionMetaFromDatabase(int $subscriptionId, string $key, bool $single = false) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabSubscriptionMetaFromDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabSubscriptionStatus()
+     */
+    public function grabSubscriptionStatus(int $subscriptionId): string {
+        return $this->getScenario()->runStep(new \Codeception\Step\Action('grabSubscriptionStatus', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes grabSubscriptionStatus and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::grabSubscriptionStatus()
+     */
+    public function retryGrabSubscriptionStatus(int $subscriptionId) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('grabSubscriptionStatus', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::haveSubscriptionStatus()
+     */
+    public function haveSubscriptionStatus(int $subscriptionId, string $status): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('haveSubscriptionStatus', func_get_args()));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::cancelSubscription()
+     */
+    public function cancelSubscription(int $subscriptionId): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('cancelSubscription', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::cancelSubscription()
+     */
+    public function tryToCancelSubscription(int $subscriptionId): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('cancelSubscription', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes cancelSubscription and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::cancelSubscription()
+     */
+    public function retryCancelSubscription(int $subscriptionId) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('cancelSubscription', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::reactivateSubscription()
+     */
+    public function reactivateSubscription(int $subscriptionId): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('reactivateSubscription', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::reactivateSubscription()
+     */
+    public function tryToReactivateSubscription(int $subscriptionId): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('reactivateSubscription', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes reactivateSubscription and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::reactivateSubscription()
+     */
+    public function retryReactivateSubscription(int $subscriptionId) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('reactivateSubscription', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::expireSubscription()
+     */
+    public function expireSubscription(int $subscriptionId): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('expireSubscription', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::expireSubscription()
+     */
+    public function tryToExpireSubscription(int $subscriptionId): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('expireSubscription', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes expireSubscription and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::expireSubscription()
+     */
+    public function retryExpireSubscription(int $subscriptionId) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('expireSubscription', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeSubscriptionInDatabase()
+     */
+    public function seeSubscriptionInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeSubscriptionInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeSubscriptionInDatabase()
+     */
+    public function canSeeSubscriptionInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeSubscriptionInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeSubscriptionInDatabase()
+     */
+    public function tryToSeeSubscriptionInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeSubscriptionInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeSubscriptionInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeSubscriptionInDatabase()
+     */
+    public function retrySeeSubscriptionInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeSubscriptionInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeSubscriptionMetaInDatabase()
+     */
+    public function seeSubscriptionMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeSubscriptionMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeSubscriptionMetaInDatabase()
+     */
+    public function canSeeSubscriptionMetaInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeSubscriptionMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeSubscriptionMetaInDatabase()
+     */
+    public function tryToSeeSubscriptionMetaInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeSubscriptionMetaInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeSubscriptionMetaInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeSubscriptionMetaInDatabase()
+     */
+    public function retrySeeSubscriptionMetaInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeSubscriptionMetaInDatabase', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeSubscriptionStatus()
+     */
+    public function seeSubscriptionStatus(int $subscriptionId, string $status): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Assertion('seeSubscriptionStatus', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeSubscriptionStatus()
+     */
+    public function canSeeSubscriptionStatus(int $subscriptionId, string $status): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('seeSubscriptionStatus', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeSubscriptionStatus()
+     */
+    public function tryToSeeSubscriptionStatus(int $subscriptionId, string $status): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('seeSubscriptionStatus', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes seeSubscriptionStatus and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::seeSubscriptionStatus()
+     */
+    public function retrySeeSubscriptionStatus(int $subscriptionId, string $status) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('seeSubscriptionStatus', func_get_args(), $retryNum, $retryInterval));
+    }
+
+ 
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeSubscriptionInDatabase()
+     */
+    public function dontSeeSubscriptionInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\Action('dontSeeSubscriptionInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Conditional Assertion: Test won't be stopped on fail
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeSubscriptionInDatabase()
+     */
+    public function cantSeeSubscriptionInDatabase(array $criteria): void {
+        $this->getScenario()->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeSubscriptionInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated. Documentation taken from corresponding module.
+     *
+     * [!] Test won't be stopped on fail. Error won't be logged 
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeSubscriptionInDatabase()
+     */
+    public function tryToDontSeeSubscriptionInDatabase(array $criteria): bool {
+        return $this->getScenario()->runStep(new \Codeception\Step\TryTo('dontSeeSubscriptionInDatabase', func_get_args()));
+    }
+    /**
+     * [!] Method is generated.
+     *
+     * * Executes dontSeeSubscriptionInDatabase and retries on failure.
+     *
+     * Retry number and interval set by $I->retry();
+     *
+     * @see \Aztec\WPBrowser\AztecWPBrowser::dontSeeSubscriptionInDatabase()
+     */
+    public function retryDontSeeSubscriptionInDatabase(array $criteria) {
+        $retryNum      = $this->retryNum ?? 1;
+        $retryInterval = $this->retryInterval ?? 200;
+        return $this->getScenario()->runStep(new \Codeception\Step\Retry('dontSeeSubscriptionInDatabase', func_get_args(), $retryNum, $retryInterval));
     }
 }
