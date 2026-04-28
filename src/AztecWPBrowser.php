@@ -11,9 +11,13 @@ use Aztec\WPBrowser\Method\CouponMethods;
 use Aztec\WPBrowser\Method\CustomerMethods;
 use Aztec\WPBrowser\Method\OrderMethods;
 use Aztec\WPBrowser\Method\ProductMethods;
+use Aztec\WPBrowser\Method\SubscriptionMethods;
 use Aztec\WPBrowser\OrderStorage\HPOSOrderStorage;
 use Aztec\WPBrowser\OrderStorage\LegacyOrderStorage;
 use Aztec\WPBrowser\OrderStorage\OrderStorageInterface;
+use Aztec\WPBrowser\SubscriptionStorage\HPOSSubscriptionStorage;
+use Aztec\WPBrowser\SubscriptionStorage\LegacySubscriptionStorage;
+use Aztec\WPBrowser\SubscriptionStorage\SubscriptionStorageInterface;
 use Aztec\WPBrowser\Page\PageObjectProvider;
 use Codeception\Module;
 use lucatume\WPBrowser\Module\WPDb;
@@ -27,6 +31,7 @@ class AztecWPBrowser extends Module
     use CustomerMethods;
     use OrderMethods;
     use ProductMethods;
+    use SubscriptionMethods;
 
     private ?WooCommerceConfig $wooCommerceConfig = null;
     private ?PageObjectProvider $pageObjectProvider = null;
@@ -74,6 +79,13 @@ class AztecWPBrowser extends Module
         return $this->isHPOSEnabled()
             ? new HPOSOrderStorage($this->wpDb())
             : new LegacyOrderStorage($this->wpDb());
+    }
+
+    protected function subscriptionStorage(): SubscriptionStorageInterface
+    {
+        return $this->isHPOSEnabled()
+            ? new HPOSSubscriptionStorage($this->wpDb())
+            : new LegacySubscriptionStorage($this->wpDb());
     }
 
     private function isHPOSEnabled(): bool

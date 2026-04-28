@@ -1,0 +1,20 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Aztec\WPBrowser\SubscriptionStorage;
+
+use Aztec\WPBrowser\Storage\WooCommerceStorageInterface;
+
+interface SubscriptionStorageInterface extends WooCommerceStorageInterface
+{
+    public function haveSubscriptionInDatabase(array $data): int;
+
+    public function haveSubscriptionMetaInDatabase(int $subscriptionId, string $key, mixed $value): int;
+
+    public function grabSubscriptionMeta(int $subscriptionId, string $key, bool $single = false): mixed;
+
+    public function grabSubscriptionStatus(int $subscriptionId): string;
+
+    public function haveSubscriptionStatus(int $subscriptionId, string $status): void;
+}

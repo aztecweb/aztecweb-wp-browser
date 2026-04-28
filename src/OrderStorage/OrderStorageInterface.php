@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\OrderStorage;
 
-interface OrderStorageInterface
+use Aztec\WPBrowser\Storage\WooCommerceStorageInterface;
+
+interface OrderStorageInterface extends WooCommerceStorageInterface
 {
     public function haveOrderInDatabase(array $data): int;
 
@@ -24,21 +26,11 @@ interface OrderStorageInterface
 
     public function getAdminOrderEditUrl(int $orderId): string;
 
-    public function getTableName(): string;
-
-    public function getMetaTableName(): string;
-
     public function getMetaIdColumnName(): string;
-
-    public function mapCriteria(array $criteria): array;
-
-    public function mapMetaCriteria(array $criteria): array;
 
     public function mapAddressCriteria(string $type, array $criteria): array;
 
     public function seeAddressInDatabase(string $addressType, array $criteria): void;
-
-    public function getIdColumnName(): string;
 
     public function getOrderAddressTableName(): string;
 }
