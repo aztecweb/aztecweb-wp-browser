@@ -21,9 +21,8 @@ class OrderCest
 
         assert(is_int($orderId) && $orderId > 0, 'Order ID should be a positive integer');
 
-        $I->seePostInDatabase([
+        $I->seeOrderInDatabase([
             'ID' => $orderId,
-            'post_type' => 'shop_order',
             'post_status' => 'wc-pending',
         ]);
     }
@@ -37,13 +36,12 @@ class OrderCest
         $I->haveOrderMetaInDatabase($orderId, '_customer_user', '1');
         $I->haveOrderMetaInDatabase($orderId, '_billing_email', 'customer@example.com');
 
-        $I->seePostInDatabase([
+        $I->seeOrderInDatabase([
             'ID' => $orderId,
-            'post_type' => 'shop_order',
             'post_status' => 'wc-processing',
         ]);
 
-        $I->seePostMetaInDatabase([
+        $I->seeOrderMetaInDatabase([
             'post_id' => $orderId,
             'meta_key' => '_customer_user',
             'meta_value' => '1',
@@ -69,7 +67,7 @@ class OrderCest
 
         $I->haveOrderStatus($orderId, 'wc-completed');
 
-        $I->seePostInDatabase([
+        $I->seeOrderInDatabase([
             'ID' => $orderId,
             'post_status' => 'wc-completed',
         ]);
@@ -108,7 +106,7 @@ class OrderCest
         $I->haveOrderMetaInDatabase($orderId, '_payment_method_title', 'Credit Card');
         $I->haveOrderMetaInDatabase($orderId, '_transaction_id', 'txn_123456');
 
-        $I->seePostMetaInDatabase([
+        $I->seeOrderMetaInDatabase([
             'post_id' => $orderId,
             'meta_key' => '_payment_method',
             'meta_value' => 'stripe',
@@ -144,19 +142,19 @@ class OrderCest
 
         assert(is_int($metaId) && $metaId > 0, 'Meta ID should be a positive integer');
 
-        $I->seePostMetaInDatabase([
+        $I->seeOrderMetaInDatabase([
             'post_id' => $orderId,
             'meta_key' => '_billing_first_name',
             'meta_value' => 'John',
         ]);
 
-        $I->seePostMetaInDatabase([
+        $I->seeOrderMetaInDatabase([
             'post_id' => $orderId,
             'meta_key' => '_billing_last_name',
             'meta_value' => 'Doe',
         ]);
 
-        $I->seePostMetaInDatabase([
+        $I->seeOrderMetaInDatabase([
             'post_id' => $orderId,
             'meta_key' => '_billing_email',
             'meta_value' => 'john.doe@example.com',
@@ -436,9 +434,8 @@ class OrderCest
         assert(count($orderIds) === $count);
 
         foreach ($orderIds as $orderId) {
-            $I->seePostInDatabase([
+            $I->seeOrderInDatabase([
                 'ID' => $orderId,
-                'post_type' => 'shop_order',
                 'post_status' => 'wc-pending',
             ]);
         }
@@ -453,9 +450,8 @@ class OrderCest
         assert(count($orderIds) === $count);
 
         foreach ($orderIds as $orderId) {
-            $I->seePostInDatabase([
+            $I->seeOrderInDatabase([
                 'ID' => $orderId,
-                'post_type' => 'shop_order',
             ]);
         }
     }

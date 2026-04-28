@@ -65,8 +65,8 @@ class SubscriptionHPOSCest
             ],
         ]);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $subscriptionId,
+        $I->seeSubscriptionMetaInDatabase([
+            'subscription_id' => $subscriptionId,
             'meta_key' => '_billing_period',
             'meta_value' => 'year',
         ]);
@@ -80,8 +80,8 @@ class SubscriptionHPOSCest
 
         assert(is_int($metaId) && $metaId > 0);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $subscriptionId,
+        $I->seeSubscriptionMetaInDatabase([
+            'subscription_id' => $subscriptionId,
             'meta_key' => '_order_total',
             'meta_value' => '99.00',
         ]);
@@ -257,14 +257,14 @@ class SubscriptionHPOSCest
     {
         $subscriptionId = $I->haveSubscriptionInDatabase();
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $subscriptionId,
+        $I->seeSubscriptionMetaInDatabase([
+            'subscription_id' => $subscriptionId,
             'meta_key' => '_billing_period',
             'meta_value' => 'month',
         ]);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $subscriptionId,
+        $I->seeSubscriptionMetaInDatabase([
+            'subscription_id' => $subscriptionId,
             'meta_key' => '_billing_interval',
             'meta_value' => '1',
         ]);
@@ -281,13 +281,12 @@ class SubscriptionHPOSCest
 
         assert(is_int($productId) && $productId > 0);
 
-        $I->seePostInDatabase([
+        $I->seeProductInDatabase([
             'ID' => $productId,
-            'post_type' => 'product',
         ]);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $productId,
+        $I->seeProductMetaInDatabase([
+            'product_id' => $productId,
             'meta_key' => '_subscription_price',
             'meta_value' => '49.99',
         ]);

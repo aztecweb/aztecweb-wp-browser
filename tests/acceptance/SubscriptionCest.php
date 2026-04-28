@@ -19,9 +19,8 @@ class SubscriptionCest
 
         assert(is_int($subscriptionId) && $subscriptionId > 0);
 
-        $I->seePostInDatabase([
+        $I->seeSubscriptionInDatabase([
             'ID' => $subscriptionId,
-            'post_type' => 'shop_subscription',
             'post_status' => 'wc-active',
         ]);
     }
@@ -32,7 +31,7 @@ class SubscriptionCest
             'post_status' => 'wc-on-hold',
         ]);
 
-        $I->seePostInDatabase([
+        $I->seeSubscriptionInDatabase([
             'ID' => $subscriptionId,
             'post_status' => 'wc-on-hold',
         ]);
@@ -48,14 +47,14 @@ class SubscriptionCest
             ],
         ]);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $subscriptionId,
+        $I->seeSubscriptionMetaInDatabase([
+            'subscription_id' => $subscriptionId,
             'meta_key' => '_billing_period',
             'meta_value' => 'year',
         ]);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $subscriptionId,
+        $I->seeSubscriptionMetaInDatabase([
+            'subscription_id' => $subscriptionId,
             'meta_key' => '_customer_user',
             'meta_value' => '1',
         ]);
@@ -69,8 +68,8 @@ class SubscriptionCest
 
         assert(is_int($metaId) && $metaId > 0);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $subscriptionId,
+        $I->seeSubscriptionMetaInDatabase([
+            'subscription_id' => $subscriptionId,
             'meta_key' => '_order_total',
             'meta_value' => '99.00',
         ]);
@@ -141,7 +140,7 @@ class SubscriptionCest
 
         $I->haveSubscriptionStatus($subscriptionId, 'wc-active');
 
-        $I->seePostInDatabase([
+        $I->seeSubscriptionInDatabase([
             'ID' => $subscriptionId,
             'post_status' => 'wc-active',
         ]);
@@ -238,19 +237,18 @@ class SubscriptionCest
 
         assert(is_int($productId) && $productId > 0);
 
-        $I->seePostInDatabase([
+        $I->seeProductInDatabase([
             'ID' => $productId,
-            'post_type' => 'product',
             'post_status' => 'publish',
         ]);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $productId,
+        $I->seeProductMetaInDatabase([
+            'product_id' => $productId,
             'meta_key' => '_subscription_price',
         ]);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $productId,
+        $I->seeProductMetaInDatabase([
+            'product_id' => $productId,
             'meta_key' => '_subscription_period',
         ]);
     }
@@ -266,19 +264,19 @@ class SubscriptionCest
             ],
         ]);
 
-        $I->seePostInDatabase([
+        $I->seeProductInDatabase([
             'ID' => $productId,
             'post_title' => 'Premium Monthly Subscription',
         ]);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $productId,
+        $I->seeProductMetaInDatabase([
+            'product_id' => $productId,
             'meta_key' => '_subscription_price',
             'meta_value' => '29.99',
         ]);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $productId,
+        $I->seeProductMetaInDatabase([
+            'product_id' => $productId,
             'meta_key' => '_subscription_sign_up_fee',
             'meta_value' => '5.00',
         ]);
@@ -307,20 +305,20 @@ class SubscriptionCest
     {
         $subscriptionId = $I->haveSubscriptionInDatabase();
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $subscriptionId,
+        $I->seeSubscriptionMetaInDatabase([
+            'subscription_id' => $subscriptionId,
             'meta_key' => '_billing_period',
             'meta_value' => 'month',
         ]);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $subscriptionId,
+        $I->seeSubscriptionMetaInDatabase([
+            'subscription_id' => $subscriptionId,
             'meta_key' => '_billing_interval',
             'meta_value' => '1',
         ]);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $subscriptionId,
+        $I->seeSubscriptionMetaInDatabase([
+            'subscription_id' => $subscriptionId,
             'meta_key' => '_subscription_expiry_date',
             'meta_value' => '0',
         ]);

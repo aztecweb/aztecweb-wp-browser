@@ -17,7 +17,7 @@ class CustomerCest
 
         assert(is_int($customerId) && $customerId > 0, 'Customer ID should be a positive integer');
 
-        $I->seeUserInDatabase([
+        $I->seeCustomerInDatabase([
             'ID' => $customerId,
             'user_login' => 'john_doe',
             'user_email' => 'john.doe@example.com',
@@ -30,7 +30,7 @@ class CustomerCest
 
         assert(is_int($customerId) && $customerId > 0, 'Customer ID should be a positive integer');
 
-        $I->seeUserInDatabase([
+        $I->seeCustomerInDatabase([
             'ID' => $customerId,
             'user_login' => 'customer',
             'user_email' => 'customer@example.com',
@@ -95,19 +95,19 @@ class CustomerCest
             ],
         ]);
 
-        $I->seeUserMetaInDatabase([
+        $I->seeCustomerMetaInDatabase([
             'user_id' => $customerId,
             'meta_key' => 'custom_field_1',
             'meta_value' => 'value_1',
         ]);
 
-        $I->seeUserMetaInDatabase([
+        $I->seeCustomerMetaInDatabase([
             'user_id' => $customerId,
             'meta_key' => 'custom_field_2',
             'meta_value' => 'value_2',
         ]);
 
-        $I->seeUserMetaInDatabase([
+        $I->seeCustomerMetaInDatabase([
             'user_id' => $customerId,
             'meta_key' => 'custom_field_3',
             'meta_value' => 'value_3',
@@ -362,7 +362,7 @@ class CustomerCest
 
         assert(is_int($metaId) && $metaId > 0, 'Meta ID should be a positive integer');
 
-        $I->seeUserMetaInDatabase([
+        $I->seeCustomerMetaInDatabase([
             'user_id' => $customerId,
             'meta_key' => 'custom_meta',
             'meta_value' => 'custom_value',
@@ -379,19 +379,19 @@ class CustomerCest
         $I->haveCustomerMetaInDatabase($customerId, 'meta_2', 'value_2');
         $I->haveCustomerMetaInDatabase($customerId, 'meta_3', 'value_3');
 
-        $I->seeUserMetaInDatabase([
+        $I->seeCustomerMetaInDatabase([
             'user_id' => $customerId,
             'meta_key' => 'meta_1',
             'meta_value' => 'value_1',
         ]);
 
-        $I->seeUserMetaInDatabase([
+        $I->seeCustomerMetaInDatabase([
             'user_id' => $customerId,
             'meta_key' => 'meta_2',
             'meta_value' => 'value_2',
         ]);
 
-        $I->seeUserMetaInDatabase([
+        $I->seeCustomerMetaInDatabase([
             'user_id' => $customerId,
             'meta_key' => 'meta_3',
             'meta_value' => 'value_3',

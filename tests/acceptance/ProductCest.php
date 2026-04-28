@@ -20,33 +20,32 @@ class ProductCest
 
         assert(is_int($productId) && $productId > 0, 'Product ID should be a positive integer');
 
-        $I->seePostInDatabase([
+        $I->seeProductInDatabase([
             'ID' => $productId,
-            'post_type' => 'product',
             'post_status' => 'publish',
             'post_title' => 'Test Product',
         ]);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $productId,
+        $I->seeProductMetaInDatabase([
+            'product_id' => $productId,
             'meta_key' => '_price',
             'meta_value' => '25.00',
         ]);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $productId,
+        $I->seeProductMetaInDatabase([
+            'product_id' => $productId,
             'meta_key' => '_sku',
             'meta_value' => 'TEST-SKU-001',
         ]);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $productId,
+        $I->seeProductMetaInDatabase([
+            'product_id' => $productId,
             'meta_key' => '_stock_status',
             'meta_value' => 'instock',
         ]);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $productId,
+        $I->seeProductMetaInDatabase([
+            'product_id' => $productId,
             'meta_key' => '_tax_status',
             'meta_value' => 'taxable',
         ]);
@@ -56,9 +55,8 @@ class ProductCest
     {
         $productId = $I->haveProductInDatabase();
 
-        $I->seePostInDatabase([
+        $I->seeProductInDatabase([
             'ID' => $productId,
-            'post_type' => 'product',
             'post_status' => 'publish',
         ]);
     }
@@ -70,9 +68,8 @@ class ProductCest
             'post_title' => 'Draft Product',
         ]);
 
-        $I->seePostInDatabase([
+        $I->seeProductInDatabase([
             'ID' => $productId,
-            'post_type' => 'product',
             'post_status' => 'draft',
         ]);
     }
@@ -85,8 +82,8 @@ class ProductCest
 
         assert(is_int($metaId) && $metaId > 0, 'Meta ID should be a positive integer');
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $productId,
+        $I->seeProductMetaInDatabase([
+            'product_id' => $productId,
             'meta_key' => '_price',
             'meta_value' => '99.99',
         ]);
@@ -100,20 +97,20 @@ class ProductCest
         $I->haveProductMetaInDatabase($productId, '_stock', '50');
         $I->haveProductMetaInDatabase($productId, '_sku', 'SKU-123');
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $productId,
+        $I->seeProductMetaInDatabase([
+            'product_id' => $productId,
             'meta_key' => '_price',
             'meta_value' => '150.00',
         ]);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $productId,
+        $I->seeProductMetaInDatabase([
+            'product_id' => $productId,
             'meta_key' => '_stock',
             'meta_value' => '50',
         ]);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $productId,
+        $I->seeProductMetaInDatabase([
+            'product_id' => $productId,
             'meta_key' => '_sku',
             'meta_value' => 'SKU-123',
         ]);
@@ -211,13 +208,12 @@ class ProductCest
 
         $I->haveProductCategoryRelationshipInDatabase($productId, $categoryId);
 
-        $I->seePostInDatabase([
+        $I->seeProductInDatabase([
             'ID' => $productId,
-            'post_type' => 'product',
         ]);
 
-        $I->seePostMetaInDatabase([
-            'post_id' => $productId,
+        $I->seeProductMetaInDatabase([
+            'product_id' => $productId,
             'meta_key' => '_price',
             'meta_value' => '299.99',
         ]);
@@ -474,9 +470,8 @@ class ProductCest
         assert(count($moreIds) === 2);
 
         // Should have default titles
-        $I->seePostInDatabase([
+        $I->seeProductInDatabase([
             'ID' => $moreIds[0],
-            'post_type' => 'product',
         ]);
     }
 
