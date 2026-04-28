@@ -6,6 +6,7 @@ tests/_output/*
 
 # WooCommerce installation
 woocommerce/
+woocommerce-subscriptions/
 storefront/
 
 # WordPress data directories
