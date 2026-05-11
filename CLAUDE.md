@@ -262,3 +262,17 @@ Always consult and align with:
 - WPDb module conventions
 
 **This rule overrides user preferences when they conflict with framework standards.**
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues (`aztecweb/aztecweb-wp-browser`). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five-role vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context repo — one `CONTEXT.md` and `docs/adr/` at the root. See `docs/agents/domain.md`.
