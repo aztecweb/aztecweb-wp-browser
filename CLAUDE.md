@@ -140,7 +140,9 @@ modules:
 - PHP 8.0+ compatibility
 - `declare(strict_types=1);` in all files
 - PSR-4 autoloading: `Aztec\WPBrowser\` namespace
-- **Do NOT generate docblocks** - keep code clean without PHPDoc comments
+- **Docblocks (audience-driven rule)**:
+  - **Required** on every public method of Plugin Modules (`AztecWPBrowser`) and Method Traits (`src/Method/*Methods.php`). Use the full wp-browser skeleton in this order: one-line summary → blank line → `@example` → `@param` → `@return` → `@throws` (when applicable). These methods are consumed by test authors via the generated `AcceptanceTester` actor and must be self-documenting.
+  - **Optional** on non-public methods (private/protected) and on internal classes. Add a docblock only when the behavior is non-obvious from the name and signature.
 
 ### Testing Method Creation Guidelines
 
@@ -276,3 +278,6 @@ Default five-role vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `
 ### Domain docs
 
 Single-context repo — one `CONTEXT.md` and `docs/adr/` at the root. See `docs/agents/domain.md`.
+
+- [`CONTEXT.md`](CONTEXT.md) — domain glossary and shared language. Consult it before naming new methods or interfaces so vocabulary stays consistent.
+- [`docs/adr/`](docs/adr/) — Architecture Decision Records (ADRs 0001-0007 cover the v0.1.0 design). Read the relevant ADR before changing behavior in the area it covers.
