@@ -1,8 +1,25 @@
 {
   "name": "aztecweb/aztecweb-wp-browser",
-  "description": "Codeception module for WooCommerce acceptance tests.",
+  "description": "Codeception/wp-browser extensions for WordPress plugin testing.",
   "type": "library",
   "license": "MIT",
+  "keywords": [
+    "wordpress",
+    "codeception",
+    "wp-browser"
+  ],
+  "homepage": "https://github.com/aztecweb/aztecweb-wp-browser",
+  "authors": [
+    {
+      "name": "Aztec Online Solutions",
+      "email": "aztec@aztecweb.net",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/aztecweb/aztecweb-wp-browser/issues",
+    "source": "https://github.com/aztecweb/aztecweb-wp-browser"
+  },
   "config": {
     "preferred-install": {
       "codeception/codeception": "source",
@@ -12,6 +29,7 @@
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true
     }
+    "sort-packages": true
   },
   "autoload": {
     "psr-4": {
@@ -20,7 +38,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Aztec\\WPBrowser\\Tests\\": "tests/"
+      "Aztec\\WPBrowser\\Tests\\": "tests/",
+      "Aztec\\WPBrowser\\Tests\\Support\\": "tests/_support/"
     }
   },
   "require": {
