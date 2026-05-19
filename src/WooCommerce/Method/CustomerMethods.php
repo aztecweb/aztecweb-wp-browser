@@ -4,17 +4,11 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\WooCommerce\Method;
 
-use Aztec\WPBrowser\WooCommerce\Config\WooCommerceConfig;
 use lucatume\WPBrowser\Module\WPDb;
-use lucatume\WPBrowser\Module\WPWebDriver;
 
 trait CustomerMethods
 {
-    abstract protected function wpWebDriver(): WPWebDriver;
-
     abstract protected function wpDb(): WPDb;
-
-    abstract protected function wooCommerceConfig(): WooCommerceConfig;
 
     public function haveCustomerInDatabase(array $data = []): int
     {
@@ -182,12 +176,6 @@ trait CustomerMethods
     {
         $table = $this->wpDb()->grabUserMetaTableName();
         $this->wpDb()->dontSeeInDatabase($table, $criteria);
-    }
-
-    
-    public function amOnMyAccountPage(): void
-    {
-        $this->wpWebDriver()->amOnPage($this->wooCommerceConfig()->myAccountPageSlug());
     }
 
     public function grabCustomerIdFromDatabase(array $criteria): int|false

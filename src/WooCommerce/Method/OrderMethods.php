@@ -6,12 +6,9 @@ namespace Aztec\WPBrowser\WooCommerce\Method;
 
 use Aztec\WPBrowser\WooCommerce\OrderStorage\OrderStorageInterface;
 use lucatume\WPBrowser\Module\WPDb;
-use lucatume\WPBrowser\Module\WPWebDriver;
 
 trait OrderMethods
 {
-    abstract protected function wpWebDriver(): WPWebDriver;
-
     abstract protected function wpDb(): WPDb;
 
     abstract protected function orderStorage(): OrderStorageInterface;
@@ -29,12 +26,6 @@ trait OrderMethods
     public function grabOrderMeta(int $orderId, string $key, bool $single = false): mixed
     {
         return $this->orderStorage()->grabOrderMeta($orderId, $key, $single);
-    }
-
-    public function amOnAdminOrderPage(int $orderId): void
-    {
-        $url = $this->orderStorage()->getAdminOrderEditUrl($orderId);
-        $this->wpWebDriver()->amOnAdminPage($url);
     }
 
     public function grabOrderStatus(int $orderId): string
