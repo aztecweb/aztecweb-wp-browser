@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser\Method;
+namespace Aztec\WPBrowser\WooCommerce\Method;
 
-use Aztec\WPBrowser\SubscriptionStorage\SubscriptionStorageInterface;
+use Aztec\WPBrowser\WooCommerce\SubscriptionStorage\SubscriptionStorageInterface;
 use lucatume\WPBrowser\Module\WPDb;
 
 trait SubscriptionMethods

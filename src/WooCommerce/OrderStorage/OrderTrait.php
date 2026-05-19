@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser\OrderStorage;
+namespace Aztec\WPBrowser\WooCommerce\OrderStorage;
 
 trait OrderTrait
 {

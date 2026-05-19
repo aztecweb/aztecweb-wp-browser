@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser\OrderStorage;
+namespace Aztec\WPBrowser\WooCommerce\OrderStorage;
 
-use Aztec\WPBrowser\Storage\WooCommerceStorageInterface;
+use Aztec\WPBrowser\WooCommerce\Storage\WooCommerceStorageInterface;
 
 interface OrderStorageInterface extends WooCommerceStorageInterface
 {

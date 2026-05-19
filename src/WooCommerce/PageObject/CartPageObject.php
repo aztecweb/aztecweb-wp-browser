@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser\Page;
+namespace Aztec\WPBrowser\WooCommerce\PageObject;
 
 class CartPageObject
 {

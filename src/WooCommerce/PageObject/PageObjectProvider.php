@@ -2,10 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser\Page;
-
-use Aztec\WPBrowser\Page\CartPageObject;
-use Aztec\WPBrowser\Page\CheckoutPageObject;
+namespace Aztec\WPBrowser\WooCommerce\PageObject;
 
 class PageObjectProvider
 {

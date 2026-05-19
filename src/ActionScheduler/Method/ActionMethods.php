@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser\Method;
+namespace Aztec\WPBrowser\ActionScheduler\Method;
 
 use lucatume\WPBrowser\Module\WPDb;
 
-trait ActionSchedulerMethods
+trait ActionMethods
 {
     abstract protected function wpDb(): WPDb;
 

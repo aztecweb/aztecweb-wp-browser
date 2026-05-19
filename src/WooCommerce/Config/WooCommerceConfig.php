@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser\Config;
+namespace Aztec\WPBrowser\WooCommerce\Config;
 
 use lucatume\WPBrowser\Module\WPDb;
 

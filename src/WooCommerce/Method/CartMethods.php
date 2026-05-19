@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser\Method;
+namespace Aztec\WPBrowser\WooCommerce\Method;
 
-use Aztec\WPBrowser\Config\WooCommerceConfig;
-use Aztec\WPBrowser\Page\PageObjectProvider;
+use Aztec\WPBrowser\WooCommerce\Config\WooCommerceConfig;
+use Aztec\WPBrowser\WooCommerce\PageObject\PageObjectProvider;
 use Codeception\Util\Locator;
 use lucatume\WPBrowser\Module\WPDb;
 use lucatume\WPBrowser\Module\WPWebDriver;
@@ -50,7 +50,7 @@ trait CartMethods
     public function seeCartItemQuantity(int $productId, int $quantity): void
     {
         $productName      = $this->wpDb()->grabPostFieldFromDatabase($productId, 'post_title');
-        $cartItemXpath         = Locator::contains($this->pageObjectProvider->cartPage()::CART_ITEM_SELECTOR, $productName);
+        $cartItemXpath         = Locator::contains($this->pageObjectProvider()->cartPage()::CART_ITEM_SELECTOR, $productName);
         $cartItemQuantity = $this->wpWebDriver()->grabAttributeFrom(
             $this->pageObjectProvider()->cartPage()->cartItemQuantitySelector($cartItemXpath),
             'value'
@@ -62,7 +62,7 @@ trait CartMethods
     public function seeCartTotalQuantity(int $quantity): void
     {
         $totalQuantity = $this->wpWebDriver()->executeJS(
-            'return Array.from(document.querySelectorAll("' . $this->pageObjectProvider->cartPage()::PRODUCT_QUANTITY_SELECTOR . '"))'
+            'return Array.from(document.querySelectorAll("' . $this->pageObjectProvider()->cartPage()::PRODUCT_QUANTITY_SELECTOR . '"))'
             . '.reduce((sum, input) => sum + parseInt(input.value), 0)'
         );
 
@@ -73,9 +73,9 @@ trait CartMethods
     {
         $countItemsJs   = sprintf(
             "return document.querySelectorAll('%s').length",
-            $this->pageObjectProvider->cartPage()::REMOVE_ITEM_SELECTOR
+            $this->pageObjectProvider()->cartPage()::REMOVE_ITEM_SELECTOR
         );
-        $clickRemoveJs  = sprintf("document.querySelector('%s').click()", $this->pageObjectProvider->cartPage()::REMOVE_ITEM_SELECTOR);
+        $clickRemoveJs  = sprintf("document.querySelector('%s').click()", $this->pageObjectProvider()->cartPage()::REMOVE_ITEM_SELECTOR);
         $remainingItems = $this->wpWebDriver()->executeJS($countItemsJs);
 
         while ($remainingItems > 0) {
@@ -83,7 +83,7 @@ trait CartMethods
             $this->wpWebDriver()->waitForJS(
                 sprintf(
                     "return document.querySelectorAll('%s').length < %d",
-                    $this->pageObjectProvider->cartPage()::REMOVE_ITEM_SELECTOR,
+                    $this->pageObjectProvider()->cartPage()::REMOVE_ITEM_SELECTOR,
                     $remainingItems
                 )
             );

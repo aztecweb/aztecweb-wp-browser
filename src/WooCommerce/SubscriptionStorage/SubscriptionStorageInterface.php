@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser\SubscriptionStorage;
+namespace Aztec\WPBrowser\WooCommerce\SubscriptionStorage;
 
-use Aztec\WPBrowser\Storage\WooCommerceStorageInterface;
+use Aztec\WPBrowser\WooCommerce\Storage\WooCommerceStorageInterface;
 
 interface SubscriptionStorageInterface extends WooCommerceStorageInterface
 {

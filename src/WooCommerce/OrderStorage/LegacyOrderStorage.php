@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser\OrderStorage;
+namespace Aztec\WPBrowser\WooCommerce\OrderStorage;
 
-use Aztec\WPBrowser\Storage\AbstractLegacyStorage;
+use Aztec\WPBrowser\WooCommerce\Storage\AbstractLegacyStorage;
 
 class LegacyOrderStorage extends AbstractLegacyStorage implements OrderStorageInterface
 {

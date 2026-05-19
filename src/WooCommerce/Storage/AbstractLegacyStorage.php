@@ -2,21 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser\Storage;
+namespace Aztec\WPBrowser\WooCommerce\Storage;
 
 use lucatume\WPBrowser\Module\WPDb;
 
-abstract class AbstractHPOSStorage implements WooCommerceStorageInterface
+abstract class AbstractLegacyStorage implements WooCommerceStorageInterface
 {
-    use HPOSStorageTrait;
-
     public function __construct(protected WPDb $wpDb) {}
 
     abstract protected function getEntityIdKey(): string;
 
     public function getTableName(): string
     {
-        return $this->grabWcOrdersTableName();
+        return $this->wpDb->grabPostsTableName();
     }
 
     public function getMetaTableName(): string
@@ -26,14 +24,20 @@ abstract class AbstractHPOSStorage implements WooCommerceStorageInterface
 
     public function getIdColumnName(): string
     {
-        return 'id';
+        return 'ID';
     }
 
     public function mapCriteria(array $criteria): array
     {
         $mapped = [];
         foreach ($criteria as $key => $value) {
-            $mapped[$key === 'post_status' ? 'status' : $key] = $value;
+            if ($key === 'status') {
+                $mapped['post_status'] = $value;
+            } elseif ($key === 'id') {
+                $mapped['ID'] = $value;
+            } else {
+                $mapped[$key] = $value;
+            }
         }
         return $mapped;
     }
@@ -62,18 +66,18 @@ abstract class AbstractHPOSStorage implements WooCommerceStorageInterface
     protected function grabEntityStatus(int $entityId): string
     {
         return (string) $this->wpDb->grabFromDatabase(
-            $this->grabWcOrdersTableName(),
-            'status',
-            ['id' => $entityId]
+            $this->wpDb->grabPostsTableName(),
+            'post_status',
+            ['ID' => $entityId]
         );
     }
 
     protected function haveEntityStatus(int $entityId, string $status): void
     {
         $this->wpDb->updateInDatabase(
-            $this->grabWcOrdersTableName(),
-            ['status' => $status],
-            ['id' => $entityId]
+            $this->wpDb->grabPostsTableName(),
+            ['post_status' => $status],
+            ['ID' => $entityId]
         );
     }
 }

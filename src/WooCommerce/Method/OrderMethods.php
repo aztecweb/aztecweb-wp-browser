@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser\Method;
+namespace Aztec\WPBrowser\WooCommerce\Method;
 
-use Aztec\WPBrowser\OrderStorage\OrderStorageInterface;
+use Aztec\WPBrowser\WooCommerce\OrderStorage\OrderStorageInterface;
 use lucatume\WPBrowser\Module\WPDb;
 use lucatume\WPBrowser\Module\WPWebDriver;
 

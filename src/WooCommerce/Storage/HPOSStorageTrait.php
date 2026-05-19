@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser\Storage;
+namespace Aztec\WPBrowser\WooCommerce\Storage;
 
 trait HPOSStorageTrait
 {

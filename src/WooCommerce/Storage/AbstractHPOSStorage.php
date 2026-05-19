@@ -2,19 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser\Storage;
+namespace Aztec\WPBrowser\WooCommerce\Storage;
 
 use lucatume\WPBrowser\Module\WPDb;
 
-abstract class AbstractLegacyStorage implements WooCommerceStorageInterface
+abstract class AbstractHPOSStorage implements WooCommerceStorageInterface
 {
+    use HPOSStorageTrait;
+
     public function __construct(protected WPDb $wpDb) {}
 
     abstract protected function getEntityIdKey(): string;
 
     public function getTableName(): string
     {
-        return $this->wpDb->grabPostsTableName();
+        return $this->grabWcOrdersTableName();
     }
 
     public function getMetaTableName(): string
@@ -24,20 +26,14 @@ abstract class AbstractLegacyStorage implements WooCommerceStorageInterface
 
     public function getIdColumnName(): string
     {
-        return 'ID';
+        return 'id';
     }
 
     public function mapCriteria(array $criteria): array
     {
         $mapped = [];
         foreach ($criteria as $key => $value) {
-            if ($key === 'status') {
-                $mapped['post_status'] = $value;
-            } elseif ($key === 'id') {
-                $mapped['ID'] = $value;
-            } else {
-                $mapped[$key] = $value;
-            }
+            $mapped[$key === 'post_status' ? 'status' : $key] = $value;
         }
         return $mapped;
     }
@@ -66,18 +62,18 @@ abstract class AbstractLegacyStorage implements WooCommerceStorageInterface
     protected function grabEntityStatus(int $entityId): string
     {
         return (string) $this->wpDb->grabFromDatabase(
-            $this->wpDb->grabPostsTableName(),
-            'post_status',
-            ['ID' => $entityId]
+            $this->grabWcOrdersTableName(),
+            'status',
+            ['id' => $entityId]
         );
     }
 
     protected function haveEntityStatus(int $entityId, string $status): void
     {
         $this->wpDb->updateInDatabase(
-            $this->wpDb->grabPostsTableName(),
-            ['post_status' => $status],
-            ['ID' => $entityId]
+            $this->grabWcOrdersTableName(),
+            ['status' => $status],
+            ['id' => $entityId]
         );
     }
 }

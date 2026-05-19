@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser\Method;
+namespace Aztec\WPBrowser\WooCommerce\Method;
 
-use Aztec\WPBrowser\Config\WooCommerceConfig;
-use Aztec\WPBrowser\Page\PageObjectProvider;
+use Aztec\WPBrowser\WooCommerce\Config\WooCommerceConfig;
+use Aztec\WPBrowser\WooCommerce\PageObject\PageObjectProvider;
 use lucatume\WPBrowser\Module\WPDb;
 use lucatume\WPBrowser\Module\WPWebDriver;
 

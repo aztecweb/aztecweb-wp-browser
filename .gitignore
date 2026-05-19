@@ -7,9 +7,9 @@ tests/_support/_generated/
 tests/_data/dump.sql
 
 # WooCommerce installation
-woocommerce/
-woocommerce-subscriptions/
-storefront/
+/woocommerce/
+/woocommerce-subscriptions/
+/storefront/
 
 # WordPress data directories
 wordpress_data/

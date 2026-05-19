@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser\SubscriptionStorage;
+namespace Aztec\WPBrowser\WooCommerce\SubscriptionStorage;
 
-use Aztec\WPBrowser\Storage\AbstractHPOSStorage;
+use Aztec\WPBrowser\WooCommerce\Storage\AbstractHPOSStorage;
 
 class HPOSSubscriptionStorage extends AbstractHPOSStorage implements SubscriptionStorageInterface
 {

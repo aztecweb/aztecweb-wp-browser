@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser\OrderStorage;
+namespace Aztec\WPBrowser\WooCommerce\OrderStorage;
 
-use Aztec\WPBrowser\Storage\AbstractHPOSStorage;
+use Aztec\WPBrowser\WooCommerce\Storage\AbstractHPOSStorage;
 
 class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterface
 {
