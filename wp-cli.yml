@@ -1,1 +1,3 @@
-path: /var/www/html
+path: public/wp
+require:
+  - public/wp-config.php
