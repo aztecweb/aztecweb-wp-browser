@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser;
+namespace Aztec\WPBrowser\WooCommerce\Module;
 
+use Aztec\WPBrowser\ActionScheduler\Method\ActionMethods;
 use Aztec\WPBrowser\WooCommerce\Config\WooCommerceConfig;
-use Aztec\WPBrowser\WooCommerce\Method\CartMethods;
-use Aztec\WPBrowser\WooCommerce\Method\CheckoutMethods;
 use Aztec\WPBrowser\WooCommerce\Method\CouponMethods;
 use Aztec\WPBrowser\WooCommerce\Method\CustomerMethods;
 use Aztec\WPBrowser\WooCommerce\Method\OrderMethods;
@@ -15,18 +14,16 @@ use Aztec\WPBrowser\WooCommerce\Method\SubscriptionMethods;
 use Aztec\WPBrowser\WooCommerce\OrderStorage\HPOSOrderStorage;
 use Aztec\WPBrowser\WooCommerce\OrderStorage\LegacyOrderStorage;
 use Aztec\WPBrowser\WooCommerce\OrderStorage\OrderStorageInterface;
-use Aztec\WPBrowser\WooCommerce\PageObject\PageObjectProvider;
 use Aztec\WPBrowser\WooCommerce\SubscriptionStorage\HPOSSubscriptionStorage;
 use Aztec\WPBrowser\WooCommerce\SubscriptionStorage\LegacySubscriptionStorage;
 use Aztec\WPBrowser\WooCommerce\SubscriptionStorage\SubscriptionStorageInterface;
+use Codeception\Exception\ModuleException;
 use Codeception\Module;
 use lucatume\WPBrowser\Module\WPDb;
-use lucatume\WPBrowser\Module\WPWebDriver;
 
-class AztecWPBrowser extends Module
+class WooCommerceDb extends Module
 {
-    use CartMethods;
-    use CheckoutMethods;
+    use ActionMethods;
     use CouponMethods;
     use CustomerMethods;
     use OrderMethods;
@@ -34,26 +31,30 @@ class AztecWPBrowser extends Module
     use SubscriptionMethods;
 
     private ?WooCommerceConfig $wooCommerceConfig = null;
-    private ?PageObjectProvider $pageObjectProvider = null;
 
-    protected array $config = [
-        'pageObjects' => []
-    ];
-
-    protected function wpWebDriver(): WPWebDriver
+    public function _initialize(): void
     {
-        /** @var WPWebDriver $wpWebDriver */
-        $wpWebDriver = $this->getModule('WPWebDriver');
+        if (! $this->hasModule('WPDb')) {
+            throw new ModuleException(
+                $this,
+                'WooCommerceDb requires the WPDb module to be enabled in the same suite.',
+            );
+        }
+    }
 
-        return $wpWebDriver;
+    protected function isHposEnabled(): bool
+    {
+        $value = $this->wpDb()->grabOptionFromDatabase('woocommerce_custom_orders_table_enabled');
+
+        return $value === 'yes';
     }
 
     protected function wpDb(): WPDb
     {
-        /** @var WPDb $wpDb */
-        $wpDb = $this->getModule('WPDb');
+        $module = $this->getModule('WPDb');
+        assert($module instanceof WPDb);
 
-        return $wpDb;
+        return $module;
     }
 
     protected function wooCommerceConfig(): WooCommerceConfig
@@ -65,32 +66,17 @@ class AztecWPBrowser extends Module
         return $this->wooCommerceConfig;
     }
 
-    protected function pageObjectProvider(): PageObjectProvider
-    {
-        if ($this->pageObjectProvider === null) {
-            $this->pageObjectProvider = new PageObjectProvider($this->_getConfig('pageObjects'));
-        }
-
-        return $this->pageObjectProvider;
-    }
-
     protected function orderStorage(): OrderStorageInterface
     {
-        return $this->isHPOSEnabled()
+        return $this->isHposEnabled()
             ? new HPOSOrderStorage($this->wpDb())
             : new LegacyOrderStorage($this->wpDb());
     }
 
     protected function subscriptionStorage(): SubscriptionStorageInterface
     {
-        return $this->isHPOSEnabled()
+        return $this->isHposEnabled()
             ? new HPOSSubscriptionStorage($this->wpDb())
             : new LegacySubscriptionStorage($this->wpDb());
-    }
-
-    private function isHPOSEnabled(): bool
-    {
-        $value = $this->wpDb()->grabOptionFromDatabase('woocommerce_custom_orders_table_enabled');
-        return $value === 'yes' || $value === true;
     }
 }

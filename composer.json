@@ -60,7 +60,10 @@
   "autoload": {
     "psr-4": {
       "Aztec\\WPBrowser\\": "src/"
-    }
+    },
+    "files": [
+      "src/aliases.php"
+    ]
   },
   "autoload-dev": {
     "psr-4": {

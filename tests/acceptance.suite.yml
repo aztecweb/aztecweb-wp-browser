@@ -10,8 +10,9 @@ modules:
     enabled:
         - WPDb
         - WPWebDriver
+        - WooCommerceDb
+        - WooCommerceWebDriver
         - \Aztec\WPBrowser\Tests\Support\Helper\Acceptance
-        - \Aztec\WPBrowser\AztecWPBrowser
     config:
         WPDb:
             dsn: 'sqlite:%DB_PATH%'
