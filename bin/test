@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+#
+# Run the test suite inside the all-in-one test image.
+#
+# Usage:
+#   bin/test                          # equivalent to: codecept run
+#   bin/test run acceptance           # runs only the acceptance suite
+#   bin/test run acceptance CouponCest
+#
+# Environment overrides:
+#   AZTEC_TEST_IMAGE  Image reference to run (default: GHCR php8.4 tag)
+#   AZTEC_TEST_DOCKER Docker CLI to use     (default: docker)
+#
+# The host repo is bind-mounted into /var/www/html so the container picks up
+# local edits without rebuilding the image. Run `composer install` on the host
+# first so vendor/ and the public/ WordPress tree exist.
+
+set -euo pipefail
+
+IMAGE="${AZTEC_TEST_IMAGE:-ghcr.io/aztecweb/aztecweb-wp-browser-test-runner:php8.4}"
+DOCKER="${AZTEC_TEST_DOCKER:-docker}"
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+exec "$DOCKER" run --rm -it \
+    -v "$REPO_ROOT:/var/www/html" \
+    -w /var/www/html \
+    "$IMAGE" \
+    vendor/bin/codecept "$@"

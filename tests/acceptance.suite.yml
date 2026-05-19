@@ -1,6 +1,9 @@
 # Codeception Acceptance Suite Configuration
 #
-# Run acceptance tests against WordPress with WooCommerce
+# Runs against the self-contained test image: PHP built-in server (driven by
+# BuiltInServerController) serving public/, SQLite via the
+# sqlite-database-integration drop-in, and a local chromedriver (driven by
+# ChromeDriverController).
 
 actor: AcceptanceTester
 modules:
@@ -11,28 +14,30 @@ modules:
         - \Aztec\WPBrowser\AztecWPBrowser
     config:
         WPDb:
-            dsn: 'mysql:host=%DB_HOST%;dbname=%DB_NAME%'
-            user: '%DB_USER%'
-            password: '%DB_PASSWORD%'
-            populator: 'mysql -u $user -p$password -h $host $dbname < $dump'
-            dump: 'tests/_data/dump.sql'
+            dsn: 'sqlite:%DB_PATH%'
+            user: ''
+            password: ''
             populate: false
-            cleanup: true
-            waitlock: 10
+            cleanup: false
             url: '%WP_URL%'
             tablePrefix: '%DB_TABLE_PREFIX%'
         WPWebDriver:
             url: '%WP_URL%'
             browser: chrome
-            host: '%CHROME_HOST%'
-            port: '%CHROME_PORT%'
+            host: '%CHROMEDRIVER_HOST%'
+            port: '%CHROMEDRIVER_PORT%'
+            path: '/'
             window_size: 1200x800
             adminUsername: '%WP_ADMIN_USER%'
             adminPassword: '%WP_ADMIN_PASSWORD%'
             adminPath: /wp-admin
             capabilities:
                 chromeOptions:
-                    args: ["--headless", "--disable-gpu", "--no-sandbox"]
+                    args:
+                        - '--headless=new'
+                        - '--disable-gpu'
+                        - '--no-sandbox'
+                        - '--disable-dev-shm-usage'
         AztecWPBrowser:
             pageObjects: []
 step_decorators:

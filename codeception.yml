@@ -10,6 +10,29 @@ actor_suffix: Tester
 extensions:
     enabled:
         - Codeception\Extension\RunFailed
+        - lucatume\WPBrowser\Extension\BuiltInServerController
+        - lucatume\WPBrowser\Extension\ChromeDriverController
+    config:
+        lucatume\WPBrowser\Extension\BuiltInServerController:
+            suites:
+                - acceptance
+            docroot: '%WP_DOCROOT%'
+            port: '%WP_SERVER_PORT%'
+            workers: 5
+        lucatume\WPBrowser\Extension\ChromeDriverController:
+            suites:
+                - acceptance
+            port: '%CHROMEDRIVER_PORT%'
+            binary: '%CHROMEDRIVER_BINARY%'
+commands:
+    - lucatume\WPBrowser\Command\DevStart
+    - lucatume\WPBrowser\Command\DevStop
+    - lucatume\WPBrowser\Command\DevRestart
+    - lucatume\WPBrowser\Command\DevInfo
+    - lucatume\WPBrowser\Command\DbImport
+    - lucatume\WPBrowser\Command\DbExport
+    - lucatume\WPBrowser\Command\RunOriginal
+    - lucatume\WPBrowser\Command\RunAll
 params:
     - .env
 bootstrap: bootstrap.php
