@@ -51,6 +51,9 @@ RUN apk add --no-cache \
         oniguruma-dev \
         sqlite-dev
 
+RUN printf 'error_reporting = E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED\n' \
+    > /usr/local/etc/php/conf.d/error-reporting.ini
+
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
 RUN adduser -D -g "" -u 1001 runner \
