@@ -8,6 +8,7 @@ $envOr = static function (string $key, string $default): string {
     return $value === false || $value === '' ? $default : (string) $value;
 };
 
+define('DB_ENGINE', $envOr('DB_ENGINE', 'sqlite'));
 define('DB_NAME', $envOr('DB_NAME', 'wordpress'));
 define('DB_USER', $envOr('DB_USER', 'wordpress'));
 define('DB_PASSWORD', $envOr('DB_PASSWORD', 'wordpress'));
