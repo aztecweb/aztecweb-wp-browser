@@ -81,6 +81,7 @@
     "roots/wordpress-no-content": "^6.8",
     "slevomat/coding-standard": "^8.0",
     "squizlabs/php_codesniffer": "^3.7",
+    "wp-cli/wp-cli-bundle": "^2.10",
     "wpackagist-plugin/sqlite-database-integration": "^2.1",
     "wpackagist-plugin/woocommerce": "^9.0",
     "wpackagist-theme/storefront": "^4.6"
