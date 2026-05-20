@@ -32,10 +32,18 @@ docker run --rm -it \
 
 ### Image tags
 
-The image is published per PHP variant (`:php8.0`, `:php8.4`). The build &
-publish workflow is being designed separately — see issue
-[#13](https://github.com/aztecweb/aztecweb-wp-browser/issues/13). For now,
-the image is built and pushed manually.
+The image is published per PHP variant (`:php8.0`, `:php8.4`), plus an
+immutable per-build content tag (`:vYYYYMMDDThhmmssZ-php{N}`) generated from
+the workflow's UTC build timestamp.
+
+### Building and publishing
+
+A maintainer fires the
+[`build-test-runner`](.github/workflows/build-test-runner.yml) workflow by
+hand from the GitHub Actions UI (or `gh workflow run build-test-runner.yml`).
+There is no push trigger or cron schedule yet — automatic rebuilds are being
+designed separately in
+[#13](https://github.com/aztecweb/aztecweb-wp-browser/issues/13).
 
 ### Overriding the image
 

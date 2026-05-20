@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `bin/test` wrapper that runs any command inside the image with the repo bind-mounted at `/var/www/html`.
 - `resources/install.sh` — idempotent script that bootstraps the SQLite WordPress site (`wp core install`, plugin/theme activation, HPOS sync), with the WP-CLI calls collapsed to four.
 - `tests/acceptance/ImageHealthCest.php` smoke test covering HPOS round-trip on SQLite, legacy order round-trip, homepage rendering, and chromedriver liveness.
+- `.github/workflows/build-test-runner.yml` — manual-trigger workflow (`workflow_dispatch` only) that builds the image for both PHP variants and pushes to GHCR as `${repo}-runner:php{N}` plus an immutable `:vYYYYMMDDThhmmssZ-php{N}` content tag. Automatic triggers (push, cron) are deferred to [#13](https://github.com/aztecweb/aztecweb-wp-browser/issues/13).
 
 ### Changed
 
