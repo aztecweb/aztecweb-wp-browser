@@ -68,7 +68,8 @@
   "autoload-dev": {
     "psr-4": {
       "Aztec\\WPBrowser\\Tests\\": "tests/",
-      "Aztec\\WPBrowser\\Tests\\Support\\": "tests/_support/"
+      "Aztec\\WPBrowser\\Tests\\Support\\": "tests/_support/",
+      "Aztec\\WPBrowser\\Tests\\Unit\\": "tests/unit/"
     }
   },
   "require": {

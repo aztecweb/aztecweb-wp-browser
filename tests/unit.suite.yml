@@ -1,0 +1,10 @@
+# Codeception Unit Suite Configuration
+#
+# Fast, framework-free tests for deep modules: HPOS detector, alias
+# registrar, sibling-module check. Uses bare `Codeception\Test\Unit`
+# (no actor) so no `codecept build` step is required.
+
+suite_namespace: Aztec\WPBrowser\Tests\Unit
+modules:
+    enabled:
+        - Asserts

@@ -189,7 +189,7 @@ trait ActionMethods
         );
     }
 
-    public function runScheduledActions(string $hook = null, array $args = []): int
+    public function runScheduledActions(?string $hook = null, array $args = []): int
     {
         $criteria = ['status' => 'pending'];
 
