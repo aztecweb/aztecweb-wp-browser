@@ -1,34 +1,28 @@
 ARG PHP_VERSION=8.4
 
-FROM php:${PHP_VERSION}-cli-alpine
+FROM php:${PHP_VERSION}-cli-bookworm
 
 ENV COMPOSER_NO_INTERACTION=1 \
+    DEBIAN_FRONTEND=noninteractive \
     PATH="/var/www/html/vendor/bin:${PATH}"
 
-RUN apk add --no-cache \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
         bash \
+        ca-certificates \
         chromium \
-        chromium-chromedriver \
-        freetype \
-        freetype-dev \
+        chromium-driver \
         git \
-        icu-dev \
-        icu-libs \
-        libjpeg-turbo \
-        libjpeg-turbo-dev \
-        libpng \
+        libfreetype6-dev \
+        libicu-dev \
+        libjpeg-dev \
+        libonig-dev \
         libpng-dev \
-        libwebp \
+        libsqlite3-dev \
         libwebp-dev \
-        libxml2 \
         libxml2-dev \
-        libzip \
         libzip-dev \
-        oniguruma \
-        oniguruma-dev \
-        sqlite \
-        sqlite-dev \
-        sqlite-libs \
+        sqlite3 \
         unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install -j"$(nproc)" \
@@ -40,20 +34,21 @@ RUN apk add --no-cache \
         pdo_sqlite \
         xml \
         zip \
-    && apk del --no-cache \
-        freetype-dev \
-        icu-dev \
-        libjpeg-turbo-dev \
+    && apt-get purge -y --auto-remove \
+        libfreetype6-dev \
+        libicu-dev \
+        libjpeg-dev \
+        libonig-dev \
         libpng-dev \
+        libsqlite3-dev \
         libwebp-dev \
         libxml2-dev \
         libzip-dev \
-        oniguruma-dev \
-        sqlite-dev
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
-RUN adduser -D -u 1000 runner \
+RUN adduser --disabled-password --gecos "" --uid 1001 runner \
     && mkdir -p /var/www/html \
     && chown -R runner:runner /var/www/html
 
