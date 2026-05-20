@@ -7,6 +7,7 @@ namespace Aztec\WPBrowser\WooCommerce\Method;
 use Aztec\WPBrowser\WooCommerce\OrderStorage\HPOSOrderStorage;
 use Aztec\WPBrowser\WooCommerce\OrderStorage\LegacyOrderStorage;
 use Aztec\WPBrowser\WooCommerce\OrderStorage\OrderStorageInterface;
+use Aztec\WPBrowser\WooCommerce\Storage\HposState;
 use lucatume\WPBrowser\Module\WPDb;
 use lucatume\WPBrowser\Module\WPWebDriver;
 
@@ -23,10 +24,10 @@ trait OrderBrowserMethods
 
     private function resolveOrderStorage(): OrderStorageInterface
     {
-        $value = $this->wpDb()->grabOptionFromDatabase('woocommerce_custom_orders_table_enabled');
+        $wpDb = $this->wpDb();
 
-        return $value === 'yes'
-            ? new HPOSOrderStorage($this->wpDb())
-            : new LegacyOrderStorage($this->wpDb());
+        return HposState::isEnabled($wpDb)
+            ? new HPOSOrderStorage($wpDb)
+            : new LegacyOrderStorage($wpDb);
     }
 }

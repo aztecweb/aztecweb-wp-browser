@@ -14,6 +14,7 @@ use Aztec\WPBrowser\WooCommerce\Method\SubscriptionMethods;
 use Aztec\WPBrowser\WooCommerce\OrderStorage\HPOSOrderStorage;
 use Aztec\WPBrowser\WooCommerce\OrderStorage\LegacyOrderStorage;
 use Aztec\WPBrowser\WooCommerce\OrderStorage\OrderStorageInterface;
+use Aztec\WPBrowser\WooCommerce\Storage\HposState;
 use Aztec\WPBrowser\WooCommerce\SubscriptionStorage\HPOSSubscriptionStorage;
 use Aztec\WPBrowser\WooCommerce\SubscriptionStorage\LegacySubscriptionStorage;
 use Aztec\WPBrowser\WooCommerce\SubscriptionStorage\SubscriptionStorageInterface;
@@ -44,9 +45,7 @@ class WooCommerceDb extends Module
 
     protected function isHposEnabled(): bool
     {
-        $value = $this->wpDb()->grabOptionFromDatabase('woocommerce_custom_orders_table_enabled');
-
-        return $value === 'yes';
+        return HposState::isEnabled($this->wpDb());
     }
 
     protected function wpDb(): WPDb
