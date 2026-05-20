@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\WooCommerce\Module;
 
-use Aztec\WPBrowser\WooCommerce\Config\WooCommerceConfig;
 use Aztec\WPBrowser\WooCommerce\Method\CartMethods;
 use Aztec\WPBrowser\WooCommerce\Method\CheckoutMethods;
 use Aztec\WPBrowser\WooCommerce\Method\CustomerBrowserMethods;
@@ -12,7 +11,6 @@ use Aztec\WPBrowser\WooCommerce\Method\OrderBrowserMethods;
 use Aztec\WPBrowser\WooCommerce\PageObject\PageObjectProvider;
 use Codeception\Exception\ModuleException;
 use Codeception\Module;
-use lucatume\WPBrowser\Module\WPDb;
 use lucatume\WPBrowser\Module\WPWebDriver;
 
 class WooCommerceWebDriver extends Module
@@ -21,13 +19,13 @@ class WooCommerceWebDriver extends Module
     use CheckoutMethods;
     use CustomerBrowserMethods;
     use OrderBrowserMethods;
+    use WooCommerceModuleSupport;
 
     /** @var array<string, mixed> */
     protected array $config = [
         'pageObjects' => [],
     ];
 
-    private ?WooCommerceConfig $wooCommerceConfig = null;
     private ?PageObjectProvider $pageObjectProvider = null;
 
     public function _initialize(): void
@@ -48,29 +46,12 @@ class WooCommerceWebDriver extends Module
         }
     }
 
-    protected function wpDb(): WPDb
-    {
-        $module = $this->getModule('WPDb');
-        assert($module instanceof WPDb);
-
-        return $module;
-    }
-
     protected function wpWebDriver(): WPWebDriver
     {
         $module = $this->getModule('WPWebDriver');
         assert($module instanceof WPWebDriver);
 
         return $module;
-    }
-
-    protected function wooCommerceConfig(): WooCommerceConfig
-    {
-        if ($this->wooCommerceConfig === null) {
-            $this->wooCommerceConfig = new WooCommerceConfig($this->wpDb());
-        }
-
-        return $this->wooCommerceConfig;
     }
 
     protected function pageObjectProvider(): PageObjectProvider
