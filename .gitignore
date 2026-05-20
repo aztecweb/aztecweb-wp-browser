@@ -25,3 +25,6 @@ Thumbs.db
 
 # Composer
 /vendor/
+
+# Claude
+.claude/worktrees/
