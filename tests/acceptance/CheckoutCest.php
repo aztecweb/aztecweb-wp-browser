@@ -393,7 +393,8 @@ class CheckoutCest
         $I->waitForElement('.woocommerce-order, .wp-block-woocommerce-order-confirmation-status', 30);
         $orderId = $I->grabOrderIdFromOrderReceived();
 
-        assert(is_int($orderId) && $orderId > 0, 'Order ID should be a positive integer');
+        $I->assertIsInt($orderId);
+        $I->assertGreaterThan(0, $orderId, 'Order ID should be a positive integer');
     }
 
     // ==================== Phase 3 Tests: Field Verification ====================
@@ -429,7 +430,7 @@ class CheckoutCest
 
         $value = $I->grabCheckoutFieldValue('billing_first_name');
 
-        assert($value === 'GrabbedValue', 'Grabbed value should match');
+        $I->assertSame('GrabbedValue', $value, 'Grabbed value should match');
     }
 
     public function testGrabCheckoutFieldValueEmpty(AcceptanceTester $I): void
@@ -444,7 +445,7 @@ class CheckoutCest
 
         $value = $I->grabCheckoutFieldValue('billing_first_name');
 
-        assert($value === '', 'Empty field should return empty string');
+        $I->assertSame('', $value, 'Empty field should return empty string');
     }
 
     public function testGrabCheckoutFieldValueMultipleFields(AcceptanceTester $I): void
@@ -465,8 +466,8 @@ class CheckoutCest
         $lastName = $I->grabCheckoutFieldValue('billing_last_name');
         $email = $I->grabCheckoutFieldValue('billing_email');
 
-        assert($firstName === 'First', 'First name should match');
-        assert($lastName === 'Last', 'Last name should match');
-        assert($email === 'multi@example.com', 'Email should match');
+        $I->assertSame('First', $firstName, 'First name should match');
+        $I->assertSame('Last', $lastName, 'Last name should match');
+        $I->assertSame('multi@example.com', $email, 'Email should match');
     }
 }

@@ -10,22 +10,22 @@ trait OrderTrait
 
     abstract protected function grabOrderItemMetaTableName(): string;
 
-    abstract protected function createOrderRecord(array $data): int;
+    abstract protected function createOrderRecord(array $overrides): int;
 
-    abstract public function haveOrderAddressInDatabase(int $orderId, string $addressType, array $data): int;
+    abstract public function haveOrderAddressInDatabase(int $orderId, string $addressType, array $overrides): int;
 
     abstract public function haveOrderMetaInDatabase(int $orderId, string $metaKey, mixed $metaValue): int;
 
-    final public function haveOrderInDatabase(array $data = []): int
+    final public function haveOrderInDatabase(array $overrides = []): int
     {
-        $billing = $data['address']['billing'] ?? [];
-        $shipping = $data['address']['shipping'] ?? [];
-        $items = $data['items'] ?? [];
-        $meta = $data['meta'] ?? [];
+        $billing = $overrides['address']['billing'] ?? [];
+        $shipping = $overrides['address']['shipping'] ?? [];
+        $items = $overrides['items'] ?? [];
+        $meta = $overrides['meta'] ?? [];
 
-        unset($data['address'], $data['items'], $data['meta']);
+        unset($overrides['address'], $overrides['items'], $overrides['meta']);
 
-        $orderId = $this->createOrderRecord($data);
+        $orderId = $this->createOrderRecord($overrides);
 
         if (!empty($billing)) {
             $this->haveOrderAddressInDatabase($orderId, 'billing', $billing);
@@ -46,14 +46,14 @@ trait OrderTrait
         return $orderId;
     }
 
-    public function haveOrderItemInDatabase(int $orderId, array $data = []): int
+    public function haveOrderItemInDatabase(int $orderId, array $overrides = []): int
     {
-        $meta = $data['meta'] ?? [];
+        $meta = $overrides['meta'] ?? [];
 
         $orderItemId = $this->wpDb->haveInDatabase($this->grabOrderItemsTableName(), [
             'order_id' => $orderId,
-            'order_item_name' => $data['order_item_name'] ?? 'Item',
-            'order_item_type' => $data['order_item_type'] ?? 'line_item',
+            'order_item_name' => $overrides['order_item_name'] ?? 'Item',
+            'order_item_type' => $overrides['order_item_type'] ?? 'line_item',
         ]);
 
         foreach ($meta as $metaKey => $metaValue) {

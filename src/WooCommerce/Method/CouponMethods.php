@@ -10,17 +10,17 @@ trait CouponMethods
 {
     abstract protected function wpDb(): WPDb;
 
-    public function haveCouponInDatabase(array $data = []): int
+    public function haveCouponInDatabase(array $overrides = []): int
     {
-        $meta = $data['meta'] ?? [];
-        unset($data['meta']);
+        $meta = $overrides['meta'] ?? [];
+        unset($overrides['meta']);
 
         $couponData = array_merge([
             'post_type' => 'shop_coupon',
             'post_status' => 'publish',
-            'post_title' => $data['code'] ?? 'coupon',
-            'post_name' => $data['code'] ?? 'coupon',
-        ], $data);
+            'post_title' => $overrides['code'] ?? 'coupon',
+            'post_name' => $overrides['code'] ?? 'coupon',
+        ], $overrides);
 
         unset($couponData['code']);
 

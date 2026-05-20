@@ -17,7 +17,8 @@ class SubscriptionHPOSCest
     {
         $subscriptionId = $I->haveSubscriptionInDatabase();
 
-        assert(is_int($subscriptionId) && $subscriptionId > 0);
+        $I->assertIsInt($subscriptionId);
+        $I->assertGreaterThan(0, $subscriptionId);
 
         $I->seeInDatabase('wp_wc_orders', [
             'id' => $subscriptionId,
@@ -78,7 +79,8 @@ class SubscriptionHPOSCest
 
         $metaId = $I->haveSubscriptionMetaInDatabase($subscriptionId, '_order_total', '99.00');
 
-        assert(is_int($metaId) && $metaId > 0);
+        $I->assertIsInt($metaId);
+        $I->assertGreaterThan(0, $metaId);
 
         $I->seeSubscriptionMetaInDatabase([
             'subscription_id' => $subscriptionId,
@@ -101,7 +103,7 @@ class SubscriptionHPOSCest
             'customer_id' => $uniqueCustomerId,
         ]);
 
-        assert($subscriptionId === $grabbedId);
+        $I->assertSame($subscriptionId, $grabbedId);
     }
 
     public function testGrabSubscriptionIdNotFound(AcceptanceTester $I): void
@@ -110,7 +112,7 @@ class SubscriptionHPOSCest
             'customer_id' => 99999,
         ]);
 
-        assert($result === false);
+        $I->assertFalse($result);
     }
 
     public function testGrabSubscriptionMetaFromDatabase(AcceptanceTester $I): void
@@ -121,7 +123,7 @@ class SubscriptionHPOSCest
 
         $meta = $I->grabSubscriptionMetaFromDatabase($subscriptionId, '_billing_period');
 
-        assert(reset($meta) === 'week');
+        $I->assertSame('week', reset($meta));
     }
 
     public function testGrabSubscriptionStatus(AcceptanceTester $I): void
@@ -132,7 +134,7 @@ class SubscriptionHPOSCest
 
         $status = $I->grabSubscriptionStatus($subscriptionId);
 
-        assert($status === 'wc-on-hold', "Expected 'wc-on-hold', got '$status'");
+        $I->assertSame('wc-on-hold', $status, "Expected 'wc-on-hold', got '$status'");
     }
 
     public function testHaveSubscriptionStatus(AcceptanceTester $I): void
@@ -311,7 +313,8 @@ class SubscriptionHPOSCest
             ],
         ]);
 
-        assert(is_int($productId) && $productId > 0);
+        $I->assertIsInt($productId);
+        $I->assertGreaterThan(0, $productId);
 
         $I->seeProductInDatabase([
             'ID' => $productId,

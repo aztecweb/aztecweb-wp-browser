@@ -34,16 +34,16 @@ trait ProductMethods
         $this->wpDb()->haveTermRelationshipInDatabase($productId, $categoryId);
     }
 
-    public function haveProductInDatabase(array $data = []): int
+    public function haveProductInDatabase(array $overrides = []): int
     {
-        $meta = $data['meta'] ?? [];
-        unset($data['meta']);
+        $meta = $overrides['meta'] ?? [];
+        unset($overrides['meta']);
 
         $productData = array_merge([
             'post_type' => 'product',
             'post_status' => 'publish',
             'post_title' => 'Test Product',
-        ], $data);
+        ], $overrides);
 
         $productId = $this->wpDb()->havePostInDatabase($productData);
 

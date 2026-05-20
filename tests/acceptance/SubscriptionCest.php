@@ -17,7 +17,8 @@ class SubscriptionCest
     {
         $subscriptionId = $I->haveSubscriptionInDatabase();
 
-        assert(is_int($subscriptionId) && $subscriptionId > 0);
+        $I->assertIsInt($subscriptionId);
+        $I->assertGreaterThan(0, $subscriptionId);
 
         $I->seeSubscriptionInDatabase([
             'ID' => $subscriptionId,
@@ -66,7 +67,8 @@ class SubscriptionCest
 
         $metaId = $I->haveSubscriptionMetaInDatabase($subscriptionId, '_order_total', '99.00');
 
-        assert(is_int($metaId) && $metaId > 0);
+        $I->assertIsInt($metaId);
+        $I->assertGreaterThan(0, $metaId);
 
         $I->seeSubscriptionMetaInDatabase([
             'subscription_id' => $subscriptionId,
@@ -87,7 +89,7 @@ class SubscriptionCest
             'post_name' => 'test-subscription-legacy',
         ]);
 
-        assert($subscriptionId === $grabbedId);
+        $I->assertSame($subscriptionId, $grabbedId);
     }
 
     public function testGrabSubscriptionIdNotFound(AcceptanceTester $I): void
@@ -96,7 +98,7 @@ class SubscriptionCest
             'post_name' => 'nonexistent-subscription-xyz-legacy',
         ]);
 
-        assert($result === false);
+        $I->assertFalse($result);
     }
 
     public function testGrabSubscriptionFieldFromDatabase(AcceptanceTester $I): void
@@ -107,7 +109,7 @@ class SubscriptionCest
 
         $title = $I->grabSubscriptionFieldFromDatabase($subscriptionId, 'post_title');
 
-        assert($title === 'My Legacy Subscription');
+        $I->assertSame('My Legacy Subscription', $title);
     }
 
     public function testGrabSubscriptionMetaFromDatabase(AcceptanceTester $I): void
@@ -118,7 +120,7 @@ class SubscriptionCest
 
         $meta = $I->grabSubscriptionMetaFromDatabase($subscriptionId, '_billing_period');
 
-        assert(reset($meta) === 'week');
+        $I->assertSame('week', reset($meta));
     }
 
     public function testGrabSubscriptionStatus(AcceptanceTester $I): void
@@ -129,7 +131,7 @@ class SubscriptionCest
 
         $status = $I->grabSubscriptionStatus($subscriptionId);
 
-        assert($status === 'wc-on-hold', "Expected 'wc-on-hold', got '$status'");
+        $I->assertSame('wc-on-hold', $status, "Expected 'wc-on-hold', got '$status'");
     }
 
     public function testHaveSubscriptionStatus(AcceptanceTester $I): void
@@ -267,7 +269,8 @@ class SubscriptionCest
     {
         $productId = $I->haveSubscriptionProductInDatabase();
 
-        assert(is_int($productId) && $productId > 0);
+        $I->assertIsInt($productId);
+        $I->assertGreaterThan(0, $productId);
 
         $I->seeProductInDatabase([
             'ID' => $productId,

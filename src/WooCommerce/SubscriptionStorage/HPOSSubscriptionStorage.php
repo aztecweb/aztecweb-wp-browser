@@ -13,10 +13,10 @@ class HPOSSubscriptionStorage extends AbstractHPOSStorage implements Subscriptio
         return 'subscription_id';
     }
 
-    public function haveSubscriptionInDatabase(array $data): int
+    public function haveSubscriptionInDatabase(array $overrides): int
     {
-        $meta = $data['meta'] ?? [];
-        unset($data['meta']);
+        $meta = $overrides['meta'] ?? [];
+        unset($overrides['meta']);
 
         $subscriptionId = $this->generateId();
 
@@ -38,7 +38,7 @@ class HPOSSubscriptionStorage extends AbstractHPOSStorage implements Subscriptio
             'ip_address' => '',
             'user_agent' => '',
             'customer_note' => '',
-        ], $data);
+        ], $overrides);
 
         $subscriptionData['id'] = $subscriptionId;
         $subscriptionData['type'] = 'shop_subscription';

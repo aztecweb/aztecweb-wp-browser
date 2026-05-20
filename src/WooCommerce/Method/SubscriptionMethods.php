@@ -13,9 +13,9 @@ trait SubscriptionMethods
 
     abstract protected function subscriptionStorage(): SubscriptionStorageInterface;
 
-    public function haveSubscriptionInDatabase(array $data = []): int
+    public function haveSubscriptionInDatabase(array $overrides = []): int
     {
-        return $this->subscriptionStorage()->haveSubscriptionInDatabase($data);
+        return $this->subscriptionStorage()->haveSubscriptionInDatabase($overrides);
     }
 
     public function haveSubscriptionMetaInDatabase(int $subscriptionId, string $key, mixed $value): int
@@ -23,16 +23,16 @@ trait SubscriptionMethods
         return $this->subscriptionStorage()->haveSubscriptionMetaInDatabase($subscriptionId, $key, $value);
     }
 
-    public function haveSubscriptionProductInDatabase(array $data = []): int
+    public function haveSubscriptionProductInDatabase(array $overrides = []): int
     {
-        $meta = $data['meta'] ?? [];
-        unset($data['meta']);
+        $meta = $overrides['meta'] ?? [];
+        unset($overrides['meta']);
 
         $productData = array_merge([
             'post_type' => 'product',
             'post_status' => 'publish',
             'post_title' => 'Subscription Product',
-        ], $data);
+        ], $overrides);
 
         $productId = $this->wpDb()->havePostInDatabase($productData);
 
@@ -129,8 +129,7 @@ trait SubscriptionMethods
 
     public function seeSubscriptionStatus(int $subscriptionId, string $status): void
     {
-        $actualStatus = $this->grabSubscriptionStatus($subscriptionId);
-        $this->assertEquals($status, $actualStatus, "Subscription {$subscriptionId} status is not {$status}");
+        $this->seeSubscriptionInDatabase(['id' => $subscriptionId, 'status' => $status]);
     }
 
     public function dontSeeSubscriptionInDatabase(array $criteria): void

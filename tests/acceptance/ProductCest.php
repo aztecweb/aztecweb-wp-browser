@@ -18,7 +18,8 @@ class ProductCest
             ],
         ]);
 
-        assert(is_int($productId) && $productId > 0, 'Product ID should be a positive integer');
+        $I->assertIsInt($productId);
+        $I->assertGreaterThan(0, $productId, 'Product ID should be a positive integer');
 
         $I->seeProductInDatabase([
             'ID' => $productId,
@@ -80,7 +81,8 @@ class ProductCest
 
         $metaId = $I->haveProductMetaInDatabase($productId, '_price', '99.99');
 
-        assert(is_int($metaId) && $metaId > 0, 'Meta ID should be a positive integer');
+        $I->assertIsInt($metaId);
+        $I->assertGreaterThan(0, $metaId, 'Meta ID should be a positive integer');
 
         $I->seeProductMetaInDatabase([
             'product_id' => $productId,
@@ -120,7 +122,8 @@ class ProductCest
     {
         $categoryId = $I->haveProductCategoryInDatabase('electronics');
 
-        assert(is_int($categoryId) && $categoryId > 0, 'Category ID should be a positive integer');
+        $I->assertIsInt($categoryId);
+        $I->assertGreaterThan(0, $categoryId, 'Category ID should be a positive integer');
 
         $I->seeTermInDatabase([
             'term_id' => $categoryId,
@@ -231,7 +234,7 @@ class ProductCest
 
         $value = $I->grabProductMetaFromDatabase($productId, '_custom_test_meta', true);
 
-        assert($value === '199.99', 'Product meta value should match');
+        $I->assertSame('199.99', $value, 'Product meta value should match');
     }
 
     public function testGrabProductMetaMultiple(AcceptanceTester $I): void
@@ -243,8 +246,8 @@ class ProductCest
         $price = $I->grabProductMetaFromDatabase($productId, '_custom_price', true);
         $stock = $I->grabProductMetaFromDatabase($productId, '_custom_stock', true);
 
-        assert($price === '100.00', 'Price meta should match');
-        assert($stock === '25', 'Stock meta should match');
+        $I->assertSame('100.00', $price, 'Price meta should match');
+        $I->assertSame('25', $stock, 'Stock meta should match');
     }
 
     public function testGrabProductCategories(AcceptanceTester $I): void
@@ -258,9 +261,9 @@ class ProductCest
 
         $categories = $I->grabProductCategoriesFromDatabase($productId);
 
-        assert(count($categories) === 2, 'Product should have 2 categories');
-        assert(in_array($category1Id, $categories, true), 'Category 1 should be in result');
-        assert(in_array($category2Id, $categories, true), 'Category 2 should be in result');
+        $I->assertCount(2, $categories, 'Product should have 2 categories');
+        $I->assertContains($category1Id, $categories, 'Category 1 should be in result');
+        $I->assertContains($category2Id, $categories, 'Category 2 should be in result');
     }
 
     public function testGrabProductCategoriesEmpty(AcceptanceTester $I): void
@@ -269,7 +272,7 @@ class ProductCest
 
         $categories = $I->grabProductCategoriesFromDatabase($productId);
 
-        assert(count($categories) === 0, 'Product without categories should return empty array');
+        $I->assertCount(0, $categories, 'Product without categories should return empty array');
     }
 
     public function testSeeProductInCategory(AcceptanceTester $I): void
@@ -337,9 +340,9 @@ class ProductCest
 
         $grabbedCategories = $I->grabProductCategoriesFromDatabase($productId);
 
-        assert(count($grabbedCategories) === 2, 'Should have 2 categories');
+        $I->assertCount(2, $grabbedCategories, 'Should have 2 categories');
         foreach ($categoryIds as $catId) {
-            assert(in_array($catId, $grabbedCategories, true), "Category $catId should be present");
+            $I->assertContains($catId, $grabbedCategories, "Category $catId should be present");
         }
     }
 
@@ -352,18 +355,18 @@ class ProductCest
 
         // Test finding existing product
         $grabbedId = $I->grabProductIdFromDatabase(['post_title' => 'Test Product for Grab']);
-        assert($productId === $grabbedId);
+        $I->assertSame($grabbedId, $productId);
 
         // Test with multiple criteria
         $grabbedId = $I->grabProductIdFromDatabase([
             'post_title' => 'Test Product for Grab',
             'post_status' => 'publish',
         ]);
-        assert($productId === $grabbedId);
+        $I->assertSame($grabbedId, $productId);
 
         // Test non-existent product
         $notFound = $I->grabProductIdFromDatabase(['post_title' => 'Nonexistent Product']);
-        assert($notFound === false);
+        $I->assertFalse($notFound);
     }
 
     public function testGrabProductFieldFromDatabase(AcceptanceTester $I): void
@@ -376,15 +379,15 @@ class ProductCest
 
         // Test grabbing title
         $title = $I->grabProductFieldFromDatabase($productId, 'post_title');
-        assert($title === 'Test Product Field');
+        $I->assertSame('Test Product Field', $title);
 
         // Test grabbing status
         $status = $I->grabProductFieldFromDatabase($productId, 'post_status');
-        assert($status === 'publish');
+        $I->assertSame('publish', $status);
 
         // Test grabbing content
         $content = $I->grabProductFieldFromDatabase($productId, 'post_content');
-        assert($content === 'Product description');
+        $I->assertSame('Product description', $content);
     }
 
     public function testSeeProductInDatabase(AcceptanceTester $I): void
@@ -439,7 +442,7 @@ class ProductCest
     public function testGrabProductsTableName(AcceptanceTester $I): void
     {
         $tableName = $I->grabProductsTableName();
-        assert($tableName === $I->grabPostsTableName());
+        $I->assertSame($I->grabPostsTableName(), $tableName);
     }
 
     public function testHaveManyProductsInDatabase(AcceptanceTester $I): void
@@ -453,7 +456,7 @@ class ProductCest
         $productIds = $I->haveManyProductsInDatabase($count, $overrides);
 
         // Should create exactly 3 products
-        assert(count($productIds) === $count);
+        $I->assertCount($count, $productIds);
 
         // Verify each product was created
         foreach ($productIds as $index => $id) {
@@ -467,7 +470,7 @@ class ProductCest
 
         // Test without overrides
         $moreIds = $I->haveManyProductsInDatabase(2);
-        assert(count($moreIds) === 2);
+        $I->assertCount(2, $moreIds);
 
         // Should have default titles
         $I->seeProductInDatabase([
@@ -490,8 +493,8 @@ class ProductCest
 
         // Test grabbing category IDs
         $categoryIds = $I->grabProductCategoryIdsFromDatabase($productId);
-        assert(is_array($categoryIds));
-        assert(in_array($categoryId, $categoryIds));
+        $I->assertIsArray($categoryIds);
+        $I->assertContains($categoryId, $categoryIds);
     }
 
     public function testDontSeeProductInDatabase(AcceptanceTester $I): void

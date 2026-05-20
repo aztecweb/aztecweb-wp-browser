@@ -13,9 +13,9 @@ trait OrderMethods
 
     abstract protected function orderStorage(): OrderStorageInterface;
 
-    public function haveOrderInDatabase(array $data = []): int
+    public function haveOrderInDatabase(array $overrides = []): int
     {
-        return $this->orderStorage()->haveOrderInDatabase($data);
+        return $this->orderStorage()->haveOrderInDatabase($overrides);
     }
 
     public function haveOrderMetaInDatabase(int $orderId, string $metaKey, mixed $metaValue): int
@@ -35,8 +35,7 @@ trait OrderMethods
 
     public function seeOrderStatus(int $orderId, string $status): void
     {
-        $actualStatus = $this->grabOrderStatus($orderId);
-        $this->assertEquals($status, $actualStatus, "Order {$orderId} status is not {$status}");
+        $this->seeOrderInDatabase(['id' => $orderId, 'status' => $status]);
     }
 
     public function haveOrderStatus(int $orderId, string $newStatus): void
@@ -44,14 +43,14 @@ trait OrderMethods
         $this->orderStorage()->haveOrderStatus($orderId, $newStatus);
     }
 
-    public function haveOrderAddressInDatabase(int $orderId, string $addressType, array $data): int
+    public function haveOrderAddressInDatabase(int $orderId, string $addressType, array $overrides): int
     {
-        return $this->orderStorage()->haveOrderAddressInDatabase($orderId, $addressType, $data);
+        return $this->orderStorage()->haveOrderAddressInDatabase($orderId, $addressType, $overrides);
     }
 
-    public function haveOrderItemInDatabase(int $orderId, array $data = []): int
+    public function haveOrderItemInDatabase(int $orderId, array $overrides = []): int
     {
-        return $this->orderStorage()->haveOrderItemInDatabase($orderId, $data);
+        return $this->orderStorage()->haveOrderItemInDatabase($orderId, $overrides);
     }
 
     public function haveOrderItemMetaInDatabase(int $orderItemId, string $metaKey, mixed $metaValue): int

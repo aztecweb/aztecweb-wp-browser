@@ -13,16 +13,16 @@ class LegacySubscriptionStorage extends AbstractLegacyStorage implements Subscri
         return 'subscription_id';
     }
 
-    public function haveSubscriptionInDatabase(array $data): int
+    public function haveSubscriptionInDatabase(array $overrides): int
     {
-        $meta = $data['meta'] ?? [];
-        unset($data['meta']);
+        $meta = $overrides['meta'] ?? [];
+        unset($overrides['meta']);
 
         $subscriptionId = $this->wpDb->havePostInDatabase(array_merge([
             'post_type' => 'shop_subscription',
             'post_status' => 'wc-active',
             'post_title' => 'Subscription',
-        ], $data));
+        ], $overrides));
 
         $finalMeta = array_merge([
             '_billing_period' => 'month',

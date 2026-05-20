@@ -8,7 +8,7 @@ use Aztec\WPBrowser\WooCommerce\Storage\WooCommerceStorageInterface;
 
 interface OrderStorageInterface extends WooCommerceStorageInterface
 {
-    public function haveOrderInDatabase(array $data): int;
+    public function haveOrderInDatabase(array $overrides): int;
 
     public function haveOrderMetaInDatabase(int $orderId, string $metaKey, mixed $metaValue): int;
 
@@ -18,9 +18,9 @@ interface OrderStorageInterface extends WooCommerceStorageInterface
 
     public function haveOrderStatus(int $orderId, string $newStatus): void;
 
-    public function haveOrderAddressInDatabase(int $orderId, string $addressType, array $data): int;
+    public function haveOrderAddressInDatabase(int $orderId, string $addressType, array $overrides): int;
 
-    public function haveOrderItemInDatabase(int $orderId, array $data = []): int;
+    public function haveOrderItemInDatabase(int $orderId, array $overrides = []): int;
 
     public function haveOrderItemMetaInDatabase(int $orderItemId, string $metaKey, mixed $metaValue): int;
 

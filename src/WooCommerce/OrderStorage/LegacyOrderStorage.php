@@ -25,12 +25,12 @@ class LegacyOrderStorage extends AbstractLegacyStorage implements OrderStorageIn
         return $this->wpDb->grabTablePrefix() . 'woocommerce_order_itemmeta';
     }
 
-    protected function createOrderRecord(array $data): int
+    protected function createOrderRecord(array $overrides): int
     {
         return $this->wpDb->havePostInDatabase(array_merge([
             'post_type' => 'shop_order',
             'post_status' => 'wc-pending',
-        ], $data));
+        ], $overrides));
     }
 
     public function haveOrderMetaInDatabase(int $orderId, string $metaKey, mixed $metaValue): int
@@ -53,7 +53,7 @@ class LegacyOrderStorage extends AbstractLegacyStorage implements OrderStorageIn
         $this->haveEntityStatus($orderId, $newStatus);
     }
 
-    public function haveOrderAddressInDatabase(int $orderId, string $addressType, array $data): int
+    public function haveOrderAddressInDatabase(int $orderId, string $addressType, array $overrides): int
     {
         $metaId = 0;
         $prefix = '_' . $addressType . '_';
@@ -76,8 +76,8 @@ class LegacyOrderStorage extends AbstractLegacyStorage implements OrderStorageIn
         }
 
         foreach ($fieldMapping as $field => $metaKey) {
-            if (isset($data[$field])) {
-                $metaId = $this->haveOrderMetaInDatabase($orderId, $metaKey, $data[$field]);
+            if (isset($overrides[$field])) {
+                $metaId = $this->haveOrderMetaInDatabase($orderId, $metaKey, $overrides[$field]);
             }
         }
 

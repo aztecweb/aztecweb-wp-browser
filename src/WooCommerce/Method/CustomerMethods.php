@@ -10,30 +10,30 @@ trait CustomerMethods
 {
     abstract protected function wpDb(): WPDb;
 
-    public function haveCustomerInDatabase(array $data = []): int
+    public function haveCustomerInDatabase(array $overrides = []): int
     {
-        $billing = $data['billing'] ?? [];
-        $shipping = $data['shipping'] ?? [];
-        $meta = $data['meta'] ?? [];
+        $billing = $overrides['billing'] ?? [];
+        $shipping = $overrides['shipping'] ?? [];
+        $meta = $overrides['meta'] ?? [];
 
-        unset($data['billing'], $data['shipping'], $data['meta']);
+        unset($overrides['billing'], $overrides['shipping'], $overrides['meta']);
 
-        $userLogin = $data['user_login'] ?? 'customer';
-        $userEmail = $data['user_email'] ?? $userLogin . '@example.com';
-        $userRole  = $data['role'] ?? 'subscriber';
+        $userLogin = $overrides['user_login'] ?? 'customer';
+        $userEmail = $overrides['user_email'] ?? $userLogin . '@example.com';
+        $userRole  = $overrides['role'] ?? 'subscriber';
 
-        unset($data['user_login'], $data['user_email'], $data['role']);
+        unset($overrides['user_login'], $overrides['user_email'], $overrides['role']);
 
         $userData = array_merge([
             'user_login' => $userLogin,
             'user_email' => $userEmail,
             'role'       => $userRole,
-        ], $data);
+        ], $overrides);
 
         $userId = $this->wpDb()->haveUserInDatabase(
             $userData['user_login'],
             $userData['role'],
-            ['user_email' => $userData['user_email'], ...$data]
+            ['user_email' => $userData['user_email'], ...$overrides]
         );
 
         foreach ($billing as $key => $value) {

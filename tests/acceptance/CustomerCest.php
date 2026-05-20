@@ -15,7 +15,8 @@ class CustomerCest
             'user_email' => 'john.doe@example.com',
         ]);
 
-        assert(is_int($customerId) && $customerId > 0, 'Customer ID should be a positive integer');
+        $I->assertIsInt($customerId);
+        $I->assertGreaterThan(0, $customerId, 'Customer ID should be a positive integer');
 
         $I->seeCustomerInDatabase([
             'ID' => $customerId,
@@ -28,7 +29,8 @@ class CustomerCest
     {
         $customerId = $I->haveCustomerInDatabase();
 
-        assert(is_int($customerId) && $customerId > 0, 'Customer ID should be a positive integer');
+        $I->assertIsInt($customerId);
+        $I->assertGreaterThan(0, $customerId, 'Customer ID should be a positive integer');
 
         $I->seeCustomerInDatabase([
             'ID' => $customerId,
@@ -147,9 +149,10 @@ class CustomerCest
 
         if (is_string($userCaps)) {
             $unserialized = unserialize($userCaps);
-            assert($unserialized['customer'] === true, 'User should have customer role');
+            $I->assertTrue($unserialized['customer'], 'User should have customer role');
         } else {
-            assert(isset($userCaps['customer']) && $userCaps['customer'] === true, 'User should have customer role');
+            $I->assertArrayHasKey('customer', $userCaps);
+            $I->assertTrue($userCaps['customer'], 'User should have customer role');
         }
     }
 
@@ -162,7 +165,7 @@ class CustomerCest
 
         $email = $I->grabCustomerFieldFromDatabase($customerId, 'user_email');
 
-        assert($email === 'grab@example.com', "Email should be 'grab@example.com', got '$email'");
+        $I->assertSame('grab@example.com', $email, "Email should be 'grab@example.com', got '$email'");
     }
 
     public function testGrabCustomerMeta(AcceptanceTester $I): void
@@ -176,7 +179,7 @@ class CustomerCest
 
         $meta = $I->grabCustomerMeta($customerId, 'custom_meta_key', true);
 
-        assert($meta === 'custom_meta_value', "Meta value should be 'custom_meta_value'");
+        $I->assertSame('custom_meta_value', $meta, "Meta value should be 'custom_meta_value'");
     }
 
     public function testGrabCustomerMetaMultiple(AcceptanceTester $I): void
@@ -192,8 +195,8 @@ class CustomerCest
         $meta1 = $I->grabCustomerMeta($customerId, 'meta_key_1', true);
         $meta2 = $I->grabCustomerMeta($customerId, 'meta_key_2', true);
 
-        assert($meta1 === 'value_1', "First meta should be 'value_1'");
-        assert($meta2 === 'value_2', "Second meta should be 'value_2'");
+        $I->assertSame('value_1', $meta1, "First meta should be 'value_1'");
+        $I->assertSame('value_2', $meta2, "Second meta should be 'value_2'");
     }
 
     public function testGrabCustomerBillingAddress(AcceptanceTester $I): void
@@ -217,17 +220,17 @@ class CustomerCest
 
         $billingAddress = $I->grabCustomerBillingAddress($customerId);
 
-        assert($billingAddress['first_name'] === 'Test', 'Billing first name should be Test');
-        assert($billingAddress['last_name'] === 'User', 'Billing last name should be User');
-        assert($billingAddress['company'] === 'Test Company', 'Billing company should match');
-        assert($billingAddress['address_1'] === '123 Test St', 'Billing address 1 should match');
-        assert($billingAddress['address_2'] === 'Apt 4B', 'Billing address 2 should match');
-        assert($billingAddress['city'] === 'Test City', 'Billing city should match');
-        assert($billingAddress['state'] === 'TS', 'Billing state should match');
-        assert($billingAddress['postcode'] === '12345', 'Billing postcode should match');
-        assert($billingAddress['country'] === 'US', 'Billing country should match');
-        assert($billingAddress['email'] === 'test@billing.com', 'Billing email should match');
-        assert($billingAddress['phone'] === '555-TEST', 'Billing phone should match');
+        $I->assertSame('Test', $billingAddress['first_name'], 'Billing first name should be Test');
+        $I->assertSame('User', $billingAddress['last_name'], 'Billing last name should be User');
+        $I->assertSame('Test Company', $billingAddress['company'], 'Billing company should match');
+        $I->assertSame('123 Test St', $billingAddress['address_1'], 'Billing address 1 should match');
+        $I->assertSame('Apt 4B', $billingAddress['address_2'], 'Billing address 2 should match');
+        $I->assertSame('Test City', $billingAddress['city'], 'Billing city should match');
+        $I->assertSame('TS', $billingAddress['state'], 'Billing state should match');
+        $I->assertSame('12345', $billingAddress['postcode'], 'Billing postcode should match');
+        $I->assertSame('US', $billingAddress['country'], 'Billing country should match');
+        $I->assertSame('test@billing.com', $billingAddress['email'], 'Billing email should match');
+        $I->assertSame('555-TEST', $billingAddress['phone'], 'Billing phone should match');
     }
 
     public function testGrabCustomerBillingAddressPartial(AcceptanceTester $I): void
@@ -242,9 +245,9 @@ class CustomerCest
 
         $billingAddress = $I->grabCustomerBillingAddress($customerId);
 
-        assert(count($billingAddress) === 2, 'Should return only populated fields');
-        assert($billingAddress['first_name'] === 'Partial', 'First name should be present');
-        assert($billingAddress['city'] === 'Partial City', 'City should be present');
+        $I->assertCount(2, $billingAddress, 'Should return only populated fields');
+        $I->assertSame('Partial', $billingAddress['first_name'], 'First name should be present');
+        $I->assertSame('Partial City', $billingAddress['city'], 'City should be present');
     }
 
     public function testGrabCustomerShippingAddress(AcceptanceTester $I): void
@@ -266,15 +269,15 @@ class CustomerCest
 
         $shippingAddress = $I->grabCustomerShippingAddress($customerId);
 
-        assert($shippingAddress['first_name'] === 'Ship', 'Shipping first name should be Ship');
-        assert($shippingAddress['last_name'] === 'Recipient', 'Shipping last name should be Recipient');
-        assert($shippingAddress['company'] === 'Ship Company', 'Shipping company should match');
-        assert($shippingAddress['address_1'] === '456 Ship Blvd', 'Shipping address 1 should match');
-        assert($shippingAddress['address_2'] === 'Suite 200', 'Shipping address 2 should match');
-        assert($shippingAddress['city'] === 'Ship City', 'Shipping city should match');
-        assert($shippingAddress['state'] === 'SC', 'Shipping state should match');
-        assert($shippingAddress['postcode'] === '54321', 'Shipping postcode should match');
-        assert($shippingAddress['country'] === 'CA', 'Shipping country should match');
+        $I->assertSame('Ship', $shippingAddress['first_name'], 'Shipping first name should be Ship');
+        $I->assertSame('Recipient', $shippingAddress['last_name'], 'Shipping last name should be Recipient');
+        $I->assertSame('Ship Company', $shippingAddress['company'], 'Shipping company should match');
+        $I->assertSame('456 Ship Blvd', $shippingAddress['address_1'], 'Shipping address 1 should match');
+        $I->assertSame('Suite 200', $shippingAddress['address_2'], 'Shipping address 2 should match');
+        $I->assertSame('Ship City', $shippingAddress['city'], 'Shipping city should match');
+        $I->assertSame('SC', $shippingAddress['state'], 'Shipping state should match');
+        $I->assertSame('54321', $shippingAddress['postcode'], 'Shipping postcode should match');
+        $I->assertSame('CA', $shippingAddress['country'], 'Shipping country should match');
     }
 
     public function testGrabCustomerShippingAddressPartial(AcceptanceTester $I): void
@@ -289,9 +292,9 @@ class CustomerCest
 
         $shippingAddress = $I->grabCustomerShippingAddress($customerId);
 
-        assert(count($shippingAddress) === 2, 'Should return only populated fields');
-        assert($shippingAddress['city'] === 'Ship Town', 'City should be present');
-        assert($shippingAddress['postcode'] === '60000', 'Postcode should be present');
+        $I->assertCount(2, $shippingAddress, 'Should return only populated fields');
+        $I->assertSame('Ship Town', $shippingAddress['city'], 'City should be present');
+        $I->assertSame('60000', $shippingAddress['postcode'], 'Postcode should be present');
     }
 
     public function testSeeCustomerInDatabaseById(AcceptanceTester $I): void
@@ -327,10 +330,12 @@ class CustomerCest
         ]);
 
         $metaId = $I->haveCustomerBillingFieldInDatabase($customerId, 'first_name', 'Jane');
-        assert(is_int($metaId) && $metaId > 0, 'Meta ID should be a positive integer');
+        $I->assertIsInt($metaId);
+        $I->assertGreaterThan(0, $metaId, 'Meta ID should be a positive integer');
 
         $metaId = $I->haveCustomerBillingFieldInDatabase($customerId, 'email', 'jane@example.com');
-        assert(is_int($metaId) && $metaId > 0, 'Meta ID should be a positive integer');
+        $I->assertIsInt($metaId);
+        $I->assertGreaterThan(0, $metaId, 'Meta ID should be a positive integer');
 
         $I->seeCustomerBillingFieldInDatabase($customerId, 'first_name', 'Jane');
         $I->seeCustomerBillingFieldInDatabase($customerId, 'email', 'jane@example.com');
@@ -343,10 +348,12 @@ class CustomerCest
         ]);
 
         $metaId = $I->haveCustomerShippingFieldInDatabase($customerId, 'city', 'Rio de Janeiro');
-        assert(is_int($metaId) && $metaId > 0, 'Meta ID should be a positive integer');
+        $I->assertIsInt($metaId);
+        $I->assertGreaterThan(0, $metaId, 'Meta ID should be a positive integer');
 
         $metaId = $I->haveCustomerShippingFieldInDatabase($customerId, 'postcode', '20000-000');
-        assert(is_int($metaId) && $metaId > 0, 'Meta ID should be a positive integer');
+        $I->assertIsInt($metaId);
+        $I->assertGreaterThan(0, $metaId, 'Meta ID should be a positive integer');
 
         $I->seeCustomerShippingFieldInDatabase($customerId, 'city', 'Rio de Janeiro');
         $I->seeCustomerShippingFieldInDatabase($customerId, 'postcode', '20000-000');
@@ -360,7 +367,8 @@ class CustomerCest
 
         $metaId = $I->haveCustomerMetaInDatabase($customerId, 'custom_meta', 'custom_value');
 
-        assert(is_int($metaId) && $metaId > 0, 'Meta ID should be a positive integer');
+        $I->assertIsInt($metaId);
+        $I->assertGreaterThan(0, $metaId, 'Meta ID should be a positive integer');
 
         $I->seeCustomerMetaInDatabase([
             'user_id' => $customerId,
@@ -490,13 +498,13 @@ class CustomerCest
         $I->seeCustomerInDatabase(['ID' => $customerId]);
 
         $billingAddress = $I->grabCustomerBillingAddress($customerId);
-        assert($billingAddress['first_name'] === 'Workflow');
+        $I->assertSame('Workflow', $billingAddress['first_name']);
 
         $shippingAddress = $I->grabCustomerShippingAddress($customerId);
-        assert($shippingAddress['city'] === 'Workflow City');
+        $I->assertSame('Workflow City', $shippingAddress['city']);
 
         $vipStatus = $I->grabCustomerMeta($customerId, 'vip_status', true);
-        assert($vipStatus === 'gold');
+        $I->assertSame('gold', $vipStatus);
 
         $I->seeCustomerMetaInDatabase([
             'user_id' => $customerId,
@@ -514,18 +522,18 @@ class CustomerCest
 
         // Test finding existing customer by user_login
         $grabbedId = $I->grabCustomerIdFromDatabase(['user_login' => 'testcustomer']);
-        assert($userId === $grabbedId);
+        $I->assertSame($grabbedId, $userId);
 
         // Test with multiple criteria
         $grabbedId = $I->grabCustomerIdFromDatabase([
             'user_login' => 'testcustomer',
             'user_email' => 'test@example.com',
         ]);
-        assert($userId === $grabbedId);
+        $I->assertSame($grabbedId, $userId);
 
         // Test non-existent customer
         $notFound = $I->grabCustomerIdFromDatabase(['user_login' => 'nonexistent']);
-        assert($notFound === false);
+        $I->assertFalse($notFound);
     }
 
     public function testSeeCustomerInDatabase(AcceptanceTester $I): void

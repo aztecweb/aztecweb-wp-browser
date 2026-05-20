@@ -20,7 +20,8 @@ class OrderHPOSCest
             'total_amount' => '100.00',
         ]);
 
-        assert(is_int($orderId) && $orderId > 0, 'Order ID should be a positive integer');
+        $I->assertIsInt($orderId);
+        $I->assertGreaterThan(0, $orderId, 'Order ID should be a positive integer');
 
         $I->seeInDatabase('wp_wc_orders', [
             'id' => $orderId,
@@ -53,7 +54,7 @@ class OrderHPOSCest
 
         $status = $I->grabOrderStatus($orderId);
 
-        assert($status === 'wc-on-hold', "Order status should be 'wc-on-hold', got '$status'");
+        $I->assertSame('wc-on-hold', $status, "Order status should be 'wc-on-hold', got '$status'");
     }
 
     public function testHaveOrderStatus(AcceptanceTester $I): void
@@ -87,10 +88,10 @@ class OrderHPOSCest
         $I->haveOrderMetaInDatabase($orderId, '_payment_method', 'bacs');
 
         $orderTotal = $I->grabOrderMeta($orderId, '_order_total');
-        assert(reset($orderTotal) === '99.99', 'Order total meta should be 99.99');
+        $I->assertSame('99.99', reset($orderTotal), 'Order total meta should be 99.99');
 
         $paymentMethod = $I->grabOrderMeta($orderId, '_payment_method');
-        assert(reset($paymentMethod) === 'bacs', 'Payment method meta should be bacs');
+        $I->assertSame('bacs', reset($paymentMethod), 'Payment method meta should be bacs');
     }
 
     public function testOrderWithPaymentDetails(AcceptanceTester $I): void
@@ -149,7 +150,8 @@ class OrderHPOSCest
             'country' => 'US',
         ]);
 
-        assert(is_int($addressId) && $addressId > 0, 'Address ID should be a positive integer');
+        $I->assertIsInt($addressId);
+        $I->assertGreaterThan(0, $addressId, 'Address ID should be a positive integer');
 
         $I->seeInDatabase('wp_wc_order_addresses', [
             'order_id' => $orderId,
@@ -169,7 +171,8 @@ class OrderHPOSCest
             'order_item_type' => 'line_item',
         ]);
 
-        assert(is_int($orderItemId) && $orderItemId > 0, 'Order item ID should be a positive integer');
+        $I->assertIsInt($orderItemId);
+        $I->assertGreaterThan(0, $orderItemId, 'Order item ID should be a positive integer');
 
         $I->seeInDatabase('wp_woocommerce_order_items', [
             'order_item_id' => $orderItemId,
@@ -189,7 +192,8 @@ class OrderHPOSCest
         ]);
 
         $metaId = $I->haveOrderItemMetaInDatabase($orderItemId, '_product_id', '123');
-        assert(is_int($metaId) && $metaId > 0, 'Order item meta ID should be a positive integer');
+        $I->assertIsInt($metaId);
+        $I->assertGreaterThan(0, $metaId, 'Order item meta ID should be a positive integer');
 
         $I->seeInDatabase('wp_woocommerce_order_itemmeta', [
             'order_item_id' => $orderItemId,
@@ -208,16 +212,16 @@ class OrderHPOSCest
         ]);
 
         $grabbedId = $I->grabOrderIdFromDatabase(['status' => 'wc-pending', 'customer_id' => $uniqueCustomerId]);
-        assert($orderId === $grabbedId);
+        $I->assertSame($grabbedId, $orderId);
 
         $grabbedId = $I->grabOrderIdFromDatabase([
             'status' => 'wc-pending',
             'customer_id' => $uniqueCustomerId,
         ]);
-        assert($orderId === $grabbedId);
+        $I->assertSame($grabbedId, $orderId);
 
         $notFound = $I->grabOrderIdFromDatabase(['status' => 'wc-completed', 'customer_id' => $uniqueCustomerId]);
-        assert($notFound === false);
+        $I->assertFalse($notFound);
     }
 
     public function testGrabOrderItemFromDatabase(AcceptanceTester $I): void
@@ -230,8 +234,8 @@ class OrderHPOSCest
         ]);
 
         $items = $I->grabOrderItemFromDatabase(['order_id' => $orderId]);
-        assert(is_array($items));
-        assert(count($items) > 0);
+        $I->assertIsArray($items);
+        $I->assertNotEmpty($items);
 
         $foundItem = null;
         foreach ($items as $item) {
@@ -240,8 +244,8 @@ class OrderHPOSCest
                 break;
             }
         }
-        assert($foundItem !== null);
-        assert($foundItem['order_item_name'] === 'Test Product Item');
+        $I->assertNotNull($foundItem);
+        $I->assertSame('Test Product Item', $foundItem['order_item_name']);
     }
 
     public function testGrabOrderItemByType(AcceptanceTester $I): void
@@ -263,8 +267,8 @@ class OrderHPOSCest
             'order_item_type' => 'line_item',
         ]);
 
-        assert(count($lineItems) === 1);
-        assert($lineItems[0]['order_item_name'] === 'Product Item');
+        $I->assertCount(1, $lineItems);
+        $I->assertSame('Product Item', $lineItems[0]['order_item_name']);
     }
 
     public function testSeeOrderInDatabase(AcceptanceTester $I): void
@@ -382,7 +386,8 @@ class OrderHPOSCest
             'country' => 'US',
         ]);
 
-        assert(is_int($addressId) && $addressId > 0);
+        $I->assertIsInt($addressId);
+        $I->assertGreaterThan(0, $addressId);
 
         $I->seeOrderAddressInDatabase('billing', [
             'first_name' => 'John',
@@ -407,7 +412,8 @@ class OrderHPOSCest
             'city' => 'Ship City',
         ]);
 
-        assert(is_int($addressId) && $addressId > 0);
+        $I->assertIsInt($addressId);
+        $I->assertGreaterThan(0, $addressId);
 
         $I->seeOrderAddressInDatabase('shipping', [
             'first_name' => 'Jane',
@@ -425,7 +431,7 @@ class OrderHPOSCest
         $tableName = $I->grabOrderItemsTableName();
 
         $expectedTable = $I->grabPrefixedTableNameFor('woocommerce_order_items');
-        assert($tableName === $expectedTable);
+        $I->assertSame($expectedTable, $tableName);
     }
 
     public function testHaveManyOrdersInDatabase(AcceptanceTester $I): void
@@ -435,7 +441,7 @@ class OrderHPOSCest
 
         $orderIds = $I->haveManyOrdersInDatabase($count, $overrides);
 
-        assert(count($orderIds) === $count);
+        $I->assertCount($count, $orderIds);
 
         foreach ($orderIds as $orderId) {
             $I->seeInDatabase('wp_wc_orders', [
@@ -451,7 +457,7 @@ class OrderHPOSCest
 
         $orderIds = $I->haveManyOrdersInDatabase($count);
 
-        assert(count($orderIds) === $count);
+        $I->assertCount($count, $orderIds);
 
         foreach ($orderIds as $orderId) {
             $I->seeInDatabase('wp_wc_orders', [
@@ -471,7 +477,8 @@ class OrderHPOSCest
 
         $metaId = $I->haveOrderItemMetaInDatabase($orderItemId, '_test_meta', 'test_value');
 
-        assert(is_int($metaId) && $metaId > 0);
+        $I->assertIsInt($metaId);
+        $I->assertGreaterThan(0, $metaId);
 
         $I->seeOrderItemMetaInDatabase([
             'order_item_id' => $orderItemId,

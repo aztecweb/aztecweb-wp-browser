@@ -30,7 +30,7 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
         return $this->wpDb->grabTablePrefix() . 'woocommerce_order_itemmeta';
     }
 
-    protected function createOrderRecord(array $data): int
+    protected function createOrderRecord(array $overrides): int
     {
         $orderId = $this->generateId();
 
@@ -52,7 +52,7 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
             'ip_address' => '',
             'user_agent' => '',
             'customer_note' => '',
-        ], $data);
+        ], $overrides);
 
         $orderData['id'] = $orderId;
 
@@ -81,7 +81,7 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
         $this->haveEntityStatus($orderId, $newStatus);
     }
 
-    public function haveOrderAddressInDatabase(int $orderId, string $addressType, array $data): int
+    public function haveOrderAddressInDatabase(int $orderId, string $addressType, array $overrides): int
     {
         return $this->wpDb->haveInDatabase($this->grabOrderAddressesTableName(), array_merge([
             'order_id' => $orderId,
@@ -97,7 +97,7 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
             'country' => '',
             'email' => '',
             'phone' => '',
-        ], $data));
+        ], $overrides));
     }
 
     public function getAdminOrderEditUrl(int $orderId): string
