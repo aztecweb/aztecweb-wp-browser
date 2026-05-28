@@ -1,8 +1,15 @@
 ARG PHP_VERSION=8.4
+ARG RUNNER_UID=1001
+ARG RUNNER_GID=1001
 
 FROM php:${PHP_VERSION}-cli-alpine
 
+ARG RUNNER_UID
+ARG RUNNER_GID
+
 ENV COMPOSER_NO_INTERACTION=1 \
+    COMPOSER_HOME=/tmp/composer \
+    HOME=/tmp \
     PATH="/var/www/html/vendor/bin:${PATH}"
 
 RUN apk add --no-cache \
@@ -37,10 +44,11 @@ RUN apk add --no-cache \
         exif \
         gd \
         intl \
+        mysqli \
         pdo_sqlite \
         xml \
         zip \
-    && apk del --no-cache \
+    && apk del \
         freetype-dev \
         icu-dev \
         libjpeg-turbo-dev \
@@ -56,9 +64,15 @@ RUN printf 'error_reporting = E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED\n' \
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 
-RUN adduser -D -g "" -u 1001 runner \
-    && mkdir -p /var/www/html \
-    && chown -R runner:runner /var/www/html
+# Default identity bakes in UID/GID for CI parity. Callers running on hosts
+# with a different UID/GID must pass `docker run --user $(id -u):$(id -g)`
+# (the bin/test wrapper does this automatically). HOME/COMPOSER_HOME point
+# at /tmp so arbitrary UIDs have a writable cache dir.
+RUN addgroup -g "${RUNNER_GID}" runner \
+    && adduser -D -g "" -u "${RUNNER_UID}" -G runner runner \
+    && mkdir -p /var/www/html /tmp/composer \
+    && chown -R runner:runner /var/www/html \
+    && chmod 1777 /tmp/composer
 
 USER runner
 

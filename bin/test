@@ -30,7 +30,19 @@ if [ "$#" -eq 0 ]; then
     set -- codecept run
 fi
 
-exec "$DOCKER" run --rm -it \
+# Stale pid files from previous ephemeral containers cause wp-browser service
+# extensions (ChromeDriverController, BuiltInServerController) to skip starting.
+# Remove them before every run — processes from a previous container are always dead.
+rm -f "$REPO_ROOT"/tests/_output/*.pid
+
+DOCKER_FLAGS=(--rm -i)
+if [ -t 0 ] && [ -t 1 ]; then
+    DOCKER_FLAGS+=(-t)
+fi
+
+DOCKER_FLAGS+=(--user "$(id -u):$(id -g)")
+
+exec "$DOCKER" run "${DOCKER_FLAGS[@]}" \
     -v "$REPO_ROOT:/var/www/html" \
     -w /var/www/html \
     "$IMAGE" \
