@@ -8,35 +8,38 @@ This is a Codeception module library for WooCommerce acceptance tests. It extend
 
 ## Commands
 
+All commands run inside the self-contained test runner image via the `bin/test`
+wrapper, which bind-mounts the repo at `/var/www/html`. See `README.md` for
+details on the image and GHCR tag scheme.
+
 ```bash
-# Install dependencies
-composer install
+# One-time: install PHP dependencies (creates vendor/)
+bin/test composer install
 
-# Start test environment (required before running tests)
-make test-up
+# One-time: bootstrap the SQLite WordPress site (idempotent)
+bin/test bash resources/install.sh
 
-# Stop test environment
-make test-down
+# Run the full default suite
+bin/test
 
-# Run tests (when available)
-composer test
-# Or directly: vendor/bin/codecept run
-
-# Run tests via Docker Compose
-docker compose -f docker-compose.test.yml exec php vendor/bin/codecept run tests/acceptance/{nome-arquivo}.php
+# Run only the acceptance suite
+bin/test codecept run acceptance
 
 # Run a single test file
-docker compose -f docker-compose.test.yml exec php vendor/bin/codecept run tests/acceptance/ProductCest.php
+bin/test codecept run acceptance ProductCest
 
-# Run specific test method
-docker compose -f docker-compose.test.yml exec php vendor/bin/codecept run tests/acceptance/ProductCest.php:testMethodName
+# Run a specific test method
+bin/test codecept run acceptance ProductCest:testMethodName
 
 # Rebuild Codeception actor classes (required after changing module method signatures)
-docker compose -f docker-compose.test.yml exec php vendor/bin/codecept build
+bin/test codecept build
 
 # HPOS (High-Performance Order Storage) management
-make hpos-enable   # Enable HPOS before running OrderHPOSCest tests
-make hpos-disable  # Disable HPOS before running OrderCest (Legacy) tests
+bin/test wp wc hpos enable    # Enable HPOS before running OrderHPOSCest tests
+bin/test wp wc hpos disable   # Disable HPOS before running OrderCest (Legacy) tests
+
+# Drop into an interactive shell inside the image
+bin/test bash
 ```
 
 
