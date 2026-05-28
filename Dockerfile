@@ -33,6 +33,7 @@ RUN apk add --no-cache \
         libzip-dev \
         oniguruma \
         oniguruma-dev \
+        procps \
         sqlite \
         sqlite-dev \
         sqlite-libs \
