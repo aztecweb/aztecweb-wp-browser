@@ -69,3 +69,32 @@ foreground; open a second terminal for any other `bin/test` commands.
 AZTEC_TEST_IMAGE=ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.0 \
     bin/test codecept run acceptance
 ```
+
+### Running against PHP 8.0
+
+The default image ships PHP 8.4 and the committed `composer.lock` is resolved
+against PHP 8.4. Running against the PHP 8.0 image requires resolving
+dependencies fresh inside that image, because some packages locked for 8.4 do
+not support 8.0.
+
+```bash
+# Remove the vendor directory so Composer starts clean
+rm -rf vendor
+
+# Resolve dependencies for PHP 8.0 (rewrites composer.lock)
+AZTEC_TEST_IMAGE=ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.0 \
+    bin/test composer update
+
+# Bootstrap the site (required after a clean vendor install)
+AZTEC_TEST_IMAGE=ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.0 \
+    bin/test bash resources/install.sh
+
+# Run the suite
+AZTEC_TEST_IMAGE=ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.0 \
+    bin/test
+```
+
+> **Note:** `composer update` rewrites `composer.lock` with PHP-8.0-compatible
+> package versions (Symfony 6.x, older Codeception 5.x releases). Do not commit
+> the rewritten lock file — restore it afterwards with `git checkout composer.lock`
+> and reinstall for your usual image: `bin/test composer install`.

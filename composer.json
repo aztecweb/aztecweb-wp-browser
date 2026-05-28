@@ -71,7 +71,9 @@
   "require": {
     "php": "^8.0",
     "codeception/codeception": "^5.0",
-    "lucatume/wp-browser": "^4.3"
+    "lucatume/wp-browser": "^4.3",
+    "symfony/filesystem": ">=4.4.24 <8.0",
+    "symfony/process": ">=4.4.24 <8.0"
   },
   "require-dev": {
     "codeception/module-webdriver": "^3.1",
