@@ -25,3 +25,8 @@ Thumbs.db
 
 # Composer
 /vendor/
+
+# WordPress
+public/*
+!public/index.php
+!public/wp-config.php

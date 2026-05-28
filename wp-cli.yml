@@ -1,3 +1,1 @@
 path: public/wp
-require:
-  - public/wp-config.php
