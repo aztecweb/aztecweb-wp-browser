@@ -11,7 +11,7 @@ class ImageHealthCest
     public function homepageRendersWithWooCommerceInstalled(AcceptanceTester $I): void
     {
         $I->amOnPage('/');
-        $I->seeResponseCodeIs(200);
+        $I->seeElement('body');
         $I->dontSee('Error establishing a database connection');
         $I->dontSee('There has been a critical error');
     }

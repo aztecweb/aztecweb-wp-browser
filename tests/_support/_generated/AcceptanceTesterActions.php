@@ -1,4 +1,4 @@
-<?php  //[STAMP] 15f301637dbc0af3b81fe91023494a24
+<?php  //[STAMP] 2a76867f640be3e0537937e50ee18ec5
 // phpcs:ignoreFile
 namespace Aztec\WPBrowser\Tests\Support\_generated;
 
@@ -9776,11 +9776,12 @@ trait AcceptanceTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Checks that the current URL (path) is equal to the given string.
+     * Checks that the current URL is equal to the given string.
+     * Unlike `seeInCurrentUrl`, this only matches the full URL.
      *
      * ```php
      * <?php
-     * // to match the home page
+     * // to match root url
      * $I->seeCurrentUrlEquals('/');
      * ```
      * @see \Codeception\Module\WebDriver::seeCurrentUrlEquals()
@@ -9792,11 +9793,12 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Conditional Assertion: Test won't be stopped on fail
-     * Checks that the current URL (path) is equal to the given string.
+     * Checks that the current URL is equal to the given string.
+     * Unlike `seeInCurrentUrl`, this only matches the full URL.
      *
      * ```php
      * <?php
-     * // to match the home page
+     * // to match root url
      * $I->seeCurrentUrlEquals('/');
      * ```
      * @see \Codeception\Module\WebDriver::seeCurrentUrlEquals()
@@ -9808,11 +9810,12 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Test won't be stopped on fail. Error won't be logged 
-     * Checks that the current URL (path) is equal to the given string.
+     * Checks that the current URL is equal to the given string.
+     * Unlike `seeInCurrentUrl`, this only matches the full URL.
      *
      * ```php
      * <?php
-     * // to match the home page
+     * // to match root url
      * $I->seeCurrentUrlEquals('/');
      * ```
      * @see \Codeception\Module\WebDriver::seeCurrentUrlEquals()
@@ -9839,11 +9842,12 @@ trait AcceptanceTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Checks that the current URL (path) matches the given regular expression.
+     * Checks that the current URL matches the given regular expression.
      *
      * ```php
      * <?php
-     * $I->seeCurrentUrlMatches('~^/users/\d+$~');
+     * // to match root url
+     * $I->seeCurrentUrlMatches('~^/users/(\d+)~');
      * ```
      * @see \Codeception\Module\WebDriver::seeCurrentUrlMatches()
      */
@@ -9854,11 +9858,12 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Conditional Assertion: Test won't be stopped on fail
-     * Checks that the current URL (path) matches the given regular expression.
+     * Checks that the current URL matches the given regular expression.
      *
      * ```php
      * <?php
-     * $I->seeCurrentUrlMatches('~^/users/\d+$~');
+     * // to match root url
+     * $I->seeCurrentUrlMatches('~^/users/(\d+)~');
      * ```
      * @see \Codeception\Module\WebDriver::seeCurrentUrlMatches()
      */
@@ -9869,11 +9874,12 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Test won't be stopped on fail. Error won't be logged 
-     * Checks that the current URL (path) matches the given regular expression.
+     * Checks that the current URL matches the given regular expression.
      *
      * ```php
      * <?php
-     * $I->seeCurrentUrlMatches('~^/users/\d+$~');
+     * // to match root url
+     * $I->seeCurrentUrlMatches('~^/users/(\d+)~');
      * ```
      * @see \Codeception\Module\WebDriver::seeCurrentUrlMatches()
      */
@@ -9899,7 +9905,7 @@ trait AcceptanceTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Checks that the current URI (path) doesn't contain the given string.
+     * Checks that the current URI doesn't contain the given string.
      *
      * ```php
      * <?php
@@ -9914,7 +9920,7 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Conditional Assertion: Test won't be stopped on fail
-     * Checks that the current URI (path) doesn't contain the given string.
+     * Checks that the current URI doesn't contain the given string.
      *
      * ```php
      * <?php
@@ -9929,7 +9935,7 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Test won't be stopped on fail. Error won't be logged 
-     * Checks that the current URI (path) doesn't contain the given string.
+     * Checks that the current URI doesn't contain the given string.
      *
      * ```php
      * <?php
@@ -9959,7 +9965,7 @@ trait AcceptanceTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Checks that the current URL (path) doesn't equal the given string.
+     * Checks that the current URL doesn't equal the given string.
      * Unlike `dontSeeInCurrentUrl`, this only matches the full URL.
      *
      * ```php
@@ -9976,7 +9982,7 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Conditional Assertion: Test won't be stopped on fail
-     * Checks that the current URL (path) doesn't equal the given string.
+     * Checks that the current URL doesn't equal the given string.
      * Unlike `dontSeeInCurrentUrl`, this only matches the full URL.
      *
      * ```php
@@ -9993,7 +9999,7 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Test won't be stopped on fail. Error won't be logged 
-     * Checks that the current URL (path) doesn't equal the given string.
+     * Checks that the current URL doesn't equal the given string.
      * Unlike `dontSeeInCurrentUrl`, this only matches the full URL.
      *
      * ```php
@@ -10025,12 +10031,12 @@ trait AcceptanceTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Checks that current URL (path) doesn't match the given regular expression.
+     * Checks that current url doesn't match the given regular expression.
      *
      * ```php
      * <?php
      * // to match root url
-     * $I->dontSeeCurrentUrlMatches('~^/users/\d+$~');
+     * $I->dontSeeCurrentUrlMatches('~^/users/(\d+)~');
      * ```
      * @see \Codeception\Module\WebDriver::dontSeeCurrentUrlMatches()
      */
@@ -10041,12 +10047,12 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Conditional Assertion: Test won't be stopped on fail
-     * Checks that current URL (path) doesn't match the given regular expression.
+     * Checks that current url doesn't match the given regular expression.
      *
      * ```php
      * <?php
      * // to match root url
-     * $I->dontSeeCurrentUrlMatches('~^/users/\d+$~');
+     * $I->dontSeeCurrentUrlMatches('~^/users/(\d+)~');
      * ```
      * @see \Codeception\Module\WebDriver::dontSeeCurrentUrlMatches()
      */
@@ -10057,12 +10063,12 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Test won't be stopped on fail. Error won't be logged 
-     * Checks that current URL (path) doesn't match the given regular expression.
+     * Checks that current url doesn't match the given regular expression.
      *
      * ```php
      * <?php
      * // to match root url
-     * $I->dontSeeCurrentUrlMatches('~^/users/\d+$~');
+     * $I->dontSeeCurrentUrlMatches('~^/users/(\d+)~');
      * ```
      * @see \Codeception\Module\WebDriver::dontSeeCurrentUrlMatches()
      */
@@ -10462,9 +10468,9 @@ trait AcceptanceTesterActions
      *      'checkbox1' => true,
      *      // ...
      * ];
-     * $I->submitForm('//form[@id=my-form]', $form, 'submitButton');
+     * $I->submitForm('//form[@id=my-form]', string $form, 'submitButton');
      * // $I->amOnPage('/path/to/form-page') may be needed
-     * $I->seeInFormFields('//form[@id=my-form]', $form);
+     * $I->seeInFormFields('//form[@id=my-form]', string $form);
      * ```
      * @see \Codeception\Module\WebDriver::seeInFormFields()
      */
@@ -10523,9 +10529,9 @@ trait AcceptanceTesterActions
      *      'checkbox1' => true,
      *      // ...
      * ];
-     * $I->submitForm('//form[@id=my-form]', $form, 'submitButton');
+     * $I->submitForm('//form[@id=my-form]', string $form, 'submitButton');
      * // $I->amOnPage('/path/to/form-page') may be needed
-     * $I->seeInFormFields('//form[@id=my-form]', $form);
+     * $I->seeInFormFields('//form[@id=my-form]', string $form);
      * ```
      * @see \Codeception\Module\WebDriver::seeInFormFields()
      */
@@ -10584,9 +10590,9 @@ trait AcceptanceTesterActions
      *      'checkbox1' => true,
      *      // ...
      * ];
-     * $I->submitForm('//form[@id=my-form]', $form, 'submitButton');
+     * $I->submitForm('//form[@id=my-form]', string $form, 'submitButton');
      * // $I->amOnPage('/path/to/form-page') may be needed
-     * $I->seeInFormFields('//form[@id=my-form]', $form);
+     * $I->seeInFormFields('//form[@id=my-form]', string $form);
      * ```
      * @see \Codeception\Module\WebDriver::seeInFormFields()
      */
@@ -12182,7 +12188,7 @@ trait AcceptanceTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Reloads the current page. All forms will be reset, so the outcome is as if the user would press <kbd>Ctrl</kbd>+<kbd>F5</kbd>.
+     * Reloads the current page.
      * @see \Codeception\Module\WebDriver::reloadPage()
      */
     public function reloadPage(): void {
@@ -12192,7 +12198,7 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Test won't be stopped on fail. Error won't be logged 
-     * Reloads the current page. All forms will be reset, so the outcome is as if the user would press <kbd>Ctrl</kbd>+<kbd>F5</kbd>.
+     * Reloads the current page.
      * @see \Codeception\Module\WebDriver::reloadPage()
      */
     public function tryToReloadPage(): bool {
@@ -12321,17 +12327,17 @@ trait AcceptanceTesterActions
      * ``` html
      * <form action="/sign_up">
      *     Login:
-     *     <input type="text" name="user[login]"><br>
+     *     <input type="text" name="user[login]" /><br/>
      *     Password:
-     *     <input type="password" name="user[password]"><br>
+     *     <input type="password" name="user[password]" /><br/>
      *     Do you agree to our terms?
-     *     <input type="checkbox" name="user[agree]"><br>
+     *     <input type="checkbox" name="user[agree]" /><br/>
      *     Select pricing plan:
      *     <select name="plan">
      *         <option value="1">Free</option>
      *         <option value="2" selected="selected">Paid</option>
      *     </select>
-     *     <input type="submit" name="submitButton" value="Submit">
+     *     <input type="submit" name="submitButton" value="Submit" />
      * </form>
      * ```
      *
@@ -12431,7 +12437,7 @@ trait AcceptanceTesterActions
      * For example, given the following HTML:
      *
      * ``` html
-     * <input type="submit" name="submitButton" value="Submit">
+     * <input type="submit" name="submitButton" value="Submit" />
      * ```
      *
      * `$button` could be any one of the following:
@@ -12484,17 +12490,17 @@ trait AcceptanceTesterActions
      * ``` html
      * <form action="/sign_up">
      *     Login:
-     *     <input type="text" name="user[login]"><br>
+     *     <input type="text" name="user[login]" /><br/>
      *     Password:
-     *     <input type="password" name="user[password]"><br>
+     *     <input type="password" name="user[password]" /><br/>
      *     Do you agree to our terms?
-     *     <input type="checkbox" name="user[agree]"><br>
+     *     <input type="checkbox" name="user[agree]" /><br/>
      *     Select pricing plan:
      *     <select name="plan">
      *         <option value="1">Free</option>
      *         <option value="2" selected="selected">Paid</option>
      *     </select>
-     *     <input type="submit" name="submitButton" value="Submit">
+     *     <input type="submit" name="submitButton" value="Submit" />
      * </form>
      * ```
      *
@@ -12594,7 +12600,7 @@ trait AcceptanceTesterActions
      * For example, given the following HTML:
      *
      * ``` html
-     * <input type="submit" name="submitButton" value="Submit">
+     * <input type="submit" name="submitButton" value="Submit" />
      * ```
      *
      * `$button` could be any one of the following:
@@ -12628,17 +12634,16 @@ trait AcceptanceTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Waits up to `$timeout` seconds for the given element to change.
+     * Waits up to $timeout seconds for the given element to change.
      * Element "change" is determined by a callback function which is called repeatedly
      * until the return value evaluates to true.
      *
      * ``` php
      * <?php
-     * use Facebook\WebDriver\WebDriverElement;
-     *
-     * $I->waitForElementChange('#menu', function(WebDriverElement $element) {
-     *     return $element->isDisplayed();
-     * }, 5);
+     * use \Facebook\WebDriver\WebDriverElement
+     * $I->waitForElementChange('#menu', function(WebDriverElement $el) {
+     *     return $el->isDisplayed();
+     * }, 100);
      * ```
      *
      * @param string|array|WebDriverBy $element
@@ -13103,13 +13108,16 @@ trait AcceptanceTesterActions
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
-     * Executes JavaScript commands.
+     * Executes custom JavaScript.
+     *
+     * This example uses jQuery to get a value and assigns that value to a PHP variable:
      *
      * ```php
      * <?php
-     * $myVar = $I->executeJS('return document.getElementById("myField").value');
+     * $myVar = $I->executeJS('return $("#myField").val()');
      *
-     * // Additional arguments can be passed as array. E.g. this will alert `Hello World`:
+     * // additional arguments can be passed as array
+     * // Example shows `Hello World` alert:
      * $I->executeJS("window.alert(arguments[0])", ['Hello world']);
      * ```
      *
@@ -13124,13 +13132,16 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * [!] Test won't be stopped on fail. Error won't be logged 
-     * Executes JavaScript commands.
+     * Executes custom JavaScript.
+     *
+     * This example uses jQuery to get a value and assigns that value to a PHP variable:
      *
      * ```php
      * <?php
-     * $myVar = $I->executeJS('return document.getElementById("myField").value');
+     * $myVar = $I->executeJS('return $("#myField").val()');
      *
-     * // Additional arguments can be passed as array. E.g. this will alert `Hello World`:
+     * // additional arguments can be passed as array
+     * // Example shows `Hello World` alert:
      * $I->executeJS("window.alert(arguments[0])", ['Hello world']);
      * ```
      *
@@ -13542,22 +13553,22 @@ trait AcceptanceTesterActions
      * [!] Method is generated. Documentation taken from corresponding module.
      *
      * Presses the given key on the given element.
-     * To specify a character and modifier (e.g. <kbd>Ctrl</kbd>, <kbd>Alt</kbd>, <kbd>Shift</kbd>, <kbd>Meta</kbd>), pass an array for `$char` with
+     * To specify a character and modifier (e.g. <kbd>Ctrl</kbd>, Alt, Shift, Meta), pass an array for `$char` with
      * the modifier as the first element and the character as the second.
-     * For special keys, use the constants from [Facebook\WebDriver\WebDriverKeys](https://github.com/php-webdriver/php-webdriver/blob/main/lib/WebDriverKeys.php).
+     * For special keys, use the constants from [`Facebook\WebDriver\WebDriverKeys`](https://github.com/php-webdriver/php-webdriver/blob/main/lib/WebDriverKeys.php).
      *
      * ``` php
      * <?php
-     * // <input id="page" value="old">
-     * $I->pressKey('#page', 'a'); // => olda
-     * $I->pressKey('#page', ['ctrl', 'a'],'new'); // => new
-     * $I->pressKey('#page', ['shift', '111'], '1', 'x'); // => old!!!1x
-     * $I->pressKey('descendant-or-self::*[@id='page']', 'u'); // => oldu
-     * $I->pressKey('#name', ['ctrl', 'a'], \Facebook\WebDriver\WebDriverKeys::DELETE); // =>''
+     * // <input id="page" value="old" />
+     * $I->pressKey('#page','a'); // => olda
+     * $I->pressKey('#page',array('ctrl','a'),'new'); //=> new
+     * $I->pressKey('#page',array('shift','111'),'1','x'); //=> old!!!1x
+     * $I->pressKey('descendant-or-self::*[@id='page']','u'); //=> oldu
+     * $I->pressKey('#name', array('ctrl', 'a'), \Facebook\WebDriver\WebDriverKeys::DELETE); //=>''
      * ```
      *
      * @param string|array|WebDriverBy $element
-     * @param string|list<string> $chars Can be char or array with modifier. You can provide several chars.
+     * @param array<string|string[]>$chars Can be char or array with modifier. You can provide several chars.
      * @throws ElementNotFound
      * @see \Codeception\Module\WebDriver::pressKey()
      */
@@ -13569,22 +13580,22 @@ trait AcceptanceTesterActions
      *
      * [!] Test won't be stopped on fail. Error won't be logged 
      * Presses the given key on the given element.
-     * To specify a character and modifier (e.g. <kbd>Ctrl</kbd>, <kbd>Alt</kbd>, <kbd>Shift</kbd>, <kbd>Meta</kbd>), pass an array for `$char` with
+     * To specify a character and modifier (e.g. <kbd>Ctrl</kbd>, Alt, Shift, Meta), pass an array for `$char` with
      * the modifier as the first element and the character as the second.
-     * For special keys, use the constants from [Facebook\WebDriver\WebDriverKeys](https://github.com/php-webdriver/php-webdriver/blob/main/lib/WebDriverKeys.php).
+     * For special keys, use the constants from [`Facebook\WebDriver\WebDriverKeys`](https://github.com/php-webdriver/php-webdriver/blob/main/lib/WebDriverKeys.php).
      *
      * ``` php
      * <?php
-     * // <input id="page" value="old">
-     * $I->pressKey('#page', 'a'); // => olda
-     * $I->pressKey('#page', ['ctrl', 'a'],'new'); // => new
-     * $I->pressKey('#page', ['shift', '111'], '1', 'x'); // => old!!!1x
-     * $I->pressKey('descendant-or-self::*[@id='page']', 'u'); // => oldu
-     * $I->pressKey('#name', ['ctrl', 'a'], \Facebook\WebDriver\WebDriverKeys::DELETE); // =>''
+     * // <input id="page" value="old" />
+     * $I->pressKey('#page','a'); // => olda
+     * $I->pressKey('#page',array('ctrl','a'),'new'); //=> new
+     * $I->pressKey('#page',array('shift','111'),'1','x'); //=> old!!!1x
+     * $I->pressKey('descendant-or-self::*[@id='page']','u'); //=> oldu
+     * $I->pressKey('#name', array('ctrl', 'a'), \Facebook\WebDriver\WebDriverKeys::DELETE); //=>''
      * ```
      *
      * @param string|array|WebDriverBy $element
-     * @param string|list<string> $chars Can be char or array with modifier. You can provide several chars.
+     * @param array<string|string[]>$chars Can be char or array with modifier. You can provide several chars.
      * @throws ElementNotFound
      * @see \Codeception\Module\WebDriver::pressKey()
      */
@@ -14194,7 +14205,7 @@ trait AcceptanceTesterActions
      * In 3rd argument you can set number a seconds to wait for element to appear
      *
      * @param string|array|WebDriverBy $element
-     * @param callable|array|\Codeception\Util\ActionSequence $actions
+     * @param callable|array|ActionSequence $actions
      * @see \Codeception\Module\WebDriver::performOn()
      */
     public function performOn($element, $actions, int $timeout = 10): void {
@@ -14243,7 +14254,7 @@ trait AcceptanceTesterActions
      * In 3rd argument you can set number a seconds to wait for element to appear
      *
      * @param string|array|WebDriverBy $element
-     * @param callable|array|\Codeception\Util\ActionSequence $actions
+     * @param callable|array|ActionSequence $actions
      * @see \Codeception\Module\WebDriver::performOn()
      */
     public function tryToPerformOn($element, $actions, int $timeout = 10): bool {
