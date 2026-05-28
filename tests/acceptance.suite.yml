@@ -17,9 +17,11 @@ modules:
             dsn: 'sqlite:%DB_PATH%'
             user: ''
             password: ''
-            populate: false
-            cleanup: false
+            populate: true
+            cleanup: true
+            dump: tests/_data/dump.sql
             url: '%WP_URL%'
+            urlReplacement: false
             tablePrefix: '%DB_TABLE_PREFIX%'
         WPWebDriver:
             url: '%WP_URL%'
@@ -32,7 +34,7 @@ modules:
             adminPassword: '%WP_ADMIN_PASSWORD%'
             adminPath: /wp-admin
             capabilities:
-                chromeOptions:
+                goog:chromeOptions:
                     args:
                         - '--headless=new'
                         - '--disable-gpu'

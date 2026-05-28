@@ -15,13 +15,13 @@ extensions:
     config:
         lucatume\WPBrowser\Extension\BuiltInServerController:
             suites:
-                - acceptance
+                - 'Aztec\WPBrowser\Tests.acceptance'
             docroot: '%WP_DOCROOT%'
             port: '%WP_SERVER_PORT%'
             workers: 5
         lucatume\WPBrowser\Extension\ChromeDriverController:
             suites:
-                - acceptance
+                - 'Aztec\WPBrowser\Tests.acceptance'
             port: '%CHROMEDRIVER_PORT%'
             binary: '%CHROMEDRIVER_BINARY%'
 commands:
