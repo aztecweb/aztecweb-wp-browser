@@ -45,6 +45,24 @@ There is no push trigger or cron schedule yet — automatic rebuilds are being
 designed separately in
 [#13](https://github.com/aztecweb/aztecweb-wp-browser/issues/13).
 
+### Browsing the site from the host
+
+The container's PHP server is only reachable inside the container during a test
+run. To open the site in a host browser — for instance to inspect the installed
+state or reproduce a failing scenario manually — use `bin/serve`:
+
+```bash
+bin/serve          # http://localhost:8080/  (reads WP_SERVER_PORT from .env)
+```
+
+`bin/serve` starts WP-CLI's built-in server bound to `0.0.0.0` and publishes
+the port to the host. Press Ctrl-C to stop it. The server runs in the
+foreground; open a second terminal for any other `bin/test` commands.
+
+> **Note:** `bin/serve` is for manual inspection only. The acceptance suite
+> manages its own server via the `BuiltInServerController` extension — do not
+> run both at the same time on the same port.
+
 ### Overriding the image
 
 ```bash

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+#
+# Start a WP-CLI built-in server bound to 0.0.0.0 so the site is reachable
+# from the host browser at http://localhost:<WP_SERVER_PORT>/
+
+set -euo pipefail
+
+IMAGE="${AZTEC_TEST_IMAGE:-ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.4}"
+DOCKER="${AZTEC_TEST_DOCKER:-docker}"
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Read WP_SERVER_PORT from .env if present
+if [ -f "$REPO_ROOT/.env" ]; then
+    PORT="$(grep -E '^WP_SERVER_PORT=' "$REPO_ROOT/.env" | cut -d= -f2 | tr -d '[:space:]')"
+fi
+PORT="${PORT:-8080}"
+
+echo "Starting WP server on http://localhost:${PORT}/ (Ctrl-C to stop)"
+
+exec "$DOCKER" run --rm -it \
+    --user "$(id -u):$(id -g)" \
+    -v "$REPO_ROOT:/var/www/html" \
+    -w /var/www/html \
+    -p "${PORT}:${PORT}" \
+    "$IMAGE" \
+    wp server --host=0.0.0.0 --port="${PORT}" --path=public
