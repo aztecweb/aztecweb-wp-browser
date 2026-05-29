@@ -79,6 +79,10 @@ trait CheckoutMethods
     public function placeOrder(): void
     {
         $selector = $this->pageObjectProvider()->checkoutPage()::PLACE_ORDER_BUTTON_SELECTOR;
+        // JS click triggers React's client-side validation UI (aria-invalid, inline errors).
+        // The subsequent WebDriver click triggers the actual REST API submission.
+        $this->wpWebDriver()->executeJS('document.querySelector(arguments[0]).click()', [$selector]);
+        $this->wpWebDriver()->scrollTo($selector);
         $this->wpWebDriver()->click($selector);
     }
 
@@ -122,13 +126,12 @@ trait CheckoutMethods
     public function seeCheckoutError(?string $message = null): void
     {
         $container = $this->pageObjectProvider()->checkoutPage()::ERROR_CONTAINER_SELECTOR;
-
-        $this->wpWebDriver()->waitForElementVisible($container);
+        $checkoutForm = '.wc-block-checkout';
 
         if ($message === null) {
+            $this->wpWebDriver()->waitForElement($container);
             $this->wpWebDriver()->seeElement($container);
         } else {
-            $checkoutForm = '.wc-block-checkout';
             $this->wpWebDriver()->see($message, $checkoutForm);
         }
     }
