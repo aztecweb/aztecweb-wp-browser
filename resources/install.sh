@@ -3,10 +3,17 @@
 # Bootstrap the WordPress test site on the mounted source tree.
 #
 # Idempotent: re-running is a no-op once the SQLite database is in place.
-# Expects vendor/bin/wp to be on PATH (the Dockerfile exports it; on the host,
-# the wrapper at bin/test ensures it).
+# WP-CLI is invoked via `composer exec -- wp` so it resolves from vendor/bin
+# regardless of PATH or working directory. This keeps the script portable
+# across the bind-mounted image (bin/test) and CI containers, where the repo
+# is checked out outside the image's baked PATH.
 
 set -euo pipefail
+
+# Resolve WP-CLI through Composer so it works wherever the script is run from.
+wp() {
+    composer exec --quiet -- wp "$@"
+}
 
 WP_HOME="${WP_HOME:-http://localhost:8080}"
 WP_TITLE="${WP_TITLE:-AztecWP Browser Test Site}"
