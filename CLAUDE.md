@@ -42,6 +42,8 @@ bin/test wp wc hpos disable   # Disable HPOS before running OrderCest (Legacy) t
 bin/test bash
 ```
 
+**Building and publishing the test runner image:** See `README.md` § "Building and publishing" and [#13](https://github.com/aztecweb/aztecweb-wp-browser/issues/13) for image build and CI workflow details. The image is published to GHCR per PHP variant; `bin/test` always uses the published image via the `AZTEC_TEST_IMAGE` environment variable (defaults to `php8.4`).
+
 
 ## Architecture
 
@@ -227,7 +229,7 @@ $I->haveOrderItemInDatabase($orderId, [
 After changing method signatures in module traits (e.g., adding default parameters), you **must** run:
 
 ```bash
-docker compose -f docker-compose.test.yml exec php vendor/bin/codecept build
+bin/test codecept build
 ```
 
 This regenerates the actor classes in `tests/_support/_generated/`. Without this, tests will fail with `ArgumentCountError` even if the source code is correct.
