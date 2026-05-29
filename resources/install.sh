@@ -38,6 +38,7 @@ wp plugin activate woocommerce sqlite-database-integration
 wp theme activate storefront
 wp wc hpos sync
 
+mkdir -p tests/_data
 sqlite3 public/packages/database/.ht.sqlite .dump > tests/_data/dump.sql
 
 echo "WordPress test site ready at ${WP_HOME}."
