@@ -32,3 +32,6 @@ Thumbs.db
 public/*
 !public/index.php
 !public/wp-config.php
+
+# Claude
+.claude/worktrees/
