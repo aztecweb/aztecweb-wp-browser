@@ -32,7 +32,7 @@ modules:
             window_size: 1200x800
             adminUsername: '%WP_ADMIN_USER%'
             adminPassword: '%WP_ADMIN_PASSWORD%'
-            adminPath: /wp-admin
+            adminPath: /wp/wp-admin
             capabilities:
                 goog:chromeOptions:
                     args:
