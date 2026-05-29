@@ -36,6 +36,8 @@ wp core is-installed --quiet || wp core install \
 
 wp plugin activate woocommerce sqlite-database-integration
 wp theme activate storefront
+wp rewrite structure '/%postname%/' --hard
+wp wc payment_gateway update cod --user=admin --enabled=true
 wp wc hpos sync
 
 mkdir -p tests/_data
