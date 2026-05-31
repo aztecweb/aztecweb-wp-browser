@@ -454,6 +454,8 @@ class CustomerCest
         $I->amOnMyAccountPage();
 
         $I->seeInCurrentUrl('my-account');
+
+        $I->restartBuiltInServer();
     }
 
     public function testCompleteCustomerWorkflow(AcceptanceTester $I): void

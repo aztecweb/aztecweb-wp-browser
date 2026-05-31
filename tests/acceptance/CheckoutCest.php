@@ -8,6 +8,11 @@ use Aztec\WPBrowser\Tests\Support\AcceptanceTester;
 
 class CheckoutCest
 {
+    public function _after(AcceptanceTester $I): void
+    {
+        $I->restartBuiltInServer();
+    }
+
     // ==================== Phase 1 Tests: Navigation & Form Filling ====================
 
     public function testAmOnCheckoutPage(AcceptanceTester $I): void
@@ -212,6 +217,12 @@ class CheckoutCest
 
     public function testDontSeeCouponApplied(AcceptanceTester $I): void
     {
+        $productId = $I->haveProductInDatabase([
+            'post_title' => 'Test Product',
+        ]);
+
+        $I->addProductToCart($productId);
+
         $I->amOnCheckoutPage();
 
         $I->dontSeeCouponApplied('nonexistent-coupon');
@@ -308,6 +319,12 @@ class CheckoutCest
 
     public function testDontSeeCheckoutErrorSpecificMessage(AcceptanceTester $I): void
     {
+        $productId = $I->haveProductInDatabase([
+            'post_title' => 'Test Product',
+        ]);
+
+        $I->addProductToCart($productId);
+
         $I->amOnCheckoutPage();
 
         $I->dontSeeCheckoutError('Specific error message');
