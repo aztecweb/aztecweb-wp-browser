@@ -18,7 +18,7 @@ extensions:
                 - 'Aztec\WPBrowser\Tests.acceptance'
             docroot: '%WP_DOCROOT%'
             port: '%WP_SERVER_PORT%'
-            workers: 5
+            workers: '%WP_SERVER_WORKERS%'
         lucatume\WPBrowser\Extension\ChromeDriverController:
             suites:
                 - 'Aztec\WPBrowser\Tests.acceptance'

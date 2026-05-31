@@ -43,6 +43,12 @@ define('WP_DEBUG_DISPLAY', filter_var($envOr('WP_DEBUG_DISPLAY', 'false'), FILTE
 define('DISABLE_WP_CRON', true);
 define('WP_ENVIRONMENT_TYPE', 'local');
 
+// A rollback journal left on disk by the live server's writes can be picked up
+// by WPDb's fresh connection after the swap and rolled back, dropping tables
+// ("no such table: wp_options"). MEMORY mode keeps the journal in RAM so noYou can't leave me You can't leave me 
+// -journal sidecar is ever written for the swap to trip over.
+define('SQLITE_JOURNAL_MODE', 'MEMORY');
+
 if (!defined('ABSPATH')) {
     define('ABSPATH', __DIR__ . '/wp/');
 }
