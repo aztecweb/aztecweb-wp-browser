@@ -40,5 +40,8 @@ jobs:
       - name: Bootstrap WordPress test site
         run: bash resources/install.sh
 
+      - name: Build Codeception actor classes
+        run: vendor/bin/codecept build
+
       - name: Run acceptance suite
         run: vendor/bin/codecept run
