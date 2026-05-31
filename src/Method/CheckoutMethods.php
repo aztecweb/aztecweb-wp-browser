@@ -19,6 +19,7 @@ trait CheckoutMethods
     public function amOnCheckoutPage(): void
     {
         $this->wpWebDriver()->amOnPage($this->wooCommerceConfig()->checkoutPageSlug());
+        $this->wpWebDriver()->waitForElement('.wc-block-checkout');
     }
 
     public function fillCheckoutField(string $field, string $value): void
@@ -58,6 +59,7 @@ trait CheckoutMethods
     public function seePaymentMethodAvailable(string $methodId): void
     {
         $labelSelector = sprintf('label[for="radio-control-wc-payment-method-options-%s"]', $methodId);
+        $this->wpWebDriver()->waitForElement($labelSelector);
         $this->wpWebDriver()->seeElement($labelSelector);
     }
 
@@ -79,11 +81,11 @@ trait CheckoutMethods
     public function placeOrder(): void
     {
         $selector = $this->pageObjectProvider()->checkoutPage()::PLACE_ORDER_BUTTON_SELECTOR;
-        // JS click triggers React's client-side validation UI (aria-invalid, inline errors).
-        // The subsequent WebDriver click triggers the actual REST API submission.
+
+        $this->wpWebDriver()->waitForElement($selector);
+        $this->wpWebDriver()->waitForElementClickable($selector);
+
         $this->wpWebDriver()->executeJS('document.querySelector(arguments[0]).click()', [$selector]);
-        $this->wpWebDriver()->scrollTo($selector);
-        $this->wpWebDriver()->click($selector);
     }
 
     public function applyCouponOnCheckout(string $couponCode): void
