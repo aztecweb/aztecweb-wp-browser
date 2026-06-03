@@ -26,9 +26,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php_version:
-          - '8.0'
-          - '8.4'
+        # Pin Chromium per PHP variant. The version must exist in that PHP base's
+        # Alpine community repo (php8.0 -> Alpine 3.16 -> Chromium 102 only;
+        # php8.4 -> Alpine 3.23 -> Chromium 148). Verify with
+        # `docker run --rm php:<ver>-cli-alpine sh -c 'apk update; apk policy chromium'`.
+        include:
+          - php_version: '8.0'
+            chromium_version: '102.0.5005.182-r0'
+          - php_version: '8.4'
+            chromium_version: '148.0.7778.178-r0'
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -61,6 +67,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           build-args: |
             PHP_VERSION=${{ matrix.php_version }}
+            CHROMIUM_VERSION=${{ matrix.chromium_version }}
           tags: |
             ${{ env.REGISTRY }}/${{ steps.image.outputs.name }}:php${{ matrix.php_version }}
             ${{ env.REGISTRY }}/${{ steps.image.outputs.name }}:${{ steps.content_version.outputs.value }}-php${{ matrix.php_version }}
