@@ -8,17 +8,28 @@ use Aztec\WPBrowser\Tests\Support\AcceptanceTester;
 
 class CheckoutCest
 {
+    public function _after(AcceptanceTester $I): void
+    {
+        $I->restartBuiltInServer();
+    }
+
     // ==================== Phase 1 Tests: Navigation & Form Filling ====================
 
     public function testAmOnCheckoutPage(AcceptanceTester $I): void
     {
+        $productId = $I->haveProductInDatabase([
+            'post_title' => 'Test Product',
+        ]);
+
+        $I->addProductToCart($productId);
+
         $I->amOnCheckoutPage();
 
-        $cartSlug = '/' . $I->grabPostFieldFromDatabase(
-            (int) $I->grabOptionFromDatabase('woocommerce_cart_page_id'),
+        $checkoutSlug = '/' . $I->grabPostFieldFromDatabase(
+            (int) $I->grabOptionFromDatabase('woocommerce_checkout_page_id'),
             'post_name'
         );
-        $I->seeInCurrentUrl($cartSlug);
+        $I->seeInCurrentUrl($checkoutSlug);
     }
 
     public function testFillCheckoutField(AcceptanceTester $I): void
@@ -206,6 +217,12 @@ class CheckoutCest
 
     public function testDontSeeCouponApplied(AcceptanceTester $I): void
     {
+        $productId = $I->haveProductInDatabase([
+            'post_title' => 'Test Product',
+        ]);
+
+        $I->addProductToCart($productId);
+
         $I->amOnCheckoutPage();
 
         $I->dontSeeCouponApplied('nonexistent-coupon');
@@ -302,6 +319,12 @@ class CheckoutCest
 
     public function testDontSeeCheckoutErrorSpecificMessage(AcceptanceTester $I): void
     {
+        $productId = $I->haveProductInDatabase([
+            'post_title' => 'Test Product',
+        ]);
+
+        $I->addProductToCart($productId);
+
         $I->amOnCheckoutPage();
 
         $I->dontSeeCheckoutError('Specific error message');
@@ -324,10 +347,10 @@ class CheckoutCest
             'billing_first_name' => 'Order',
             'billing_last_name' => 'Test',
             'billing_email' => 'order@example.com',
-            'billing_phone' => '11987654321',
+            'billing_phone' => '1234567890',
             'billing_address_1' => '789 Test Road',
-            'billing_city' => 'Sao Paulo',
-            'billing_postcode' => '01310-100',
+            'billing_city' => 'New York',
+            'billing_postcode' => '10001',
         ];
 
         $I->fillCheckoutForm($checkoutData);
@@ -357,10 +380,10 @@ class CheckoutCest
             'billing_first_name' => 'Grab',
             'billing_last_name' => 'Order',
             'billing_email' => 'grab@example.com',
-            'billing_phone' => '11955555555',
+            'billing_phone' => '1234567890',
             'billing_address_1' => '999 Grab Ave',
-            'billing_city' => 'Sao Paulo',
-            'billing_postcode' => '01311-000',
+            'billing_city' => 'New York',
+            'billing_postcode' => '10002',
         ];
 
         $I->fillCheckoutForm($checkoutData);

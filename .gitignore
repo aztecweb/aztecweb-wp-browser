@@ -3,6 +3,8 @@
 .env.local
 tests/_output/*
 !tests/_output/.gitkeep
+tests/_support/_generated/
+tests/_data/dump.sql
 
 # WooCommerce installation
 woocommerce/
@@ -25,6 +27,11 @@ Thumbs.db
 
 # Composer
 /vendor/
+
+# WordPress
+public/*
+!public/index.php
+!public/wp-config.php
 
 # Claude
 .claude/worktrees/

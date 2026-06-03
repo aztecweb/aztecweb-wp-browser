@@ -87,10 +87,16 @@ trait ProductMethods
 
     public function grabProductCategoriesFromDatabase(int $productId): array
     {
-        return $this->wpDb()->grabColumnFromDatabase(
-            $this->wpDb()->grabTermRelationshipsTableName(),
-            'term_taxonomy_id',
-            ['object_id' => $productId]
+        // Cast to int: on PHP < 8.1 PDO SQLite returns integer columns as
+        // strings, on 8.1+ as native ints. Normalising to int keeps the return
+        // type stable across PHP versions so strict comparisons behave the same.
+        return array_map(
+            'intval',
+            $this->wpDb()->grabColumnFromDatabase(
+                $this->wpDb()->grabTermRelationshipsTableName(),
+                'term_taxonomy_id',
+                ['object_id' => $productId]
+            )
         );
     }
 
@@ -183,10 +189,15 @@ trait ProductMethods
 
     public function grabProductCategoryIdsFromDatabase(int $productId): array
     {
-        return $this->wpDb()->grabColumnFromDatabase(
-            $this->wpDb()->grabTermRelationshipsTableName(),
-            'term_taxonomy_id',
-            ['object_id' => $productId]
+        // Cast to int for a stable return type across PHP versions (PDO SQLite
+        // returns integer columns as strings on PHP < 8.1, ints on 8.1+).
+        return array_map(
+            'intval',
+            $this->wpDb()->grabColumnFromDatabase(
+                $this->wpDb()->grabTermRelationshipsTableName(),
+                'term_taxonomy_id',
+                ['object_id' => $productId]
+            )
         );
     }
 }

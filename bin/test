@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+#
+# Run any command inside the test runner image with the repo bind-mounted at
+# /var/www/html. With no arguments, defaults to `codecept run`.
+#
+# Examples:
+#   bin/test                                  # codecept run
+#   bin/test codecept run acceptance          # only the acceptance suite
+#   bin/test composer install                 # install dependencies
+#   bin/test bash resources/install.sh        # bootstrap the SQLite WP site
+#   bin/test bash                             # interactive shell
+#
+# Environment overrides:
+#   AZTEC_TEST_IMAGE  Image reference to run (default: GHCR php8.4 tag)
+#   AZTEC_TEST_DOCKER Docker CLI to use     (default: docker)
+#
+# The image carries PHP, Chromium, chromedriver, SQLite and Composer only — the
+# source tree (vendor/, public/, src/, tests/) comes from the bind-mount. Run
+# `bin/test composer install` and `bin/test bash resources/install.sh` once to
+# materialise vendor/ and the SQLite database before invoking the test suite.
+
+set -euo pipefail
+
+IMAGE="${AZTEC_TEST_IMAGE:-ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.4}"
+DOCKER="${AZTEC_TEST_DOCKER:-docker}"
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+if [ "$#" -eq 0 ]; then
+    set -- codecept run
+fi
+
+# Stale pid files from previous ephemeral containers cause wp-browser service
+# extensions (ChromeDriverController, BuiltInServerController) to skip starting.
+# Remove them before every run — processes from a previous container are always dead.
+rm -f "$REPO_ROOT"/tests/_output/*.pid
+
+DOCKER_FLAGS=(--rm -i)
+if [ -t 0 ] && [ -t 1 ]; then
+    DOCKER_FLAGS+=(-t)
+fi
+
+DOCKER_FLAGS+=(--user "$(id -u):$(id -g)")
+
+exec "$DOCKER" run "${DOCKER_FLAGS[@]}" \
+    -v "$REPO_ROOT:/var/www/html" \
+    -w /var/www/html \
+    "$IMAGE" \
+    "$@"
