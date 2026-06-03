@@ -7,6 +7,15 @@ FROM php:${PHP_VERSION}-cli-alpine
 ARG RUNNER_UID
 ARG RUNNER_GID
 
+# Chromium/chromedriver versions are determined by the base image's Alpine
+# release, and the two packages must match each other. Pin them explicitly per
+# PHP variant so the browser version is reproducible and visible instead of
+# silently tracking the base Alpine (php8.0/Alpine3.16 -> Chromium 102,
+# php8.4/Alpine3.23 -> Chromium 148). The build matrix passes CHROMIUM_VERSION
+# per variant; it must exist in that base Alpine's community repo
+# (verify with `apk policy chromium`). Leave empty to take the repo default.
+ARG CHROMIUM_VERSION=
+
 ENV COMPOSER_NO_INTERACTION=1 \
     COMPOSER_HOME=/tmp/composer \
     HOME=/tmp \
@@ -14,8 +23,8 @@ ENV COMPOSER_NO_INTERACTION=1 \
 
 RUN apk add --no-cache \
         bash \
-        chromium \
-        chromium-chromedriver \
+        "chromium${CHROMIUM_VERSION:+=$CHROMIUM_VERSION}" \
+        "chromium-chromedriver${CHROMIUM_VERSION:+=$CHROMIUM_VERSION}" \
         freetype \
         freetype-dev \
         git \
