@@ -14,6 +14,11 @@
         <exclude name="PSR2.Methods.MethodDeclaration.Underscore"/>
     </rule>
 
+    <!-- aliases.php intentionally defines registerAliases() and calls it in the same file -->
+    <rule ref="PSR1.Files.SideEffects">
+        <exclude-pattern>src/aliases.php</exclude-pattern>
+    </rule>
+
     <config name="testVersion" value="8.0-"/>
     <rule ref="PHPCompatibility"/>
 
@@ -31,7 +36,16 @@
             <property name="spacesCountAroundEqualsSign" value="0"/>
         </properties>
     </rule>
-    <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName"/>
+    <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
+        <properties>
+            <property name="rootNamespaces" type="array">
+                <element key="src" value="Aztec\WPBrowser"/>
+                <element key="tests/unit" value="Aztec\WPBrowser\Tests\Unit"/>
+                <element key="tests/_support" value="Aztec\WPBrowser\Tests\Support"/>
+                <element key="tests/acceptance" value="Aztec\WPBrowser\Tests\Acceptance"/>
+            </property>
+        </properties>
+    </rule>
 
     <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue"/>
     <rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInCall"/>
