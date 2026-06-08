@@ -98,3 +98,31 @@ AZTEC_TEST_IMAGE=ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.0 \
 > package versions (Symfony 6.x, older Codeception 5.x releases). Do not commit
 > the rewritten lock file — restore it afterwards with `git checkout composer.lock`
 > and reinstall for your usual image: `bin/test composer install`.
+
+### Running the CI workflow locally with `act`
+
+[`act`](https://github.com/nektos/act) lets you run GitHub Actions workflows on
+your machine without pushing to GitHub.
+
+```bash
+act push -j acceptance \
+    --network bridge \
+    -s GITHUB_TOKEN=$(gh auth token)
+```
+
+`--network bridge` gives the container its own isolated network namespace,
+preventing port conflicts between the host and the PHP server started by
+Codeception inside the container.
+
+The workflow matrix covers PHP 8.0 and 8.4. To target a single version:
+
+```bash
+act push -j acceptance \
+    --matrix php_version:8.0 \
+    --network bridge \
+    -s GITHUB_TOKEN=$(gh auth token)
+```
+
+> **Note:** `GITHUB_TOKEN` is required to pull the runner image from GHCR.
+> `$(gh auth token)` uses your existing GitHub CLI session. Alternatively,
+> pass a personal access token with `read:packages` scope.
