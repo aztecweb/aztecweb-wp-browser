@@ -17,6 +17,20 @@ trait OrderBrowserMethods
 
     abstract protected function wpWebDriver(): WPWebDriver;
 
+    /**
+     * Navigate to the admin order edit page for a given order.
+     *
+     * @example
+     * ```php
+     * $orderId = $I->haveOrderInDatabase(['status' => 'processing']);
+     * $I->amOnAdminOrderPage($orderId);
+     * $I->seeInCurrentUrl('order/' . $orderId);
+     * ```
+     *
+     * @param int $orderId  Order ID to view in the admin
+     *
+     * @return void
+     */
     public function amOnAdminOrderPage(int $orderId): void
     {
         $this->wpWebDriver()->amOnAdminPage($this->resolveOrderStorage()->getAdminOrderEditUrl($orderId));

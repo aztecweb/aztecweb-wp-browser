@@ -13,6 +13,17 @@ trait CustomerBrowserMethods
 
     abstract protected function wooCommerceConfig(): WooCommerceConfig;
 
+    /**
+     * Navigate to the WooCommerce My Account page.
+     *
+     * @example
+     * ```php
+     * $I->amOnMyAccountPage();
+     * $I->seeElement('.woocommerce-account');
+     * ```
+     *
+     * @return void
+     */
     public function amOnMyAccountPage(): void
     {
         $this->wpWebDriver()->amOnPage($this->wooCommerceConfig()->myAccountPageSlug());
