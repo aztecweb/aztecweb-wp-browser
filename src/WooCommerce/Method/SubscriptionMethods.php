@@ -13,6 +13,9 @@ trait SubscriptionMethods
 
     abstract protected function subscriptionStorage(): SubscriptionStorageInterface;
 
+    /**
+     * @param array<string, mixed> $overrides
+     */
     public function haveSubscriptionInDatabase(array $overrides = []): int
     {
         return $this->subscriptionStorage()->haveSubscriptionInDatabase($overrides);
@@ -23,9 +26,12 @@ trait SubscriptionMethods
         return $this->subscriptionStorage()->haveSubscriptionMetaInDatabase($subscriptionId, $key, $value);
     }
 
+    /**
+     * @param array<string, mixed> $overrides
+     */
     public function haveSubscriptionProductInDatabase(array $overrides = []): int
     {
-        $meta = $overrides['meta'] ?? [];
+        $meta = is_array($overrides['meta'] ?? null) ? $overrides['meta'] : [];
         unset($overrides['meta']);
 
         $productData = array_merge([
@@ -61,6 +67,9 @@ trait SubscriptionMethods
         return $productId;
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     public function grabSubscriptionIdFromDatabase(array $criteria): int|false
     {
         $mappedCriteria = $this->subscriptionStorage()->mapCriteria($criteria);
@@ -75,7 +84,7 @@ trait SubscriptionMethods
             return false;
         }
 
-        return (int) $id;
+        return is_numeric($id) ? (int) $id : false;
     }
 
     public function grabSubscriptionFieldFromDatabase(int $id, string $field): mixed
@@ -113,6 +122,9 @@ trait SubscriptionMethods
         $this->haveSubscriptionStatus($subscriptionId, 'wc-expired');
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     public function seeSubscriptionInDatabase(array $criteria): void
     {
         $tableName = $this->subscriptionStorage()->getTableName();
@@ -120,6 +132,9 @@ trait SubscriptionMethods
         $this->wpDb()->seeInDatabase($tableName, $mappedCriteria);
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     public function seeSubscriptionMetaInDatabase(array $criteria): void
     {
         $tableName = $this->subscriptionStorage()->getMetaTableName();
@@ -132,6 +147,9 @@ trait SubscriptionMethods
         $this->seeSubscriptionInDatabase(['id' => $subscriptionId, 'status' => $status]);
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     public function dontSeeSubscriptionInDatabase(array $criteria): void
     {
         $tableName = $this->subscriptionStorage()->getTableName();
@@ -139,6 +157,9 @@ trait SubscriptionMethods
         $this->wpDb()->dontSeeInDatabase($tableName, $mappedCriteria);
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     public function dontSeeSubscriptionMetaInDatabase(array $criteria): void
     {
         $tableName = $this->subscriptionStorage()->getMetaTableName();
@@ -163,20 +184,20 @@ trait SubscriptionMethods
 
         $termId = $this->wpDb()->grabFromDatabase($termsTable, 'term_id', ['slug' => $productType]);
 
-        if ($termId !== false) {
+        if ($termId !== false && is_numeric($termId)) {
             $termTaxonomyId = $this->wpDb()->grabFromDatabase(
                 $termTaxonomyTable,
                 'term_taxonomy_id',
                 ['term_id' => (int) $termId, 'taxonomy' => 'product_type']
             );
 
-            if ($termTaxonomyId !== false) {
+            if ($termTaxonomyId !== false && is_numeric($termTaxonomyId)) {
                 return (int) $termTaxonomyId;
             }
         }
 
         $termIds = $this->wpDb()->haveTermInDatabase($productType, 'product_type', ['slug' => $productType]);
 
-        return $termIds[1];
+        return (int) ($termIds[1] ?? 0);
     }
 }

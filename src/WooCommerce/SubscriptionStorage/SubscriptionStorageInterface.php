@@ -8,6 +8,12 @@ use Aztec\WPBrowser\WooCommerce\Storage\WooCommerceStorageInterface;
 
 interface SubscriptionStorageInterface extends WooCommerceStorageInterface
 {
+    /**
+     * Create a subscription in the database.
+     *
+     * @param array<string, mixed> $overrides Database row overrides.
+     * @return int The subscription ID.
+     */
     public function haveSubscriptionInDatabase(array $overrides): int;
 
     public function haveSubscriptionMetaInDatabase(int $subscriptionId, string $key, mixed $value): int;

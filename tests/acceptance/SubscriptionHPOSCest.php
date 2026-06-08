@@ -123,7 +123,8 @@ class SubscriptionHPOSCest
 
         $meta = $I->grabSubscriptionMetaFromDatabase($subscriptionId, '_billing_period');
 
-        $I->assertSame('week', reset($meta));
+        $metaValue = is_array($meta) ? reset($meta) : $meta;
+        $I->assertSame('week', $metaValue);
     }
 
     public function testGrabSubscriptionStatus(AcceptanceTester $I): void

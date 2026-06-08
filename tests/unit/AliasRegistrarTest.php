@@ -26,11 +26,17 @@ class AliasRegistrarTest extends Unit
 
     public function testShortNameAliasResolvesToFullyQualifiedClass(): void
     {
+        // The short-name aliases are registered at autoload via class_alias().
+        // PHPStan resolves aliases.php statically so it considers these is_a()
+        // checks always-true, but the assertions exist to verify the runtime
+        // alias wiring, so the narrowed-type notice is expected here.
         $this->assertTrue(
+            // @phpstan-ignore function.alreadyNarrowedType
             is_a('Codeception\\Module\\WooCommerceDb', WooCommerceDb::class, true),
             'short-name alias must resolve to the FQN class',
         );
         $this->assertTrue(
+            // @phpstan-ignore function.alreadyNarrowedType
             is_a('Codeception\\Module\\WooCommerceWebDriver', WooCommerceWebDriver::class, true),
             'short-name alias must resolve to the FQN class',
         );

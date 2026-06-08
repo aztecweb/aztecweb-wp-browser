@@ -19,7 +19,9 @@ class Acceptance extends Module
      */
     public function waitForWooCommerce(): void
     {
-        $this->getModule('WPWebDriver')->waitForElement('.woocommerce', 10);
+        /** @var WPWebDriver $webDriver */
+        $webDriver = $this->getModule('WPWebDriver');
+        $webDriver->waitForElement('.woocommerce', 10);
     }
 
     /**

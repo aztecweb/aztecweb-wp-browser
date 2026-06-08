@@ -10,9 +10,15 @@ trait CouponMethods
 {
     abstract protected function wpDb(): WPDb;
 
+    /**
+     * Create a coupon in the database.
+     *
+     * @param array<string, mixed> $overrides Database row overrides.
+     * @return int The coupon post ID.
+     */
     public function haveCouponInDatabase(array $overrides = []): int
     {
-        $meta = $overrides['meta'] ?? [];
+        $meta = isset($overrides['meta']) && is_array($overrides['meta']) ? $overrides['meta'] : [];
         unset($overrides['meta']);
 
         $couponData = array_merge([
@@ -50,42 +56,90 @@ trait CouponMethods
         return $couponId;
     }
 
+    /**
+     * Create a percentage discount coupon in the database.
+     *
+     * @param string $code The coupon code.
+     * @param float $percentage The discount percentage (0-100).
+     * @param array<string, mixed> $overrides Database row overrides.
+     * @return int The coupon post ID.
+     */
     public function havePercentageCouponInDatabase(string $code, float $percentage, array $overrides = []): int
     {
         $overrides['code'] = $code;
+        if (!isset($overrides['meta']) || !is_array($overrides['meta'])) {
+            $overrides['meta'] = [];
+        }
         $overrides['meta']['discount_type'] = 'percent';
         $overrides['meta']['coupon_amount'] = $percentage;
 
         return $this->haveCouponInDatabase($overrides);
     }
 
+    /**
+     * Create a fixed cart discount coupon in the database.
+     *
+     * @param string $code The coupon code.
+     * @param float $amount The discount amount in shop currency.
+     * @param array<string, mixed> $overrides Database row overrides.
+     * @return int The coupon post ID.
+     */
     public function haveFixedCartCouponInDatabase(string $code, float $amount, array $overrides = []): int
     {
         $overrides['code'] = $code;
+        if (!isset($overrides['meta']) || !is_array($overrides['meta'])) {
+            $overrides['meta'] = [];
+        }
         $overrides['meta']['discount_type'] = 'fixed_cart';
         $overrides['meta']['coupon_amount'] = $amount;
 
         return $this->haveCouponInDatabase($overrides);
     }
 
+    /**
+     * Create a fixed product discount coupon in the database.
+     *
+     * @param string $code The coupon code.
+     * @param float $amount The discount amount in shop currency.
+     * @param array<string, mixed> $overrides Database row overrides.
+     * @return int The coupon post ID.
+     */
     public function haveFixedProductCouponInDatabase(string $code, float $amount, array $overrides = []): int
     {
         $overrides['code'] = $code;
+        if (!isset($overrides['meta']) || !is_array($overrides['meta'])) {
+            $overrides['meta'] = [];
+        }
         $overrides['meta']['discount_type'] = 'fixed_product';
         $overrides['meta']['coupon_amount'] = $amount;
 
         return $this->haveCouponInDatabase($overrides);
     }
 
+    /**
+     * Create a free shipping coupon in the database.
+     *
+     * @param string $code The coupon code.
+     * @param array<string, mixed> $overrides Database row overrides.
+     * @return int The coupon post ID.
+     */
     public function haveFreeShippingCouponInDatabase(string $code, array $overrides = []): int
     {
         $overrides['code'] = $code;
+        if (!isset($overrides['meta']) || !is_array($overrides['meta'])) {
+            $overrides['meta'] = [];
+        }
         $overrides['meta']['discount_type'] = 'fixed_cart';
         $overrides['meta']['free_shipping'] = 'yes';
 
         return $this->haveCouponInDatabase($overrides);
     }
 
+    /**
+     * Assert a coupon exists in the database.
+     *
+     * @param array<string, mixed> $criteria Database query criteria.
+     */
     public function seeCouponInDatabase(array $criteria): void
     {
         $table = $this->wpDb()->grabPostsTableName();
@@ -93,6 +147,11 @@ trait CouponMethods
         $this->wpDb()->seeInDatabase($table, array_merge($criteria, ['post_type' => 'shop_coupon']));
     }
 
+    /**
+     * Assert a coupon does not exist in the database.
+     *
+     * @param array<string, mixed> $criteria Database query criteria.
+     */
     public function dontSeeCouponInDatabase(array $criteria): void
     {
         $table = $this->wpDb()->grabPostsTableName();
@@ -110,6 +169,11 @@ trait CouponMethods
         return $this->wpDb()->grabPostMetaFromDatabase($couponId, $key, $single);
     }
 
+    /**
+     * Assert coupon meta exists in the database.
+     *
+     * @param array<string, mixed> $criteria Database query criteria.
+     */
     public function seeCouponMetaInDatabase(array $criteria): void
     {
         if (isset($criteria['coupon_id'])) {
@@ -120,6 +184,11 @@ trait CouponMethods
         $this->wpDb()->seePostMetaInDatabase($criteria);
     }
 
+    /**
+     * Assert coupon meta does not exist in the database.
+     *
+     * @param array<string, mixed> $criteria Database query criteria.
+     */
     public function dontSeeCouponMetaInDatabase(array $criteria): void
     {
         $table = $this->wpDb()->grabPostMetaTableName();
@@ -132,7 +201,7 @@ trait CouponMethods
         $table = $this->wpDb()->grabPostsTableName();
         $status = $this->wpDb()->grabFromDatabase($table, 'post_status', ['ID' => $couponId]);
 
-        return $status ?: false;
+        return is_string($status) ? $status : false;
     }
 
     public function haveCouponStatus(int $couponId, string $status): void
@@ -152,6 +221,12 @@ trait CouponMethods
         ]);
     }
 
+    /**
+     * Get a coupon ID from the database.
+     *
+     * @param array<string, mixed> $criteria Database query criteria.
+     * @return int|false The coupon post ID, or false if not found.
+     */
     public function grabCouponIdFromDatabase(array $criteria): int|false
     {
         $criteria['post_type'] = 'shop_coupon';
@@ -161,7 +236,7 @@ trait CouponMethods
             $criteria
         );
 
-        if ($id === false) {
+        if ($id === false || !is_numeric($id)) {
             return false;
         }
 

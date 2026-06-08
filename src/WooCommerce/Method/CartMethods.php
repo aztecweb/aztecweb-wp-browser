@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Aztec\WPBrowser\WooCommerce\Method;
 
 use Aztec\WPBrowser\WooCommerce\Config\WooCommerceConfig;
+use Aztec\WPBrowser\WooCommerce\PageObject\CartPageObject;
 use Aztec\WPBrowser\WooCommerce\PageObject\PageObjectProvider;
 use Codeception\Util\Locator;
 use lucatume\WPBrowser\Module\WPDb;
@@ -20,6 +21,8 @@ trait CartMethods
 
     abstract protected function pageObjectProvider(): PageObjectProvider;
 
+    abstract protected function selector(mixed $value): string;
+
     public function amOnCartPage(): void
     {
         $this->wpWebDriver()->amOnPage($this->wooCommerceConfig()->cartPageSlug());
@@ -28,31 +31,40 @@ trait CartMethods
     public function addProductToCart(int $productId, int $quantity = 1): void
     {
         $this->wpWebDriver()->amOnPage("/?add-to-cart=$productId&quantity=$quantity");
-        $this->wpWebDriver()->waitForElement(
-            $this->pageObjectProvider()->cartPage()::PRODUCT_ADDED_TO_CART_MESSAGE_SELECTOR
-        );
+        /** @var CartPageObject $cartPage */
+        $cartPage = $this->pageObjectProvider()->cartPage();
+        $this->wpWebDriver()->waitForElement($this->selector($cartPage::PRODUCT_ADDED_TO_CART_MESSAGE_SELECTOR));
     }
 
     public function seeProductInCart(int $productId): void
     {
         $productName = $this->wpDb()->grabPostFieldFromDatabase($productId, 'post_title');
+        $productName = is_string($productName) ? $productName : '';
+        /** @var CartPageObject $cartPage */
+        $cartPage = $this->pageObjectProvider()->cartPage();
 
-        $this->wpWebDriver()->see($productName, $this->pageObjectProvider()->cartPage()::PRODUCT_NAME_SELECTOR);
+        $this->wpWebDriver()->see($productName, $this->selector($cartPage::PRODUCT_NAME_SELECTOR));
     }
 
     public function dontSeeProductInCart(int $productId): void
     {
         $productName = $this->wpDb()->grabPostFieldFromDatabase($productId, 'post_title');
+        $productName = is_string($productName) ? $productName : '';
+        /** @var CartPageObject $cartPage */
+        $cartPage = $this->pageObjectProvider()->cartPage();
 
-        $this->wpWebDriver()->dontSee($productName, $this->pageObjectProvider()->cartPage()::PRODUCT_NAME_SELECTOR);
+        $this->wpWebDriver()->dontSee($productName, $this->selector($cartPage::PRODUCT_NAME_SELECTOR));
     }
 
     public function seeCartItemQuantity(int $productId, int $quantity): void
     {
-        $productName      = $this->wpDb()->grabPostFieldFromDatabase($productId, 'post_title');
-        $cartItemXpath         = Locator::contains($this->pageObjectProvider()->cartPage()::CART_ITEM_SELECTOR, $productName);
+        $productName = $this->wpDb()->grabPostFieldFromDatabase($productId, 'post_title');
+        $productName = is_string($productName) ? $productName : '';
+        /** @var CartPageObject $cartPage */
+        $cartPage = $this->pageObjectProvider()->cartPage();
+        $cartItemXpath = Locator::contains($this->selector($cartPage::CART_ITEM_SELECTOR), $productName);
         $cartItemQuantity = $this->wpWebDriver()->grabAttributeFrom(
-            $this->pageObjectProvider()->cartPage()->cartItemQuantitySelector($cartItemXpath),
+            $cartPage->cartItemQuantitySelector($cartItemXpath),
             'value'
         );
 
@@ -61,8 +73,11 @@ trait CartMethods
 
     public function seeCartTotalQuantity(int $quantity): void
     {
+        /** @var CartPageObject $cartPage */
+        $cartPage = $this->pageObjectProvider()->cartPage();
+        $productQtySelector = $this->selector($cartPage::PRODUCT_QUANTITY_SELECTOR);
         $totalQuantity = $this->wpWebDriver()->executeJS(
-            'return Array.from(document.querySelectorAll("' . $this->pageObjectProvider()->cartPage()::PRODUCT_QUANTITY_SELECTOR . '"))'
+            'return Array.from(document.querySelectorAll("' . $productQtySelector . '"))'
             . '.reduce((sum, input) => sum + parseInt(input.value), 0)'
         );
 
@@ -71,19 +86,23 @@ trait CartMethods
 
     public function clearCart(): void
     {
+        /** @var CartPageObject $cartPage */
+        $cartPage = $this->pageObjectProvider()->cartPage();
+        $removeItemSelector = $this->selector($cartPage::REMOVE_ITEM_SELECTOR);
         $countItemsJs   = sprintf(
             "return document.querySelectorAll('%s').length",
-            $this->pageObjectProvider()->cartPage()::REMOVE_ITEM_SELECTOR
+            $removeItemSelector
         );
-        $clickRemoveJs  = sprintf("document.querySelector('%s').click()", $this->pageObjectProvider()->cartPage()::REMOVE_ITEM_SELECTOR);
+        $clickRemoveJs  = sprintf("document.querySelector('%s').click()", $removeItemSelector);
         $remainingItems = $this->wpWebDriver()->executeJS($countItemsJs);
+        $remainingItems = is_numeric($remainingItems) ? (int) $remainingItems : 0;
 
         while ($remainingItems > 0) {
             $this->wpWebDriver()->executeJS($clickRemoveJs);
             $this->wpWebDriver()->waitForJS(
                 sprintf(
                     "return document.querySelectorAll('%s').length < %d",
-                    $this->pageObjectProvider()->cartPage()::REMOVE_ITEM_SELECTOR,
+                    $removeItemSelector,
                     $remainingItems
                 )
             );
@@ -91,6 +110,6 @@ trait CartMethods
             $remainingItems--;
         }
 
-        $this->wpWebDriver()->seeElement($this->pageObjectProvider()->cartPage()::EMPTY_CART_SELECTOR);
+        $this->wpWebDriver()->seeElement($cartPage::EMPTY_CART_SELECTOR);
     }
 }

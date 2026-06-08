@@ -32,9 +32,16 @@ trait ActionMethods
         return $this->wpDb()->grabPrefixedTableNameFor('actionscheduler_logs');
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     private function getArgsKey(array $args): string
     {
         $json = json_encode($args, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        if ($json === false) {
+            return '';
+        }
 
         if (strlen($json) > 191) {
             $json = substr($json, 0, 191);
@@ -45,6 +52,14 @@ trait ActionMethods
 
     // ==================== CREATE METHODS ====================
 
+    /**
+     * Create an action in the database.
+     *
+     * @param string $hook The action hook.
+     * @param array<string, mixed> $args The action arguments.
+     * @param array<string, mixed> $overrides Database row overrides.
+     * @return int The action ID.
+     */
     public function haveActionInDatabase(string $hook, array $args = [], array $overrides = []): int
     {
         $now = gmdate('Y-m-d H:i:s');
@@ -72,6 +87,13 @@ trait ActionMethods
 
     // ==================== READ METHODS ====================
 
+    /**
+     * Get an action ID from the database.
+     *
+     * @param string $hook The action hook.
+     * @param array<string, mixed> $args The action arguments.
+     * @return int|false The action ID, or false if not found.
+     */
     public function grabActionIdFromDatabase(string $hook, array $args = []): int|false
     {
         $criteria = ['hook' => $hook, 'status' => 'pending'];
@@ -80,14 +102,22 @@ trait ActionMethods
             $criteria['args'] = $this->getArgsKey($args);
         }
 
-        return $this->wpDb()->grabFromDatabase($this->actionsTableName(), 'action_id', $criteria);
+        $result = $this->wpDb()->grabFromDatabase($this->actionsTableName(), 'action_id', $criteria);
+        return is_numeric($result) ? (int) $result : false;
     }
 
     public function grabActionStatusFromDatabase(int $actionId): string|false
     {
-        return $this->wpDb()->grabFromDatabase($this->actionsTableName(), 'status', ['action_id' => $actionId]);
+        $result = $this->wpDb()->grabFromDatabase($this->actionsTableName(), 'status', ['action_id' => $actionId]);
+        return is_string($result) ? $result : false;
     }
 
+    /**
+     * Get actions from the database.
+     *
+     * @param array<string, mixed> $criteria Database query criteria.
+     * @return array<int, array<string, mixed>> Array of action rows.
+     */
     public function grabActionsFromDatabase(array $criteria = []): array
     {
         $actionIds = $this->wpDb()->grabColumnFromDatabase(
@@ -96,28 +126,54 @@ trait ActionMethods
             $criteria
         );
 
+        /** @var array<int, array<string, mixed>> $actions */
         $actions = [];
         foreach ($actionIds as $actionId) {
-            $actions[] = $this->wpDb()->grabRowFromDatabase(
+            $row = $this->wpDb()->grabFromDatabase(
                 $this->actionsTableName(),
+                '*',
                 ['action_id' => $actionId]
             );
+            if ($row !== false && is_array($row)) {
+                /** @var array<string, mixed> $row */
+                $actions[] = $row;
+            }
         }
 
         return $actions;
     }
 
+    /**
+     * Get action logs from the database.
+     *
+     * @return array<int, array<string, mixed>> Array of log rows.
+     */
     public function grabActionLogFromDatabase(int $actionId): array
     {
-        return $this->wpDb()->grabRowsFromDatabase(
+        $results = $this->wpDb()->grabFromDatabase(
             $this->logsTableName(),
-            ['action_id' => $actionId],
-            ['log_date_gmt' => 'ASC']
+            '*',
+            ['action_id' => $actionId]
         );
+
+        if ($results === false || !is_array($results)) {
+            return [];
+        }
+
+        $firstItem = reset($results);
+        /** @var array<int, array<string, mixed>> $return */
+        $return = is_array($firstItem) ? $results : [$results];
+        return $return;
     }
 
     // ==================== ASSERTION METHODS ====================
 
+    /**
+     * Assert an action is scheduled in the database.
+     *
+     * @param string $hook The action hook.
+     * @param array<string, mixed> $args The action arguments.
+     */
     public function seeActionScheduled(string $hook, array $args = []): void
     {
         $criteria = ['hook' => $hook, 'status' => 'pending'];
@@ -129,6 +185,12 @@ trait ActionMethods
         $this->wpDb()->seeInDatabase($this->actionsTableName(), $criteria);
     }
 
+    /**
+     * Assert an action is not scheduled in the database.
+     *
+     * @param string $hook The action hook.
+     * @param array<string, mixed> $args The action arguments.
+     */
     public function dontSeeActionScheduled(string $hook, array $args = []): void
     {
         $criteria = ['hook' => $hook, 'status' => 'pending'];
@@ -140,6 +202,11 @@ trait ActionMethods
         $this->wpDb()->dontSeeInDatabase($this->actionsTableName(), $criteria);
     }
 
+    /**
+     * Assert actions exist in the database.
+     *
+     * @param array<string, mixed> $criteria Database query criteria.
+     */
     public function seeActionInDatabase(array $criteria): void
     {
         $this->wpDb()->seeInDatabase($this->actionsTableName(), $criteria);
@@ -156,6 +223,11 @@ trait ActionMethods
         );
     }
 
+    /**
+     * Assert action meta exists in the database.
+     *
+     * @param array<string, mixed> $criteria Database query criteria.
+     */
     public function seeActionMetaInDatabase(array $criteria): void
     {
         if (isset($criteria['action_id'])) {
@@ -189,6 +261,13 @@ trait ActionMethods
         );
     }
 
+    /**
+     * Run scheduled actions matching the given criteria.
+     *
+     * @param string|null $hook The action hook to run, or null for all.
+     * @param array<string, mixed> $args The action arguments.
+     * @return int The number of actions that were run.
+     */
     public function runScheduledActions(?string $hook = null, array $args = []): int
     {
         $criteria = ['status' => 'pending'];
@@ -210,13 +289,15 @@ trait ActionMethods
         $count = count($actionIds);
 
         foreach ($actionIds as $actionId) {
-            $this->markActionCompleteInDatabase($actionId);
-            $this->wpDb()->haveInDatabase($this->logsTableName(), [
-                'action_id' => $actionId,
-                'message' => 'Action executed via runScheduledActions',
-                'log_date_gmt' => gmdate('Y-m-d H:i:s'),
-                'log_entry_type' => 'result',
-            ]);
+            if (is_numeric($actionId)) {
+                $this->markActionCompleteInDatabase((int) $actionId);
+                $this->wpDb()->haveInDatabase($this->logsTableName(), [
+                    'action_id' => $actionId,
+                    'message' => 'Action executed via runScheduledActions',
+                    'log_date_gmt' => gmdate('Y-m-d H:i:s'),
+                    'log_entry_type' => 'result',
+                ]);
+            }
         }
 
         return $count;

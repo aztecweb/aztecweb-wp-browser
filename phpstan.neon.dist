@@ -5,3 +5,6 @@ parameters:
         - tests
     scanDirectories:
         - tests/_support
+    excludePaths:
+        analyse:
+            - tests/_support/_generated

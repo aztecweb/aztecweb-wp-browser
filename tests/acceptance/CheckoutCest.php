@@ -25,10 +25,11 @@ class CheckoutCest
 
         $I->amOnCheckoutPage();
 
-        $checkoutSlug = '/' . $I->grabPostFieldFromDatabase(
-            (int) $I->grabOptionFromDatabase('woocommerce_checkout_page_id'),
-            'post_name'
-        );
+        $pageId = $I->grabOptionFromDatabase('woocommerce_checkout_page_id');
+        $pageIdInt = is_numeric($pageId) ? (int) $pageId : 0;
+        $postName = $I->grabPostFieldFromDatabase($pageIdInt, 'post_name');
+        $postNameStr = is_string($postName) ? $postName : '';
+        $checkoutSlug = '/' . $postNameStr;
         $I->seeInCurrentUrl($checkoutSlug);
     }
 

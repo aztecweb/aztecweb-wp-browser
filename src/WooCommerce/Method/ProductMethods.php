@@ -10,17 +10,21 @@ trait ProductMethods
 {
     abstract protected function wpDb(): WPDb;
 
+    /**
+     * @param array<string, mixed> $overrides
+     */
     public function haveProductCategoryInDatabase(string $slug, array $overrides = []): int
     {
-        $name = $overrides['name'] ?? $slug;
+        $nameValue = $overrides['name'] ?? $slug;
+        $name = is_string($nameValue) ? $nameValue : $slug;
 
         $termData = array_merge([
             'slug' => $slug,
             'name' => $name,
         ], $overrides);
 
-        $termIds = $this->wpDb()->haveTermInDatabase($termData['name'], 'product_cat', [
-            'slug' => $termData['slug'],
+        $termIds = $this->wpDb()->haveTermInDatabase($name, 'product_cat', [
+            'slug' => $slug,
             'description' => $overrides['description'] ?? '',
             'parent' => $overrides['parent'] ?? 0,
             'count' => $overrides['count'] ?? 0,
@@ -34,9 +38,12 @@ trait ProductMethods
         $this->wpDb()->haveTermRelationshipInDatabase($productId, $categoryId);
     }
 
+    /**
+     * @param array<string, mixed> $overrides
+     */
     public function haveProductInDatabase(array $overrides = []): int
     {
-        $meta = $overrides['meta'] ?? [];
+        $meta = is_array($overrides['meta'] ?? null) ? $overrides['meta'] : [];
         unset($overrides['meta']);
 
         $productData = array_merge([
@@ -73,6 +80,9 @@ trait ProductMethods
         return $this->wpDb()->havePostMetaInDatabase($productId, $key, $value);
     }
 
+    /**
+     * @param array<int, int> $categoryIds
+     */
     public function haveProductInCategoriesInDatabase(int $productId, array $categoryIds): void
     {
         foreach ($categoryIds as $categoryId) {
@@ -85,22 +95,25 @@ trait ProductMethods
         return $this->wpDb()->grabPostMetaFromDatabase($productId, $key, $single);
     }
 
+    /**
+     * @return array<int, int>
+     */
     public function grabProductCategoriesFromDatabase(int $productId): array
     {
         // Cast to int: on PHP < 8.1 PDO SQLite returns integer columns as
         // strings, on 8.1+ as native ints. Normalising to int keeps the return
         // type stable across PHP versions so strict comparisons behave the same.
-        return array_map(
-            'intval',
-            $this->wpDb()->grabColumnFromDatabase(
-                $this->wpDb()->grabTermRelationshipsTableName(),
-                'term_taxonomy_id',
-                ['object_id' => $productId]
-            )
+        $ids = $this->wpDb()->grabColumnFromDatabase(
+            $this->wpDb()->grabTermRelationshipsTableName(),
+            'term_taxonomy_id',
+            ['object_id' => $productId]
         );
+        /** @var array<int, int> $result */
+        $result = array_map(static fn (mixed $v): int => is_numeric($v) ? (int) $v : 0, $ids);
+        return $result;
     }
 
-      public function seeProductInCategoryInDatabase(int $productId, int $categoryId): void
+    public function seeProductInCategoryInDatabase(int $productId, int $categoryId): void
     {
         $this->wpDb()->seeInDatabase(
             $this->wpDb()->grabTermRelationshipsTableName(),
@@ -111,6 +124,9 @@ trait ProductMethods
         );
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     public function grabProductIdFromDatabase(array $criteria): int|false
     {
         $criteria['post_type'] = 'product';
@@ -124,7 +140,7 @@ trait ProductMethods
             return false;
         }
 
-        return (int)$id;
+        return is_numeric($id) ? (int)$id : false;
     }
 
     public function grabProductFieldFromDatabase(int $id, string $field): mixed
@@ -132,12 +148,18 @@ trait ProductMethods
         return $this->wpDb()->grabPostFieldFromDatabase($id, $field);
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     public function seeProductInDatabase(array $criteria): void
     {
         $criteria['post_type'] = 'product';
         $this->wpDb()->seePostInDatabase($criteria);
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     public function seeProductMetaInDatabase(array $criteria): void
     {
         if (isset($criteria['product_id'])) {
@@ -148,6 +170,9 @@ trait ProductMethods
         $this->wpDb()->seePostMetaInDatabase($criteria);
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     public function dontSeeProductInDatabase(array $criteria): void
     {
         $criteria['post_type'] = 'product';
@@ -159,6 +184,9 @@ trait ProductMethods
         return $this->wpDb()->grabPostsTableName();
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     public function dontSeeProductMetaInDatabase(array $criteria): void
     {
         if (isset($criteria['product_id'])) {
@@ -169,10 +197,15 @@ trait ProductMethods
         $this->wpDb()->dontSeePostMetaInDatabase($criteria);
     }
 
+    /**
+     * @param array<string, mixed> $overrides
+     * @return array<int, int>
+     */
     public function haveManyProductsInDatabase(int $count, array $overrides = []): array
     {
         $createdIds = [];
-        $baseTitle = $overrides['post_title'] ?? 'Product';
+        $baseTitleValue = $overrides['post_title'] ?? 'Product';
+        $baseTitle = is_string($baseTitleValue) ? $baseTitleValue : 'Product';
 
         for ($i = 1; $i <= $count; $i++) {
             $productData = array_merge($overrides, [
@@ -187,17 +220,20 @@ trait ProductMethods
         return $createdIds;
     }
 
+    /**
+     * @return array<int, int>
+     */
     public function grabProductCategoryIdsFromDatabase(int $productId): array
     {
         // Cast to int for a stable return type across PHP versions (PDO SQLite
         // returns integer columns as strings on PHP < 8.1, ints on 8.1+).
-        return array_map(
-            'intval',
-            $this->wpDb()->grabColumnFromDatabase(
-                $this->wpDb()->grabTermRelationshipsTableName(),
-                'term_taxonomy_id',
-                ['object_id' => $productId]
-            )
+        $ids = $this->wpDb()->grabColumnFromDatabase(
+            $this->wpDb()->grabTermRelationshipsTableName(),
+            'term_taxonomy_id',
+            ['object_id' => $productId]
         );
+        /** @var array<int, int> $result */
+        $result = array_map(static fn (mixed $v): int => is_numeric($v) ? (int) $v : 0, $ids);
+        return $result;
     }
 }

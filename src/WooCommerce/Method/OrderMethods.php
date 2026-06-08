@@ -13,6 +13,9 @@ trait OrderMethods
 
     abstract protected function orderStorage(): OrderStorageInterface;
 
+    /**
+     * @param array<string, mixed> $overrides
+     */
     public function haveOrderInDatabase(array $overrides = []): int
     {
         return $this->orderStorage()->haveOrderInDatabase($overrides);
@@ -43,11 +46,17 @@ trait OrderMethods
         $this->orderStorage()->haveOrderStatus($orderId, $newStatus);
     }
 
+    /**
+     * @param array<string, mixed> $overrides
+     */
     public function haveOrderAddressInDatabase(int $orderId, string $addressType, array $overrides): int
     {
         return $this->orderStorage()->haveOrderAddressInDatabase($orderId, $addressType, $overrides);
     }
 
+    /**
+     * @param array<string, mixed> $overrides
+     */
     public function haveOrderItemInDatabase(int $orderId, array $overrides = []): int
     {
         return $this->orderStorage()->haveOrderItemInDatabase($orderId, $overrides);
@@ -58,6 +67,9 @@ trait OrderMethods
         return $this->orderStorage()->haveOrderItemMetaInDatabase($orderItemId, $metaKey, $metaValue);
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     public function grabOrderIdFromDatabase(array $criteria): int|false
     {
         $mappedCriteria = $this->orderStorage()->mapCriteria($criteria);
@@ -72,9 +84,13 @@ trait OrderMethods
             return false;
         }
 
-        return (int)$id;
+        return is_numeric($id) ? (int)$id : false;
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     * @return array<int, array<string, mixed>>
+     */
     public function grabOrderItemFromDatabase(array $criteria): array
     {
         $items = $this->wpDb()->grabAllFromDatabase(
@@ -83,9 +99,13 @@ trait OrderMethods
             $criteria
         );
 
-        return $items;
+        /** @var array<int, array<string, mixed>> */
+        return array_values($items);
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     public function seeOrderInDatabase(array $criteria): void
     {
         $tableName = $this->orderStorage()->getTableName();
@@ -93,6 +113,9 @@ trait OrderMethods
         $this->wpDb()->seeInDatabase($tableName, $mappedCriteria);
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     public function seeOrderMetaInDatabase(array $criteria): void
     {
         $tableName = $this->orderStorage()->getMetaTableName();
@@ -100,6 +123,9 @@ trait OrderMethods
         $this->wpDb()->seeInDatabase($tableName, $mappedCriteria);
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     public function seeOrderItemInDatabase(array $criteria): void
     {
         $this->wpDb()->seeInDatabase(
@@ -108,6 +134,9 @@ trait OrderMethods
         );
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     public function seeOrderItemMetaInDatabase(array $criteria): void
     {
         $this->wpDb()->seeInDatabase(
@@ -116,6 +145,9 @@ trait OrderMethods
         );
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     public function dontSeeOrderItemInDatabase(array $criteria): void
     {
         $this->wpDb()->dontSeeInDatabase(
@@ -124,6 +156,9 @@ trait OrderMethods
         );
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     public function dontSeeOrderItemMetaInDatabase(array $criteria): void
     {
         $this->wpDb()->dontSeeInDatabase(
@@ -132,6 +167,9 @@ trait OrderMethods
         );
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
     public function seeOrderAddressInDatabase(string $type, array $criteria): void
     {
         $this->orderStorage()->seeAddressInDatabase($type, $criteria);
@@ -142,6 +180,10 @@ trait OrderMethods
         return $this->wpDb()->grabPrefixedTableNameFor('woocommerce_order_items');
     }
 
+    /**
+     * @param array<string, mixed> $overrides
+     * @return array<int, int>
+     */
     public function haveManyOrdersInDatabase(int $count, array $overrides = []): array
     {
         $createdIds = [];

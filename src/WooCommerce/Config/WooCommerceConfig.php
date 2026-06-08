@@ -32,9 +32,14 @@ class WooCommerceConfig
 
     private function pageSlug(string $pageIdOption): string
     {
-        return $this->slugCache[$pageIdOption] ??= '/' . $this->wpDb->grabPostFieldFromDatabase(
-            (int) $this->wpDb->grabOptionFromDatabase($pageIdOption),
-            'post_name',
-        );
+        if (!isset($this->slugCache[$pageIdOption])) {
+            $pageId = $this->wpDb->grabOptionFromDatabase($pageIdOption);
+            $pageId = is_numeric($pageId) ? (int) $pageId : 0;
+            $slug = $this->wpDb->grabPostFieldFromDatabase($pageId, 'post_name');
+            $slug = is_string($slug) ? $slug : '';
+            $this->slugCache[$pageIdOption] = '/' . $slug;
+        }
+
+        return $this->slugCache[$pageIdOption];
     }
 }

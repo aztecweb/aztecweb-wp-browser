@@ -13,9 +13,15 @@ class HPOSSubscriptionStorage extends AbstractHPOSStorage implements Subscriptio
         return 'subscription_id';
     }
 
+    /**
+     * Create a subscription in the database.
+     *
+     * @param array<string, mixed> $overrides Database row overrides and metadata.
+     * @return int The subscription ID.
+     */
     public function haveSubscriptionInDatabase(array $overrides): int
     {
-        $meta = $overrides['meta'] ?? [];
+        $meta = is_array($overrides['meta'] ?? null) ? $overrides['meta'] : [];
         unset($overrides['meta']);
 
         $subscriptionId = $this->generateId();

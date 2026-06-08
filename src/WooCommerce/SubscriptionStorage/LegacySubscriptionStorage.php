@@ -13,9 +13,15 @@ class LegacySubscriptionStorage extends AbstractLegacyStorage implements Subscri
         return 'subscription_id';
     }
 
+    /**
+     * Create a subscription in the database.
+     *
+     * @param array<string, mixed> $overrides Database row overrides and metadata.
+     * @return int The subscription post ID.
+     */
     public function haveSubscriptionInDatabase(array $overrides): int
     {
-        $meta = $overrides['meta'] ?? [];
+        $meta = is_array($overrides['meta'] ?? null) ? $overrides['meta'] : [];
         unset($overrides['meta']);
 
         $subscriptionId = $this->wpDb->havePostInDatabase(array_merge([

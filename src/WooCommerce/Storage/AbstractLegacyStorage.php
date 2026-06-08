@@ -16,6 +16,12 @@ abstract class AbstractLegacyStorage extends AbstractStorage
         return 'ID';
     }
 
+    /**
+     * Map criteria to legacy (wp_posts) format.
+     *
+     * @param array<string, mixed> $criteria Database query criteria.
+     * @return array<string, mixed> Mapped criteria.
+     */
     public function mapCriteria(array $criteria): array
     {
         $mapped = [];
@@ -34,11 +40,12 @@ abstract class AbstractLegacyStorage extends AbstractStorage
 
     protected function grabEntityStatus(int $entityId): string
     {
-        return (string) $this->wpDb->grabFromDatabase(
+        $status = $this->wpDb->grabFromDatabase(
             $this->wpDb->grabPostsTableName(),
             'post_status',
             ['ID' => $entityId],
         );
+        return is_string($status) ? $status : '';
     }
 
     protected function haveEntityStatus(int $entityId, string $status): void

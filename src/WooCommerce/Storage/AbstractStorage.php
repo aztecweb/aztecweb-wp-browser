@@ -19,6 +19,12 @@ abstract class AbstractStorage implements WooCommerceStorageInterface
         return $this->wpDb->grabPostMetaTableName();
     }
 
+    /**
+     * Map meta query criteria to storage format.
+     *
+     * @param array<string, mixed> $criteria Database query criteria.
+     * @return array<string, mixed> Mapped criteria.
+     */
     public function mapMetaCriteria(array $criteria): array
     {
         $entityKey = $this->getEntityIdKey();

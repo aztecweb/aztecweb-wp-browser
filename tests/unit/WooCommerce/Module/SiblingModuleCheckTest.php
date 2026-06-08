@@ -26,9 +26,9 @@ class SiblingModuleCheckTest extends Unit
     {
         $module = $this->moduleWithSiblings(WooCommerceDb::class, ['WPDb' => true]);
 
-        $module->_initialize();
+        $this->expectNotToPerformAssertions();
 
-        $this->assertTrue(true, 'no exception was thrown');
+        $module->_initialize();
     }
 
     public function testWooCommerceWebDriverThrowsWhenWpWebDriverIsMissing(): void
@@ -64,9 +64,9 @@ class SiblingModuleCheckTest extends Unit
             'WPDb' => true,
         ]);
 
-        $module->_initialize();
+        $this->expectNotToPerformAssertions();
 
-        $this->assertTrue(true, 'no exception was thrown');
+        $module->_initialize();
     }
 
     /**

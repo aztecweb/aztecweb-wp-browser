@@ -88,10 +88,12 @@ class OrderHPOSCest
         $I->haveOrderMetaInDatabase($orderId, '_payment_method', 'bacs');
 
         $orderTotal = $I->grabOrderMeta($orderId, '_order_total');
-        $I->assertSame('99.99', reset($orderTotal), 'Order total meta should be 99.99');
+        $orderTotalValue = is_array($orderTotal) ? reset($orderTotal) : $orderTotal;
+        $I->assertSame('99.99', $orderTotalValue, 'Order total meta should be 99.99');
 
         $paymentMethod = $I->grabOrderMeta($orderId, '_payment_method');
-        $I->assertSame('bacs', reset($paymentMethod), 'Payment method meta should be bacs');
+        $paymentMethodValue = is_array($paymentMethod) ? reset($paymentMethod) : $paymentMethod;
+        $I->assertSame('bacs', $paymentMethodValue, 'Payment method meta should be bacs');
     }
 
     public function testOrderWithPaymentDetails(AcceptanceTester $I): void
@@ -125,8 +127,10 @@ class OrderHPOSCest
         do {
             $I->loginAsAdmin();
             $I->amOnAdminOrderPage($orderId);
+            $currentUrl = $I->grabFromCurrentUrl();
+            $urlStr = is_string($currentUrl) ? $currentUrl : '';
         } while (
-            strpos((string) $I->grabFromCurrentUrl(), 'action=edit') === false
+            strpos($urlStr, 'action=edit') === false
             && ++$attempts < 3
         );
 

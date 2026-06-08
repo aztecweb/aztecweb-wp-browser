@@ -30,6 +30,12 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
         return $this->wpDb->grabTablePrefix() . 'woocommerce_order_itemmeta';
     }
 
+    /**
+     * Create an order record in the HPOS (wc_orders) table.
+     *
+     * @param array<string, mixed> $overrides Database row overrides.
+     * @return int The order ID.
+     */
     protected function createOrderRecord(array $overrides): int
     {
         $orderId = $this->generateId();
@@ -81,6 +87,14 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
         $this->haveEntityStatus($orderId, $newStatus);
     }
 
+    /**
+     * Create an order address in the database.
+     *
+     * @param int $orderId The order ID.
+     * @param string $addressType The address type ('billing' or 'shipping').
+     * @param array<string, mixed> $overrides Database row overrides.
+     * @return int The address ID.
+     */
     public function haveOrderAddressInDatabase(int $orderId, string $addressType, array $overrides): int
     {
         return $this->wpDb->haveInDatabase($this->grabOrderAddressesTableName(), array_merge([
@@ -105,6 +119,12 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
         return "admin.php?page=wc-orders&action=edit&id={$orderId}";
     }
 
+    /**
+     * Map criteria from legacy (wp_posts) format to HPOS (wc_orders) format.
+     *
+     * @param array<string, mixed> $criteria Legacy format criteria.
+     * @return array<string, mixed> HPOS format criteria.
+     */
     public function mapCriteria(array $criteria): array
     {
         $mapped = [];
@@ -120,6 +140,13 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
         return $mapped;
     }
 
+    /**
+     * Map and add address type to address criteria.
+     *
+     * @param string $type The address type ('billing' or 'shipping').
+     * @param array<string, mixed> $criteria Database query criteria.
+     * @return array<string, mixed> Mapped criteria.
+     */
     public function mapAddressCriteria(string $type, array $criteria): array
     {
         $mapped = $criteria;
@@ -127,6 +154,12 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
         return $mapped;
     }
 
+    /**
+     * Assert an address exists in the database.
+     *
+     * @param string $addressType The address type ('billing' or 'shipping').
+     * @param array<string, mixed> $criteria Database query criteria.
+     */
     public function seeAddressInDatabase(string $addressType, array $criteria): void
     {
         $this->wpDb->seeInDatabase(

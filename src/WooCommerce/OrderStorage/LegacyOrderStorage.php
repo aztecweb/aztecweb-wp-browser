@@ -25,6 +25,12 @@ class LegacyOrderStorage extends AbstractLegacyStorage implements OrderStorageIn
         return $this->wpDb->grabTablePrefix() . 'woocommerce_order_itemmeta';
     }
 
+    /**
+     * Create an order record in the legacy (wp_posts) table.
+     *
+     * @param array<string, mixed> $overrides Database row overrides.
+     * @return int The order post ID.
+     */
     protected function createOrderRecord(array $overrides): int
     {
         return $this->wpDb->havePostInDatabase(array_merge([
@@ -53,6 +59,14 @@ class LegacyOrderStorage extends AbstractLegacyStorage implements OrderStorageIn
         $this->haveEntityStatus($orderId, $newStatus);
     }
 
+    /**
+     * Create an order address in the database (stored as post meta in legacy mode).
+     *
+     * @param int $orderId The order ID.
+     * @param string $addressType The address type ('billing' or 'shipping').
+     * @param array<string, mixed> $overrides Database row overrides.
+     * @return int The meta ID.
+     */
     public function haveOrderAddressInDatabase(int $orderId, string $addressType, array $overrides): int
     {
         $metaId = 0;
@@ -89,6 +103,12 @@ class LegacyOrderStorage extends AbstractLegacyStorage implements OrderStorageIn
         return "post.php?post={$orderId}&action=edit";
     }
 
+    /**
+     * Map criteria to legacy (wp_posts) format.
+     *
+     * @param array<string, mixed> $criteria Database query criteria.
+     * @return array<string, mixed> Mapped criteria.
+     */
     public function mapCriteria(array $criteria): array
     {
         $prepped = [];
@@ -98,6 +118,13 @@ class LegacyOrderStorage extends AbstractLegacyStorage implements OrderStorageIn
         return parent::mapCriteria($prepped);
     }
 
+    /**
+     * Map and add address type prefix to address criteria.
+     *
+     * @param string $type The address type ('billing' or 'shipping').
+     * @param array<string, mixed> $criteria Database query criteria.
+     * @return array<string, mixed> Mapped criteria.
+     */
     public function mapAddressCriteria(string $type, array $criteria): array
     {
         $mapped = [];
@@ -110,6 +137,12 @@ class LegacyOrderStorage extends AbstractLegacyStorage implements OrderStorageIn
         return $mapped;
     }
 
+    /**
+     * Assert an address exists in the database.
+     *
+     * @param string $addressType The address type ('billing' or 'shipping').
+     * @param array<string, mixed> $criteria Database query criteria.
+     */
     public function seeAddressInDatabase(string $addressType, array $criteria): void
     {
         foreach ($this->mapAddressCriteria($addressType, $criteria) as $metaKey => $metaValue) {

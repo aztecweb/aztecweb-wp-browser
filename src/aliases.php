@@ -6,7 +6,8 @@ namespace Aztec\WPBrowser;
 
 if (! function_exists(__NAMESPACE__ . '\\registerAliases')) {
     /**
-     * @param array<class-string, class-string> $aliases
+     * @param array<string, class-string> $aliases Map of alias name (created
+     *     at runtime) to the existing fully-qualified target class.
      */
     function registerAliases(array $aliases): void
     {
