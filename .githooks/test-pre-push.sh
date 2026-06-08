@@ -66,9 +66,9 @@ process_changed_files() {
     local run_all=0
     declare -a cests_array
 
-    # Safety default: no changed files means run all tests
+    # No changed files: abort the push
     if [ ${#files[@]} -eq 0 ]; then
-        echo "RUN_ALL"
+        echo "ABORT"
         return
     fi
 
@@ -109,9 +109,9 @@ assert_equals "CouponCest" "$result" "Duplicate files don't duplicate output"
 result=$(process_changed_files "src/Method/CouponMethods.php" "src/Config/WooCommerceConfig.php")
 assert_equals "RUN_ALL" "$result" "Infrastructure changes trigger RUN_ALL"
 
-# Test 6: No changed files triggers RUN_ALL (safety default)
+# Test 6: No changed files aborts the push
 result=$(process_changed_files)
-assert_equals "RUN_ALL" "$result" "No changed files triggers RUN_ALL"
+assert_equals "ABORT" "$result" "No changed files aborts the push"
 
 # Test 7: Unknown files are ignored
 result=$(process_changed_files "docs/README.md")

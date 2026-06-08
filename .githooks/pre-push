@@ -20,16 +20,10 @@ else
     CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
 fi
 
-# If no changed files detected, run full suite (safety default)
+# If no changed files detected, abort — something is off with the git state
 if [ -z "$CHANGED_FILES" ]; then
-    echo "No changed files detected; running full acceptance suite (safety default)"
-    docker run \
-        --rm \
-        -v "$PWD:/var/www/html" \
-        -w /var/www/html \
-        ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.0 \
-        vendor/bin/codecept run acceptance
-    exit $?
+    echo "No changed files detected; aborting push. Use --no-verify to bypass." >&2
+    exit 1
 fi
 
 # Map changed files to Cest classes
