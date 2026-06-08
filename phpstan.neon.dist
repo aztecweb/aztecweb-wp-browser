@@ -3,6 +3,8 @@ parameters:
     paths:
         - src
         - tests
+    scanDirectories:
+        - tests/_support
     excludePaths:
         analyse:
-            - tests/_support/_generated (?)
+            - tests/_support/_generated

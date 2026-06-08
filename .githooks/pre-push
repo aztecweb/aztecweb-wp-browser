@@ -9,6 +9,8 @@
 
 set -e
 
+AZTEC_TEST_IMAGE=${AZTEC_TEST_IMAGE:-php8.4}
+
 # Determine changed files
 # First, try to get files since tracking branch (most common case)
 if git merge-base --is-ancestor @{push} HEAD 2>/dev/null; then
@@ -70,7 +72,7 @@ if [ $RUN_ALL -eq 1 ] || [ ${#CESTS[@]} -eq 0 ]; then
         --rm \
         -v "$PWD:/var/www/html" \
         -w /var/www/html \
-        ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.0 \
+        ghcr.io/aztecweb/aztecweb-wp-browser-runner:$AZTEC_TEST_IMAGE \
         vendor/bin/codecept run acceptance
 else
     echo "Running impacted tests: ${CESTS[*]}"
@@ -78,6 +80,6 @@ else
         --rm \
         -v "$PWD:/var/www/html" \
         -w /var/www/html \
-        ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.0 \
+        ghcr.io/aztecweb/aztecweb-wp-browser-runner:$AZTEC_TEST_IMAGE \
         vendor/bin/codecept run acceptance "${CESTS[@]}"
 fi

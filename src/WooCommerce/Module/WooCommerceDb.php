@@ -1,0 +1,61 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Aztec\WPBrowser\WooCommerce\Module;
+
+use Aztec\WPBrowser\ActionScheduler\Method\ActionMethods;
+use Aztec\WPBrowser\WooCommerce\Method\CouponMethods;
+use Aztec\WPBrowser\WooCommerce\Method\CustomerMethods;
+use Aztec\WPBrowser\WooCommerce\Method\OrderMethods;
+use Aztec\WPBrowser\WooCommerce\Method\ProductMethods;
+use Aztec\WPBrowser\WooCommerce\Method\SubscriptionMethods;
+use Aztec\WPBrowser\WooCommerce\OrderStorage\HPOSOrderStorage;
+use Aztec\WPBrowser\WooCommerce\OrderStorage\LegacyOrderStorage;
+use Aztec\WPBrowser\WooCommerce\OrderStorage\OrderStorageInterface;
+use Aztec\WPBrowser\WooCommerce\Storage\HposState;
+use Aztec\WPBrowser\WooCommerce\SubscriptionStorage\HPOSSubscriptionStorage;
+use Aztec\WPBrowser\WooCommerce\SubscriptionStorage\LegacySubscriptionStorage;
+use Aztec\WPBrowser\WooCommerce\SubscriptionStorage\SubscriptionStorageInterface;
+use Codeception\Exception\ModuleException;
+use Codeception\Module;
+
+class WooCommerceDb extends Module
+{
+    use ActionMethods;
+    use CouponMethods;
+    use CustomerMethods;
+    use OrderMethods;
+    use ProductMethods;
+    use SubscriptionMethods;
+    use WooCommerceModuleSupport;
+
+    public function _initialize(): void
+    {
+        if (! $this->hasModule('WPDb')) {
+            throw new ModuleException(
+                $this,
+                'WooCommerceDb requires the WPDb module to be enabled in the same suite.',
+            );
+        }
+    }
+
+    protected function isHposEnabled(): bool
+    {
+        return HposState::isEnabled($this->wpDb());
+    }
+
+    protected function orderStorage(): OrderStorageInterface
+    {
+        return $this->isHposEnabled()
+            ? new HPOSOrderStorage($this->wpDb())
+            : new LegacyOrderStorage($this->wpDb());
+    }
+
+    protected function subscriptionStorage(): SubscriptionStorageInterface
+    {
+        return $this->isHposEnabled()
+            ? new HPOSSubscriptionStorage($this->wpDb())
+            : new LegacySubscriptionStorage($this->wpDb());
+    }
+}

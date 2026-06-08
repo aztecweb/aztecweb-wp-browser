@@ -60,12 +60,16 @@
   "autoload": {
     "psr-4": {
       "Aztec\\WPBrowser\\": "src/"
-    }
+    },
+    "files": [
+      "src/aliases.php"
+    ]
   },
   "autoload-dev": {
     "psr-4": {
       "Aztec\\WPBrowser\\Tests\\": "tests/",
-      "Aztec\\WPBrowser\\Tests\\Support\\": "tests/_support/"
+      "Aztec\\WPBrowser\\Tests\\Support\\": "tests/_support/",
+      "Aztec\\WPBrowser\\Tests\\Unit\\": "tests/unit/"
     }
   },
   "require": {
@@ -76,7 +80,8 @@
     "symfony/process": ">=4.4.24 <8.0"
   },
   "require-dev": {
-    "codeception/module-webdriver": "^3.1",
+    "codeception/module-asserts": "^2.0 || ^3.2",
+    "codeception/module-webdriver": "^3.1 || ^4.0",
     "composer/installers": "^2.2",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
     "phpcompatibility/php-compatibility": "^10.0@alpha",
@@ -91,7 +96,10 @@
     "wpackagist-theme/storefront": "^4.6"
   },
   "scripts": {
-    "stan": "phpstan analyse --memory-limit 1G",
+    "stan": [
+			"codecept build",
+      "phpstan analyse --memory-limit 1G"
+    ],
     "cs": "phpcs",
     "cs:fix": "phpcbf",
     "check": [

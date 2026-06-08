@@ -8,10 +8,12 @@
 actor: AcceptanceTester
 modules:
     enabled:
+        - Asserts
         - WPDb
         - WPWebDriver
+        - WooCommerceDb
+        - WooCommerceWebDriver
         - \Aztec\WPBrowser\Tests\Support\Helper\Acceptance
-        - \Aztec\WPBrowser\AztecWPBrowser
     config:
         WPDb:
             dsn: 'sqlite:%DB_PATH%'

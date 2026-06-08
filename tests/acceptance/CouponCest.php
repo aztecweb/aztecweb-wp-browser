@@ -18,7 +18,7 @@ class CouponCest
             ],
         ]);
 
-        assert(is_int($couponId) && $couponId > 0, 'Coupon ID should be a positive integer');
+        $I->assertGreaterThan(0, $couponId, 'Coupon ID should be a positive integer');
         $I->seeCouponInDatabase(['post_title' => 'SAVE10']);
 
         $I->seeCouponMetaInDatabase([
@@ -38,7 +38,7 @@ class CouponCest
     {
         $couponId = $I->havePercentageCouponInDatabase('PCT20', 20.0);
 
-        assert(is_int($couponId) && $couponId > 0, 'Coupon ID should be a positive integer');
+        $I->assertGreaterThan(0, $couponId, 'Coupon ID should be a positive integer');
         $I->seeCouponInDatabase(['post_title' => 'PCT20']);
 
         $I->seeCouponMetaInDatabase([
@@ -58,7 +58,7 @@ class CouponCest
     {
         $couponId = $I->haveFixedCartCouponInDatabase('FIXED5', 5.00);
 
-        assert(is_int($couponId) && $couponId > 0, 'Coupon ID should be a positive integer');
+        $I->assertGreaterThan(0, $couponId, 'Coupon ID should be a positive integer');
         $I->seeCouponInDatabase(['post_title' => 'FIXED5']);
 
         $I->seeCouponMetaInDatabase([
@@ -78,7 +78,7 @@ class CouponCest
     {
         $couponId = $I->haveFixedProductCouponInDatabase('PROD10', 10.00);
 
-        assert(is_int($couponId) && $couponId > 0, 'Coupon ID should be a positive integer');
+        $I->assertGreaterThan(0, $couponId, 'Coupon ID should be a positive integer');
         $I->seeCouponInDatabase(['post_title' => 'PROD10']);
 
         $I->seeCouponMetaInDatabase([
@@ -98,7 +98,7 @@ class CouponCest
     {
         $couponId = $I->haveFreeShippingCouponInDatabase('FREESHIP');
 
-        assert(is_int($couponId) && $couponId > 0, 'Coupon ID should be a positive integer');
+        $I->assertGreaterThan(0, $couponId, 'Coupon ID should be a positive integer');
         $I->seeCouponInDatabase(['post_title' => 'FREESHIP']);
 
         $I->seeCouponMetaInDatabase([
@@ -127,18 +127,18 @@ class CouponCest
 
         // Test finding existing coupon by code (stored in post_name)
         $grabbedId = $I->grabCouponIdFromDatabase(['post_name' => 'TEST10']);
-        assert($couponId === $grabbedId);
+        $I->assertSame($couponId, $grabbedId);
 
         // Test with post_status
         $grabbedId = $I->grabCouponIdFromDatabase([
             'post_name' => 'TEST10',
             'post_status' => 'publish',
         ]);
-        assert($couponId === $grabbedId);
+        $I->assertSame($couponId, $grabbedId);
 
         // Test non-existent coupon
         $notFound = $I->grabCouponIdFromDatabase(['post_name' => 'NONEXISTENT']);
-        assert($notFound === false);
+        $I->assertFalse($notFound);
     }
 
     public function testSeeCouponInDatabase(AcceptanceTester $I): void
@@ -215,7 +215,7 @@ class CouponCest
         ]);
 
         $metaValue = $I->grabCouponMetaFromDatabase($couponId, 'minimum_amount', true);
-        assert($metaValue === '50.00', 'Meta value should match expected value');
+        $I->assertSame('50.00', $metaValue, 'Meta value should match expected value');
 
         $I->seeCouponMetaInDatabase([
             'post_id' => $couponId,
@@ -238,7 +238,7 @@ class CouponCest
         ]);
 
         $status = $I->grabCouponStatus($couponId);
-        assert($status === 'draft', 'Coupon status should be draft');
+        $I->assertSame('draft', $status, 'Coupon status should be draft');
 
         $I->seeCouponStatus($couponId, 'draft');
 
@@ -269,16 +269,18 @@ class CouponCest
             ],
         ]);
 
-        assert(is_int($couponId) && $couponId > 0, 'Coupon ID should be a positive integer');
+        $I->assertGreaterThan(0, $couponId, 'Coupon ID should be a positive integer');
         $I->seeCouponInDatabase(['post_title' => 'FULLMETA']);
 
-        foreach ([
+        foreach (
+            [
             'discount_type' => 'percent',
             'coupon_amount' => '15.00',
             'minimum_amount' => '100.00',
             'product_ids' => '1,2,3',
             'individual_use' => 'yes',
-        ] as $key => $value) {
+            ] as $key => $value
+        ) {
             $I->seeCouponMetaInDatabase([
                 'post_id' => $couponId,
                 'meta_key' => $key,

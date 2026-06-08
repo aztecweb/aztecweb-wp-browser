@@ -59,5 +59,8 @@ jobs:
       - name: Install PHP dependencies
         run: composer install --no-progress
 
+      - name: Copy environment file
+        run: cp .env.example .env
+
       - name: Run static analysis and code style checks
         run: composer check
