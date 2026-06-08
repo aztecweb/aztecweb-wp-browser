@@ -3,7 +3,23 @@ name: Acceptance tests
 on:
   push:
     branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'composer.json'
+      - 'composer.lock'
+      - '.env.example'
+      - 'resources/**'
+      - '.github/workflows/acceptance.yml'
   pull_request:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'composer.json'
+      - 'composer.lock'
+      - '.env.example'
+      - 'resources/**'
+      - '.github/workflows/acceptance.yml'
 
 permissions:
   contents: read

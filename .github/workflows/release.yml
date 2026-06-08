@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Extract release notes from CHANGELOG
+        id: release-notes
+        run: |
+          # Extract the version from the tag
+          TAG=${{ github.ref_name }}
+          VERSION=${TAG#v}
+
+          # Extract the changelog section for this version
+          CHANGELOG=$(awk "
+            /^## \[$VERSION\]/ {
+              found=1
+              next
+            }
+            found && /^## \[/ {
+              exit
+            }
+            found && NF {
+              print
+            }
+          " CHANGELOG.md | sed -e '/^[[:space:]]*$/d' -e '1{/^[[:space:]]*$/d;}')
+
+          # Output the release notes
+          echo "release_notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@69032c65d51b7acc75d03dfd4cff0dd5d6d8d86d # v1.4.0
+        with:
+          body: ${{ steps.release-notes.outputs.release_notes }}
+          draft: false
+          prerelease: false
