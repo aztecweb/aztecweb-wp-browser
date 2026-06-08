@@ -272,13 +272,15 @@ class CouponCest
         $I->assertGreaterThan(0, $couponId, 'Coupon ID should be a positive integer');
         $I->seeCouponInDatabase(['post_title' => 'FULLMETA']);
 
-        foreach ([
+        foreach (
+            [
             'discount_type' => 'percent',
             'coupon_amount' => '15.00',
             'minimum_amount' => '100.00',
             'product_ids' => '1,2,3',
             'individual_use' => 'yes',
-        ] as $key => $value) {
+            ] as $key => $value
+        ) {
             $I->seeCouponMetaInDatabase([
                 'post_id' => $couponId,
                 'meta_key' => $key,

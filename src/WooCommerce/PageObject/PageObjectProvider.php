@@ -23,7 +23,7 @@ class PageObjectProvider
 
     public function cartPage(): CartPageObject
     {
-        if ( ! isset($this->pageInstances['cart'])) {
+        if (! isset($this->pageInstances['cart'])) {
             $class = $this->pageObjectsConfig['cart'] ?? CartPageObject::class;
             /** @var CartPageObject $pageObj */
             $pageObj = new $class();
@@ -37,7 +37,7 @@ class PageObjectProvider
 
     public function checkoutPage(): CheckoutPageObject
     {
-        if ( ! isset($this->pageInstances['checkout'])) {
+        if (! isset($this->pageInstances['checkout'])) {
             $class = $this->pageObjectsConfig['checkout'] ?? CheckoutPageObject::class;
             /** @var CheckoutPageObject $pageObj */
             $pageObj = new $class();
@@ -48,5 +48,4 @@ class PageObjectProvider
         $instance = $this->pageInstances['checkout'];
         return $instance;
     }
-
 }

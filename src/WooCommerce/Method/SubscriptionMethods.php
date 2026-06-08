@@ -77,7 +77,7 @@ trait SubscriptionMethods
         $id = $this->wpDb()->grabFromDatabase(
             $this->subscriptionStorage()->getTableName(),
             $this->subscriptionStorage()->getIdColumnName(),
-            $mappedCriteria
+            $mappedCriteria,
         );
 
         if ($id === false) {
@@ -188,7 +188,7 @@ trait SubscriptionMethods
             $termTaxonomyId = $this->wpDb()->grabFromDatabase(
                 $termTaxonomyTable,
                 'term_taxonomy_id',
-                ['term_id' => (int) $termId, 'taxonomy' => 'product_type']
+                ['term_id' => (int) $termId, 'taxonomy' => 'product_type'],
             );
 
             if ($termTaxonomyId !== false && is_numeric($termTaxonomyId)) {

@@ -103,7 +103,7 @@ trait OrderTrait
                 'order_item_id' => $orderItemId,
                 'meta_key' => $metaKey,
                 'meta_value' => is_array($metaValue) ? serialize($metaValue) : $metaValue,
-            ]
+            ],
         );
     }
 }

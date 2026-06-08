@@ -106,7 +106,7 @@ trait ProductMethods
         $ids = $this->wpDb()->grabColumnFromDatabase(
             $this->wpDb()->grabTermRelationshipsTableName(),
             'term_taxonomy_id',
-            ['object_id' => $productId]
+            ['object_id' => $productId],
         );
         /** @var array<int, int> $result */
         $result = array_map(static fn (mixed $v): int => is_numeric($v) ? (int) $v : 0, $ids);
@@ -120,7 +120,7 @@ trait ProductMethods
             [
                 'object_id' => $productId,
                 'term_taxonomy_id' => $categoryId,
-            ]
+            ],
         );
     }
 
@@ -133,7 +133,7 @@ trait ProductMethods
         $id = $this->wpDb()->grabFromDatabase(
             $this->wpDb()->grabPostsTableName(),
             'ID',
-            $criteria
+            $criteria,
         );
 
         if ($id === false) {
@@ -230,7 +230,7 @@ trait ProductMethods
         $ids = $this->wpDb()->grabColumnFromDatabase(
             $this->wpDb()->grabTermRelationshipsTableName(),
             'term_taxonomy_id',
-            ['object_id' => $productId]
+            ['object_id' => $productId],
         );
         /** @var array<int, int> $result */
         $result = array_map(static fn (mixed $v): int => is_numeric($v) ? (int) $v : 0, $ids);

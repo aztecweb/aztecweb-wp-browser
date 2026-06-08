@@ -233,7 +233,7 @@ trait CouponMethods
         $id = $this->wpDb()->grabFromDatabase(
             $this->wpDb()->grabPostsTableName(),
             'ID',
-            $criteria
+            $criteria,
         );
 
         if ($id === false || !is_numeric($id)) {

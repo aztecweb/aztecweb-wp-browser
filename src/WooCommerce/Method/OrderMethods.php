@@ -77,7 +77,7 @@ trait OrderMethods
         $id = $this->wpDb()->grabFromDatabase(
             $this->orderStorage()->getTableName(),
             $this->orderStorage()->getIdColumnName(),
-            $mappedCriteria
+            $mappedCriteria,
         );
 
         if ($id === false) {
@@ -96,7 +96,7 @@ trait OrderMethods
         $items = $this->wpDb()->grabAllFromDatabase(
             $this->wpDb()->grabPrefixedTableNameFor('woocommerce_order_items'),
             '*',
-            $criteria
+            $criteria,
         );
 
         /** @var array<int, array<string, mixed>> */
@@ -130,7 +130,7 @@ trait OrderMethods
     {
         $this->wpDb()->seeInDatabase(
             $this->wpDb()->grabPrefixedTableNameFor('woocommerce_order_items'),
-            $criteria
+            $criteria,
         );
     }
 
@@ -141,7 +141,7 @@ trait OrderMethods
     {
         $this->wpDb()->seeInDatabase(
             $this->wpDb()->grabPrefixedTableNameFor('woocommerce_order_itemmeta'),
-            $criteria
+            $criteria,
         );
     }
 
@@ -152,7 +152,7 @@ trait OrderMethods
     {
         $this->wpDb()->dontSeeInDatabase(
             $this->wpDb()->grabPrefixedTableNameFor('woocommerce_order_items'),
-            $criteria
+            $criteria,
         );
     }
 
@@ -163,7 +163,7 @@ trait OrderMethods
     {
         $this->wpDb()->dontSeeInDatabase(
             $this->wpDb()->grabPrefixedTableNameFor('woocommerce_order_itemmeta'),
-            $criteria
+            $criteria,
         );
     }
 

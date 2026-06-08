@@ -123,7 +123,7 @@ trait ActionMethods
         $actionIds = $this->wpDb()->grabColumnFromDatabase(
             $this->actionsTableName(),
             'action_id',
-            $criteria
+            $criteria,
         );
 
         /** @var array<int, array<string, mixed>> $actions */
@@ -132,12 +132,14 @@ trait ActionMethods
             $row = $this->wpDb()->grabFromDatabase(
                 $this->actionsTableName(),
                 '*',
-                ['action_id' => $actionId]
+                ['action_id' => $actionId],
             );
-            if ($row !== false && is_array($row)) {
-                /** @var array<string, mixed> $row */
-                $actions[] = $row;
+            if ($row === false || !is_array($row)) {
+                continue;
             }
+
+            /** @var array<string, mixed> $row */
+            $actions[] = $row;
         }
 
         return $actions;
@@ -153,7 +155,7 @@ trait ActionMethods
         $results = $this->wpDb()->grabFromDatabase(
             $this->logsTableName(),
             '*',
-            ['action_id' => $actionId]
+            ['action_id' => $actionId],
         );
 
         if ($results === false || !is_array($results)) {
@@ -219,7 +221,7 @@ trait ActionMethods
             [
                 'action_id' => $actionId,
                 'group_id' => $groupId,
-            ]
+            ],
         );
     }
 
@@ -245,7 +247,7 @@ trait ActionMethods
         $this->wpDb()->updateInDatabase(
             $this->actionsTableName(),
             ['status' => 'canceled'],
-            ['action_id' => $actionId]
+            ['action_id' => $actionId],
         );
     }
 
@@ -257,7 +259,7 @@ trait ActionMethods
                 'status' => 'complete',
                 'last_attempt_gmt' => gmdate('Y-m-d H:i:s'),
             ],
-            ['action_id' => $actionId]
+            ['action_id' => $actionId],
         );
     }
 
@@ -283,21 +285,23 @@ trait ActionMethods
         $actionIds = $this->wpDb()->grabColumnFromDatabase(
             $this->actionsTableName(),
             'action_id',
-            $criteria
+            $criteria,
         );
 
         $count = count($actionIds);
 
         foreach ($actionIds as $actionId) {
-            if (is_numeric($actionId)) {
-                $this->markActionCompleteInDatabase((int) $actionId);
-                $this->wpDb()->haveInDatabase($this->logsTableName(), [
-                    'action_id' => $actionId,
-                    'message' => 'Action executed via runScheduledActions',
-                    'log_date_gmt' => gmdate('Y-m-d H:i:s'),
-                    'log_entry_type' => 'result',
-                ]);
+            if (!is_numeric($actionId)) {
+                continue;
             }
+
+            $this->markActionCompleteInDatabase((int) $actionId);
+            $this->wpDb()->haveInDatabase($this->logsTableName(), [
+                'action_id' => $actionId,
+                'message' => 'Action executed via runScheduledActions',
+                'log_date_gmt' => gmdate('Y-m-d H:i:s'),
+                'log_entry_type' => 'result',
+            ]);
         }
 
         return $count;

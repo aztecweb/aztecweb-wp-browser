@@ -90,9 +90,11 @@ class LegacyOrderStorage extends AbstractLegacyStorage implements OrderStorageIn
         }
 
         foreach ($fieldMapping as $field => $metaKey) {
-            if (isset($overrides[$field])) {
-                $metaId = $this->haveOrderMetaInDatabase($orderId, $metaKey, $overrides[$field]);
+            if (!isset($overrides[$field])) {
+                continue;
             }
+
+            $metaId = $this->haveOrderMetaInDatabase($orderId, $metaKey, $overrides[$field]);
         }
 
         return $metaId;
@@ -148,7 +150,7 @@ class LegacyOrderStorage extends AbstractLegacyStorage implements OrderStorageIn
         foreach ($this->mapAddressCriteria($addressType, $criteria) as $metaKey => $metaValue) {
             $this->wpDb->seeInDatabase(
                 $this->getMetaTableName(),
-                ['meta_key' => $metaKey, 'meta_value' => $metaValue]
+                ['meta_key' => $metaKey, 'meta_value' => $metaValue],
             );
         }
     }

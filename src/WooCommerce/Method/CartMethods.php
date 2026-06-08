@@ -65,7 +65,7 @@ trait CartMethods
         $cartItemXpath = Locator::contains($this->selector($cartPage::CART_ITEM_SELECTOR), $productName);
         $cartItemQuantity = $this->wpWebDriver()->grabAttributeFrom(
             $cartPage->cartItemQuantitySelector($cartItemXpath),
-            'value'
+            'value',
         );
 
         $this->assertEquals($quantity, (int)$cartItemQuantity);
@@ -78,7 +78,7 @@ trait CartMethods
         $productQtySelector = $this->selector($cartPage::PRODUCT_QUANTITY_SELECTOR);
         $totalQuantity = $this->wpWebDriver()->executeJS(
             'return Array.from(document.querySelectorAll("' . $productQtySelector . '"))'
-            . '.reduce((sum, input) => sum + parseInt(input.value), 0)'
+            . '.reduce((sum, input) => sum + parseInt(input.value), 0)',
         );
 
         $this->assertEquals($quantity, $totalQuantity);
@@ -91,7 +91,7 @@ trait CartMethods
         $removeItemSelector = $this->selector($cartPage::REMOVE_ITEM_SELECTOR);
         $countItemsJs   = sprintf(
             "return document.querySelectorAll('%s').length",
-            $removeItemSelector
+            $removeItemSelector,
         );
         $clickRemoveJs  = sprintf("document.querySelector('%s').click()", $removeItemSelector);
         $remainingItems = $this->wpWebDriver()->executeJS($countItemsJs);
@@ -103,8 +103,8 @@ trait CartMethods
                 sprintf(
                     "return document.querySelectorAll('%s').length < %d",
                     $removeItemSelector,
-                    $remainingItems
-                )
+                    $remainingItems,
+                ),
             );
 
             $remainingItems--;

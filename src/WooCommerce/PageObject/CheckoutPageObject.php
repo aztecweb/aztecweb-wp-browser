@@ -43,11 +43,14 @@ class CheckoutPageObject
     // Messages (WooCommerce Block Checkout)
     public const ERROR_CONTAINER_SELECTOR = '.wc-block-components-validation-error, .wc-block-components-notice-banner';
     public const SUCCESS_MESSAGE_SELECTOR = '.wc-block-components-notice-banner.is-success, .woocommerce-message';
-    public const ORDER_RECEIVED_SELECTOR = '.woocommerce-order, .wp-block-woocommerce-order-confirmation-status, .wc-block-order-confirmation';
+    public const ORDER_RECEIVED_SELECTOR = '.woocommerce-order,'
+        . ' .wp-block-woocommerce-order-confirmation-status,'
+        . ' .wc-block-order-confirmation';
 
     // Order confirmation page
     public const ORDER_RECEIVED_URL_PATTERN = '/order-received/';
-    public const ORDER_ID_SELECTOR = '.woocommerce-order-overview__order strong, .wc-block-order-confirmation-summary-list-item__value';
+    public const ORDER_ID_SELECTOR = '.woocommerce-order-overview__order strong,'
+        . ' .wc-block-order-confirmation-summary-list-item__value';
 
     public function getFieldSelector(string $field): string
     {

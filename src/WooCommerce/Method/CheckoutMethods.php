@@ -32,7 +32,7 @@ trait CheckoutMethods
 
         $isSelect = $this->wpWebDriver()->executeJS(
             'return document.querySelector(arguments[0]) instanceof HTMLSelectElement',
-            [$selector]
+            [$selector],
         );
 
         if ($isSelect) {
@@ -50,9 +50,11 @@ trait CheckoutMethods
     public function fillCheckoutForm(array $data): void
     {
         foreach ($data as $field => $value) {
-            if (is_string($value)) {
-                $this->fillCheckoutField($field, $value);
+            if (!is_string($value)) {
+                continue;
             }
+
+            $this->fillCheckoutField($field, $value);
         }
     }
 

@@ -44,25 +44,31 @@ trait CustomerMethods
         $userId = $this->wpDb()->haveUserInDatabase(
             $userLogin,
             $userRole,
-            ['user_email' => $userEmail, ...$overrides]
+            ['user_email' => $userEmail, ...$overrides],
         );
 
         foreach ($billing as $key => $value) {
-            if (is_string($key)) {
-                $this->wpDb()->haveUserMetaInDatabase($userId, 'billing_' . $key, $value);
+            if (!is_string($key)) {
+                continue;
             }
+
+            $this->wpDb()->haveUserMetaInDatabase($userId, 'billing_' . $key, $value);
         }
 
         foreach ($shipping as $key => $value) {
-            if (is_string($key)) {
-                $this->wpDb()->haveUserMetaInDatabase($userId, 'shipping_' . $key, $value);
+            if (!is_string($key)) {
+                continue;
             }
+
+            $this->wpDb()->haveUserMetaInDatabase($userId, 'shipping_' . $key, $value);
         }
 
         foreach ($meta as $key => $value) {
-            if (is_string($key)) {
-                $this->wpDb()->haveUserMetaInDatabase($userId, $key, $value);
+            if (!is_string($key)) {
+                continue;
             }
+
+            $this->wpDb()->haveUserMetaInDatabase($userId, $key, $value);
         }
 
         return $userId;
@@ -100,9 +106,11 @@ trait CustomerMethods
         $address = [];
         foreach ($billingFields as $field) {
             $value = $this->grabCustomerMeta($customerId, 'billing_' . $field, true);
-            if ($value !== '') {
-                $address[$field] = $value;
+            if ($value === '') {
+                continue;
             }
+
+            $address[$field] = $value;
         }
 
         return $address;
@@ -128,9 +136,11 @@ trait CustomerMethods
         $address = [];
         foreach ($shippingFields as $field) {
             $value = $this->grabCustomerMeta($customerId, 'shipping_' . $field, true);
-            if ($value !== '') {
-                $address[$field] = $value;
+            if ($value === '') {
+                continue;
             }
+
+            $address[$field] = $value;
         }
 
         return $address;
@@ -233,7 +243,7 @@ trait CustomerMethods
         $id = $this->wpDb()->grabFromDatabase(
             $this->wpDb()->grabUsersTableName(),
             'ID',
-            $criteria
+            $criteria,
         );
 
         if ($id === false) {

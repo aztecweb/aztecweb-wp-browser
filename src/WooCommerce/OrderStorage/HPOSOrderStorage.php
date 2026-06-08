@@ -164,7 +164,7 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
     {
         $this->wpDb->seeInDatabase(
             $this->grabOrderAddressesTableName(),
-            $this->mapAddressCriteria($addressType, $criteria)
+            $this->mapAddressCriteria($addressType, $criteria),
         );
     }
 

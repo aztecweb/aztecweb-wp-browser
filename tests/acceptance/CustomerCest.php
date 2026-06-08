@@ -446,7 +446,7 @@ class CustomerCest
         ]);
     }
 
-    
+
     public function testAmOnMyAccountPage(AcceptanceTester $I): void
     {
         $pageId = $I->havePostInDatabase([
