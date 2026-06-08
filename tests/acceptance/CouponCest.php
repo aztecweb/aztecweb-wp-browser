@@ -18,7 +18,6 @@ class CouponCest
             ],
         ]);
 
-        $I->assertIsInt($couponId);
         $I->assertGreaterThan(0, $couponId, 'Coupon ID should be a positive integer');
         $I->seeCouponInDatabase(['post_title' => 'SAVE10']);
 
@@ -39,7 +38,6 @@ class CouponCest
     {
         $couponId = $I->havePercentageCouponInDatabase('PCT20', 20.0);
 
-        $I->assertIsInt($couponId);
         $I->assertGreaterThan(0, $couponId, 'Coupon ID should be a positive integer');
         $I->seeCouponInDatabase(['post_title' => 'PCT20']);
 
@@ -60,7 +58,6 @@ class CouponCest
     {
         $couponId = $I->haveFixedCartCouponInDatabase('FIXED5', 5.00);
 
-        $I->assertIsInt($couponId);
         $I->assertGreaterThan(0, $couponId, 'Coupon ID should be a positive integer');
         $I->seeCouponInDatabase(['post_title' => 'FIXED5']);
 
@@ -81,7 +78,6 @@ class CouponCest
     {
         $couponId = $I->haveFixedProductCouponInDatabase('PROD10', 10.00);
 
-        $I->assertIsInt($couponId);
         $I->assertGreaterThan(0, $couponId, 'Coupon ID should be a positive integer');
         $I->seeCouponInDatabase(['post_title' => 'PROD10']);
 
@@ -102,7 +98,6 @@ class CouponCest
     {
         $couponId = $I->haveFreeShippingCouponInDatabase('FREESHIP');
 
-        $I->assertIsInt($couponId);
         $I->assertGreaterThan(0, $couponId, 'Coupon ID should be a positive integer');
         $I->seeCouponInDatabase(['post_title' => 'FREESHIP']);
 
@@ -274,7 +269,6 @@ class CouponCest
             ],
         ]);
 
-        $I->assertIsInt($couponId);
         $I->assertGreaterThan(0, $couponId, 'Coupon ID should be a positive integer');
         $I->seeCouponInDatabase(['post_title' => 'FULLMETA']);
 

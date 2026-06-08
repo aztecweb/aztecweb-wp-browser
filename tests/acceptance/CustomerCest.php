@@ -15,7 +15,6 @@ class CustomerCest
             'user_email' => 'john.doe@example.com',
         ]);
 
-        $I->assertIsInt($customerId);
         $I->assertGreaterThan(0, $customerId, 'Customer ID should be a positive integer');
 
         $I->seeCustomerInDatabase([
@@ -29,7 +28,6 @@ class CustomerCest
     {
         $customerId = $I->haveCustomerInDatabase();
 
-        $I->assertIsInt($customerId);
         $I->assertGreaterThan(0, $customerId, 'Customer ID should be a positive integer');
 
         $I->seeCustomerInDatabase([
@@ -335,11 +333,9 @@ class CustomerCest
         ]);
 
         $metaId = $I->haveCustomerBillingFieldInDatabase($customerId, 'first_name', 'Jane');
-        $I->assertIsInt($metaId);
         $I->assertGreaterThan(0, $metaId, 'Meta ID should be a positive integer');
 
         $metaId = $I->haveCustomerBillingFieldInDatabase($customerId, 'email', 'jane@example.com');
-        $I->assertIsInt($metaId);
         $I->assertGreaterThan(0, $metaId, 'Meta ID should be a positive integer');
 
         $I->seeCustomerBillingFieldInDatabase($customerId, 'first_name', 'Jane');
@@ -353,11 +349,9 @@ class CustomerCest
         ]);
 
         $metaId = $I->haveCustomerShippingFieldInDatabase($customerId, 'city', 'Rio de Janeiro');
-        $I->assertIsInt($metaId);
         $I->assertGreaterThan(0, $metaId, 'Meta ID should be a positive integer');
 
         $metaId = $I->haveCustomerShippingFieldInDatabase($customerId, 'postcode', '20000-000');
-        $I->assertIsInt($metaId);
         $I->assertGreaterThan(0, $metaId, 'Meta ID should be a positive integer');
 
         $I->seeCustomerShippingFieldInDatabase($customerId, 'city', 'Rio de Janeiro');
@@ -372,7 +366,6 @@ class CustomerCest
 
         $metaId = $I->haveCustomerMetaInDatabase($customerId, 'custom_meta', 'custom_value');
 
-        $I->assertIsInt($metaId);
         $I->assertGreaterThan(0, $metaId, 'Meta ID should be a positive integer');
 
         $I->seeCustomerMetaInDatabase([

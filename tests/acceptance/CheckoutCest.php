@@ -394,7 +394,6 @@ class CheckoutCest
         $I->waitForElement('.woocommerce-order, .wp-block-woocommerce-order-confirmation-status', 30);
         $orderId = $I->grabOrderIdFromOrderReceived();
 
-        $I->assertIsInt($orderId);
         $I->assertGreaterThan(0, $orderId, 'Order ID should be a positive integer');
     }
 

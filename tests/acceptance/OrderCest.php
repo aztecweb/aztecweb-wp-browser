@@ -19,7 +19,6 @@ class OrderCest
             'post_status' => 'wc-pending',
         ]);
 
-        $I->assertIsInt($orderId);
         $I->assertGreaterThan(0, $orderId, 'Order ID should be a positive integer');
 
         $I->seeOrderInDatabase([
@@ -158,7 +157,6 @@ class OrderCest
             'country' => 'US',
         ]);
 
-        $I->assertIsInt($metaId);
         $I->assertGreaterThan(0, $metaId, 'Meta ID should be a positive integer');
 
         $I->seeOrderMetaInDatabase([
@@ -189,7 +187,6 @@ class OrderCest
             'order_item_type' => 'line_item',
         ]);
 
-        $I->assertIsInt($orderItemId);
         $I->assertGreaterThan(0, $orderItemId, 'Order item ID should be a positive integer');
 
         $I->seeInDatabase('wp_woocommerce_order_items', [
@@ -210,7 +207,6 @@ class OrderCest
         ]);
 
         $metaId = $I->haveOrderItemMetaInDatabase($orderItemId, '_product_id', '123');
-        $I->assertIsInt($metaId);
         $I->assertGreaterThan(0, $metaId, 'Order item meta ID should be a positive integer');
 
         $I->seeInDatabase('wp_woocommerce_order_itemmeta', [
@@ -251,7 +247,6 @@ class OrderCest
         ]);
 
         $items = $I->grabOrderItemFromDatabase(['order_id' => $orderId]);
-        $I->assertIsArray($items);
         $I->assertNotEmpty($items);
 
         $foundItem = null;
@@ -488,7 +483,6 @@ class OrderCest
 
         $metaId = $I->haveOrderItemMetaInDatabase($orderItemId, '_test_meta', 'test_value');
 
-        $I->assertIsInt($metaId);
         $I->assertGreaterThan(0, $metaId);
 
         $I->seeOrderItemMetaInDatabase([

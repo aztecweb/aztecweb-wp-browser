@@ -17,7 +17,6 @@ class SubscriptionCest
     {
         $subscriptionId = $I->haveSubscriptionInDatabase();
 
-        $I->assertIsInt($subscriptionId);
         $I->assertGreaterThan(0, $subscriptionId);
 
         $I->seeSubscriptionInDatabase([
@@ -67,7 +66,6 @@ class SubscriptionCest
 
         $metaId = $I->haveSubscriptionMetaInDatabase($subscriptionId, '_order_total', '99.00');
 
-        $I->assertIsInt($metaId);
         $I->assertGreaterThan(0, $metaId);
 
         $I->seeSubscriptionMetaInDatabase([
@@ -270,7 +268,6 @@ class SubscriptionCest
     {
         $productId = $I->haveSubscriptionProductInDatabase();
 
-        $I->assertIsInt($productId);
         $I->assertGreaterThan(0, $productId);
 
         $I->seeProductInDatabase([

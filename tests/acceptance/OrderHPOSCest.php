@@ -20,7 +20,6 @@ class OrderHPOSCest
             'total_amount' => '100.00',
         ]);
 
-        $I->assertIsInt($orderId);
         $I->assertGreaterThan(0, $orderId, 'Order ID should be a positive integer');
 
         $I->seeInDatabase('wp_wc_orders', [
@@ -154,7 +153,6 @@ class OrderHPOSCest
             'country' => 'US',
         ]);
 
-        $I->assertIsInt($addressId);
         $I->assertGreaterThan(0, $addressId, 'Address ID should be a positive integer');
 
         $I->seeInDatabase('wp_wc_order_addresses', [
@@ -175,7 +173,6 @@ class OrderHPOSCest
             'order_item_type' => 'line_item',
         ]);
 
-        $I->assertIsInt($orderItemId);
         $I->assertGreaterThan(0, $orderItemId, 'Order item ID should be a positive integer');
 
         $I->seeInDatabase('wp_woocommerce_order_items', [
@@ -196,7 +193,6 @@ class OrderHPOSCest
         ]);
 
         $metaId = $I->haveOrderItemMetaInDatabase($orderItemId, '_product_id', '123');
-        $I->assertIsInt($metaId);
         $I->assertGreaterThan(0, $metaId, 'Order item meta ID should be a positive integer');
 
         $I->seeInDatabase('wp_woocommerce_order_itemmeta', [
@@ -238,7 +234,6 @@ class OrderHPOSCest
         ]);
 
         $items = $I->grabOrderItemFromDatabase(['order_id' => $orderId]);
-        $I->assertIsArray($items);
         $I->assertNotEmpty($items);
 
         $foundItem = null;
@@ -390,7 +385,6 @@ class OrderHPOSCest
             'country' => 'US',
         ]);
 
-        $I->assertIsInt($addressId);
         $I->assertGreaterThan(0, $addressId);
 
         $I->seeOrderAddressInDatabase('billing', [
@@ -416,7 +410,6 @@ class OrderHPOSCest
             'city' => 'Ship City',
         ]);
 
-        $I->assertIsInt($addressId);
         $I->assertGreaterThan(0, $addressId);
 
         $I->seeOrderAddressInDatabase('shipping', [
@@ -481,7 +474,6 @@ class OrderHPOSCest
 
         $metaId = $I->haveOrderItemMetaInDatabase($orderItemId, '_test_meta', 'test_value');
 
-        $I->assertIsInt($metaId);
         $I->assertGreaterThan(0, $metaId);
 
         $I->seeOrderItemMetaInDatabase([

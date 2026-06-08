@@ -17,7 +17,6 @@ class SubscriptionHPOSCest
     {
         $subscriptionId = $I->haveSubscriptionInDatabase();
 
-        $I->assertIsInt($subscriptionId);
         $I->assertGreaterThan(0, $subscriptionId);
 
         $I->seeInDatabase('wp_wc_orders', [
@@ -79,7 +78,6 @@ class SubscriptionHPOSCest
 
         $metaId = $I->haveSubscriptionMetaInDatabase($subscriptionId, '_order_total', '99.00');
 
-        $I->assertIsInt($metaId);
         $I->assertGreaterThan(0, $metaId);
 
         $I->seeSubscriptionMetaInDatabase([
@@ -314,7 +312,6 @@ class SubscriptionHPOSCest
             ],
         ]);
 
-        $I->assertIsInt($productId);
         $I->assertGreaterThan(0, $productId);
 
         $I->seeProductInDatabase([

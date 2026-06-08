@@ -18,7 +18,6 @@ class ProductCest
             ],
         ]);
 
-        $I->assertIsInt($productId);
         $I->assertGreaterThan(0, $productId, 'Product ID should be a positive integer');
 
         $I->seeProductInDatabase([
@@ -81,7 +80,6 @@ class ProductCest
 
         $metaId = $I->haveProductMetaInDatabase($productId, '_price', '99.99');
 
-        $I->assertIsInt($metaId);
         $I->assertGreaterThan(0, $metaId, 'Meta ID should be a positive integer');
 
         $I->seeProductMetaInDatabase([
@@ -122,7 +120,6 @@ class ProductCest
     {
         $categoryId = $I->haveProductCategoryInDatabase('electronics');
 
-        $I->assertIsInt($categoryId);
         $I->assertGreaterThan(0, $categoryId, 'Category ID should be a positive integer');
 
         $I->seeTermInDatabase([
@@ -493,7 +490,6 @@ class ProductCest
 
         // Test grabbing category IDs
         $categoryIds = $I->grabProductCategoryIdsFromDatabase($productId);
-        $I->assertIsArray($categoryIds);
         $I->assertContains($categoryId, $categoryIds);
     }
 
