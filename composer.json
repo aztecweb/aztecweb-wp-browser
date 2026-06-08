@@ -41,7 +41,10 @@
       "composer/installers": true,
       "roots/wordpress-core-installer": true
     },
-    "sort-packages": true
+    "sort-packages": true,
+    "platform": {
+      "php": "8.0.0"
+    }
   },
   "extra": {
     "wordpress-install-dir": "public/wp",
