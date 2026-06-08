@@ -1,0 +1,83 @@
+#!/bin/bash
+# Pre-push hook: Run impacted tests before pushing to origin
+#
+# Determines which tests are impacted by changed files and runs them locally
+# via the all-in-one Docker image. Can be bypassed with --no-verify.
+#
+# Maps each changed file to a Cest class. Files that match shared infrastructure
+# trigger a full acceptance test suite run.
+
+set -e
+
+# Determine changed files
+# First, try to get files since tracking branch (most common case)
+if git merge-base --is-ancestor @{push} HEAD 2>/dev/null; then
+    CHANGED_FILES=$(git diff --name-only @{push}..HEAD)
+elif [ -n "$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null)" ]; then
+    CHANGED_FILES=$(git diff --name-only @{u}...HEAD)
+else
+    # Fallback: compare to origin/main
+    CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
+fi
+
+# If no changed files detected, abort — something is off with the git state
+if [ -z "$CHANGED_FILES" ]; then
+    echo "No changed files detected; aborting push. Use --no-verify to bypass." >&2
+    exit 1
+fi
+
+# Map changed files to Cest classes
+declare -a CESTS
+RUN_ALL=0
+
+for file in $CHANGED_FILES; do
+    case "$file" in
+        src/Method/CartMethods.php)
+            CESTS+=("CartCest")
+            ;;
+        src/Method/CheckoutMethods.php)
+            CESTS+=("CheckoutCest")
+            ;;
+        src/Method/CouponMethods.php)
+            CESTS+=("CouponCest")
+            ;;
+        src/Method/CustomerMethods.php)
+            CESTS+=("CustomerCest")
+            ;;
+        src/Method/OrderMethods.php)
+            CESTS+=("OrderCest")
+            ;;
+        src/Method/ProductMethods.php)
+            CESTS+=("ProductCest")
+            ;;
+        # Shared infrastructure: triggers full suite
+        src/aliases.php|src/AztecWPBrowser.php|src/Config/*|src/Page/*|src/OrderStorage/*|src/Storage/*|src/SubscriptionStorage/*|composer.json|composer.lock|phpstan.neon.dist|phpcs.xml.dist|tests/_support/*|tests/acceptance/*)
+            RUN_ALL=1
+            break
+            ;;
+    esac
+done
+
+# Remove duplicates from Cests array
+if [ $RUN_ALL -eq 0 ] && [ ${#CESTS[@]} -gt 0 ]; then
+    CESTS=($(printf '%s\n' "${CESTS[@]}" | sort -u))
+fi
+
+# Run tests
+if [ $RUN_ALL -eq 1 ] || [ ${#CESTS[@]} -eq 0 ]; then
+    echo "Running full acceptance suite..."
+    docker run \
+        --rm \
+        -v "$PWD:/var/www/html" \
+        -w /var/www/html \
+        ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.0 \
+        vendor/bin/codecept run acceptance
+else
+    echo "Running impacted tests: ${CESTS[*]}"
+    docker run \
+        --rm \
+        -v "$PWD:/var/www/html" \
+        -w /var/www/html \
+        ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.0 \
+        vendor/bin/codecept run acceptance "${CESTS[@]}"
+fi

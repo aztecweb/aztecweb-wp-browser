@@ -95,8 +95,10 @@
     "cs": "phpcs",
     "cs:fix": "phpcbf",
     "check": [
+      "composer validate --strict --no-check-publish",
       "@stan",
       "@cs"
-    ]
+    ],
+    "post-install-cmd": "git config core.hooksPath .githooks"
   }
 }
