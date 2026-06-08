@@ -95,7 +95,10 @@
     "wpackagist-theme/storefront": "^4.6"
   },
   "scripts": {
-    "stan": "phpstan analyse --memory-limit 1G",
+    "stan": [
+			"codecept build",
+      "phpstan analyse --memory-limit 1G"
+    ],
     "cs": "phpcs",
     "cs:fix": "phpcbf",
     "check": [
