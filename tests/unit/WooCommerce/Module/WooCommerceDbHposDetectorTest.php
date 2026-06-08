@@ -68,7 +68,8 @@ class WooCommerceDbHposDetectorTest extends Unit
         return $module;
     }
 
-    private function wpDbReturning(string|false $value): WPDb&MockObject
+    /** @return WPDb&MockObject */
+    private function wpDbReturning(string|false $value): WPDb
     {
         $wpDb = $this->createMock(WPDb::class);
         $wpDb->method('grabOptionFromDatabase')
