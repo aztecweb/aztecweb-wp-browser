@@ -1,103 +1,122 @@
-# aztecweb-wp-browser
+# aztecweb/aztecweb-wp-browser
 
-Codeception modules and method traits for WordPress + WooCommerce acceptance
-testing, layered on top of [`lucatume/wp-browser`](https://github.com/lucatume/wp-browser).
+High-level Codeception modules for writing WooCommerce acceptance tests on top of
+[`lucatume/wp-browser`](https://github.com/lucatume/wp-browser).
 
-## Running the test suite
+This library gives test authors a vocabulary of WooCommerce-aware actor methods —
+`haveCouponInDatabase`, `addProductToCart`, `seeOrderStatus` — so you can express
+store behaviour directly instead of hand-rolling SQL and CSS selectors. Order
+storage (HPOS vs. legacy) is detected and encapsulated for you, so the same test
+runs unchanged in both modes.
 
-The test environment is a slim Docker image published to GitHub Container
-Registry (GHCR) — PHP, Chromium, chromedriver, SQLite and Composer. WordPress,
-WooCommerce and the library source come from a bind-mount of the repository, so
-the image does not need to rebuild every time the code changes.
-
-### Quick start
-
-```bash
-bin/test composer install              # one-time: install PHP dependencies
-bin/test bash resources/install.sh     # one-time: bootstrap the SQLite WP site
-bin/test                               # codecept run
-```
-
-`bin/test` is a thin wrapper that runs any command inside the image with the
-repo bind-mounted at `/var/www/html`. With no arguments, it runs the default
-test suite. You can also invoke `docker` directly:
+## Installation
 
 ```bash
-docker run --rm -it \
-    -v "$PWD:/var/www/html" \
-    -w /var/www/html \
-    ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.4 \
-    codecept run acceptance
+composer require --dev aztecweb/aztecweb-wp-browser:^0.1.0
 ```
 
-### Image tags
+Then enable the modules in your acceptance suite (e.g. `tests/acceptance.suite.yml`).
+`WPDb` and `WPWebDriver` must come first, since the Aztec modules build on top of
+them:
 
-The image is published per PHP variant (`:php8.0`, `:php8.4`), plus an
-immutable per-build content tag (`:vYYYYMMDDThhmmssZ-php{N}`) generated from
-the workflow's UTC build timestamp.
+```yaml
+# Default — short form via the Class Alias Trick
+modules:
+    enabled:
+        - WPDb
+        - WPWebDriver
+        - WooCommerceDb
+        - WooCommerceWebDriver
+    config:
+        WPDb:
+            # ...your WPDb config
+        WPWebDriver:
+            # ...your WPWebDriver config
+```
 
-### Building and publishing
+The short names `WooCommerceDb` and `WooCommerceWebDriver` are registered at load
+time via `class_alias` (the **Class Alias Trick**, see
+[ADR-0004](docs/adr/0004-class-alias-trick.md)). If another package already owns
+`Codeception\Module\WooCommerceDb`, the alias is skipped (with a warning) and you
+should reference the modules by their fully-qualified class names instead:
 
-A maintainer fires the
-[`build-test-runner`](.github/workflows/build-test-runner.yml) workflow by
-hand from the GitHub Actions UI (or `gh workflow run build-test-runner.yml`).
-There is no push trigger or cron schedule yet — automatic rebuilds are being
-designed separately in
-[#13](https://github.com/aztecweb/aztecweb-wp-browser/issues/13).
+```yaml
+# Fallback if a class_alias collision is detected (rare)
+modules:
+    enabled:
+        - WPDb
+        - WPWebDriver
+        - \Aztec\WPBrowser\WooCommerce\Module\WooCommerceDb
+        - \Aztec\WPBrowser\WooCommerce\Module\WooCommerceWebDriver
+```
 
-### Browsing the site from the host
-
-The container's PHP server is only reachable inside the container during a test
-run. To open the site in a host browser — for instance to inspect the installed
-state or reproduce a failing scenario manually — use `bin/serve`:
+After enabling the modules, rebuild the actor classes:
 
 ```bash
-bin/serve          # http://localhost:8080/  (reads WP_SERVER_PORT from .env)
+vendor/bin/codecept build
 ```
 
-`bin/serve` starts WP-CLI's built-in server bound to `0.0.0.0` and publishes
-the port to the host. Press Ctrl-C to stop it. The server runs in the
-foreground; open a second terminal for any other `bin/test` commands.
+## Quick start
 
-> **Note:** `bin/serve` is for manual inspection only. The acceptance suite
-> manages its own server via the `BuiltInServerController` extension — do not
-> run both at the same time on the same port.
+```php
+public function customerCheckoutWithCoupon(AcceptanceTester $I): void
+{
+    $productId = $I->haveProductInDatabase(['post_title' => 'Test Product']);
+    $I->havePercentageCouponInDatabase('SAVE10', 10.0);
 
-### Overriding the image
+    $I->amOnCartPage();
+    $I->addProductToCart($productId);
+    $I->seeProductInCart($productId);
+
+    $I->amOnCheckoutPage();
+    $I->applyCouponOnCheckout('SAVE10');
+    $I->seeCouponApplied('SAVE10');
+}
+```
+
+## HPOS support
+
+HPOS (High-Performance Order Storage) is **auto-detected** from the
+`woocommerce_custom_orders_table_enabled` option; no consumer configuration is
+needed. The same order and subscription methods work whether your site uses the
+`wc_orders` tables or the legacy `wp_posts` storage. See
+[ADR-0005](docs/adr/0005-hpos-detection-encapsulation.md) for details.
+
+## Architecture
+
+The library favours **composition over inheritance**: each WooCommerce module
+composes domain-specific method traits rather than extending a base module
+([ADR-0002](docs/adr/0002-composition-over-extension.md)). Capabilities are split
+**one module per plugin concern** — `WooCommerceDb`, `WooCommerceWebDriver`, and
+the Action Scheduler subnamespace
+([ADR-0003](docs/adr/0003-module-per-plugin-architecture.md)) — and HPOS detection
+is encapsulated behind the order storage interfaces so tests stay storage-agnostic.
+See [`CONTEXT.md`](CONTEXT.md) for shared vocabulary and [`docs/adr/`](docs/adr/)
+for the full design rationale.
+
+## Local development
+
+This repo runs its own test suite inside a self-contained Docker image via the
+`bin/test` wrapper, which bind-mounts the repo at `/var/www/html`.
 
 ```bash
-AZTEC_TEST_IMAGE=ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.0 \
-    bin/test codecept run acceptance
+bin/test composer install                    # install deps (also installs the pre-push hook)
+bin/test bash resources/install.sh           # bootstrap the SQLite WordPress site (idempotent)
+bin/test codecept build                      # rebuild actor classes after method signature changes
+bin/test codecept run                        # run all suites
+bin/test codecept run acceptance CouponCest  # run a single Cest
+bin/serve                                    # start WP-CLI server at http://localhost:8080/ for manual browsing
+composer check                               # validate composer.json, run PHPStan and PHPCS
 ```
 
-### Running against PHP 8.0
+The port defaults to `8080` and can be overridden by setting `WP_SERVER_PORT` in a `.env` file.
 
-The default image ships PHP 8.4 and the committed `composer.lock` is resolved
-against PHP 8.4. Running against the PHP 8.0 image requires resolving
-dependencies fresh inside that image, because some packages locked for 8.4 do
-not support 8.0.
-
-```bash
-# Remove the vendor directory so Composer starts clean
-rm -rf vendor
-
-# Resolve dependencies for PHP 8.0 (rewrites composer.lock)
-AZTEC_TEST_IMAGE=ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.0 \
-    bin/test composer update
-
-# Bootstrap the site (required after a clean vendor install)
-AZTEC_TEST_IMAGE=ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.0 \
-    bin/test bash resources/install.sh
-
-# Run the suite
-AZTEC_TEST_IMAGE=ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.0 \
-    bin/test
-```
-
-> **Note:** `composer update` rewrites `composer.lock` with PHP-8.0-compatible
-> package versions (Symfony 6.x, older Codeception 5.x releases). Do not commit
-> the rewritten lock file — restore it afterwards with `git checkout composer.lock`
-> and reinstall for your usual image: `bin/test composer install`.
+`composer install` wires up the pre-push hook by running
+`git config core.hooksPath .githooks` (the `post-install-cmd` script). The hook
+([`.githooks/pre-push`](.githooks/pre-push)) runs only the tests impacted by your
+changed files, and falls back to the full acceptance suite when shared
+infrastructure changes. In an emergency you can bypass it with
+`git push --no-verify` — but CI is the authoritative gate.
 
 ### Running the CI workflow locally with `act`
 
@@ -126,3 +145,18 @@ act push -j acceptance \
 > **Note:** `GITHUB_TOKEN` is required to pull the runner image from GHCR.
 > `$(gh auth token)` uses your existing GitHub CLI session. Alternatively,
 > pass a personal access token with `read:packages` scope.
+
+## Contributing
+
+Contributions go through pull request: review is required, CI must be green, and
+new public methods on the modules and method traits must carry the full PHPDoc
+skeleton (see the docblock convention in [`CLAUDE.md`](CLAUDE.md), which also
+documents the guidelines for AI coding assistants).
+
+## License
+
+[MIT](LICENSE).
+
+## Changelog
+
+See [`CHANGELOG.md`](CHANGELOG.md).

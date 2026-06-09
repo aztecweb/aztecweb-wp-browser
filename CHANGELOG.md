@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `resources/install.sh` — idempotent script that bootstraps the SQLite WordPress site (`wp core install`, plugin/theme activation, HPOS sync), with the WP-CLI calls collapsed to four.
 - `.github/workflows/acceptance.yml` — CI workflow that runs the acceptance suite against PHP 8.0 and 8.4 on every push and pull request, using the published GHCR runner image.
 - `.github/workflows/build-test-runner.yml` — manual-trigger workflow (`workflow_dispatch` only) that builds the image for both PHP variants and pushes to GHCR as `${repo}-runner:php{N}` plus an immutable `:vYYYYMMDDThhmmssZ-php{N}` content tag. Automatic triggers (push, cron) are deferred to [#13](https://github.com/aztecweb/aztecweb-wp-browser/issues/13).
+- Consumer-facing `README.md`: requirements, installation with the `suite.yml` snippet (short-form and FQN fallback), quick-start Cest, a per-domain method index across `WooCommerceDb` and `WooCommerceWebDriver`, an HPOS note, an architecture paragraph linking the ADRs, and local-development/contributing sections ([#8](https://github.com/aztecweb/aztecweb-wp-browser/issues/8)).
 
 ### Changed
 
