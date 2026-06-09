@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Aztec\WPBrowser\CodeSniffer\Sniffs;
+namespace AztecWPBrowser\Sniffs\Docblock;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
@@ -39,7 +39,6 @@ class RequirePublicMethodDocBlockSniff implements Sniff
         /** @var array<int, PhpcsToken> $tokens */
         $tokens = $phpcsFile->getTokens();
 
-        // Get the fully qualified namespace and class/trait name
         $namespace = $this->getNamespace($phpcsFile, $stackPtr);
         $classOrTraitName = $phpcsFile->getDeclarationName($stackPtr);
 
@@ -47,50 +46,61 @@ class RequirePublicMethodDocBlockSniff implements Sniff
             return;
         }
 
-        // Check if this class/trait should be enforced
         if (!$this->shouldEnforce($namespace)) {
             return;
         }
 
-        // Find all methods in this class/trait
         $classOpenBrace = $phpcsFile->findNext(T_OPEN_CURLY_BRACKET, $stackPtr);
         if ($classOpenBrace === false) {
             return;
         }
         $classCloseBrace = $tokens[$classOpenBrace]['bracket_closer'];
 
-        // Search for all function declarations within this class/trait
         for ($i = $classOpenBrace; $i < $classCloseBrace; $i++) {
             if ($tokens[$i]['code'] !== T_FUNCTION) {
                 continue;
             }
 
-            // Check if this is a public method
             $visibility = $this->getMethodVisibility($phpcsFile, $i);
             if ($visibility !== 'public') {
                 continue;
             }
 
-            // Get the method name
             $methodName = $phpcsFile->getDeclarationName($i);
             if (!$methodName) {
                 continue;
             }
 
-            // Check if the method has a docblock with @example
+            // Skip Codeception lifecycle hooks (_initialize, _before, _after, etc.)
+            if (str_starts_with($methodName, '_')) {
+                continue;
+            }
+
             $docComment = $this->getDocComment($phpcsFile, $i);
-            if ($docComment && $this->hasExampleTag($docComment)) {
+            if (!$docComment || !$this->hasExampleTag($docComment)) {
+                $phpcsFile->addError(
+                    sprintf(
+                        'Public method %s() in %s class must have a non-empty docblock with @example tag',
+                        $methodName,
+                        $namespace,
+                    ),
+                    $i,
+                    'MissingDocBlock',
+                );
+                continue;
+            }
+
+            if ($this->hasCorrectAnnotationOrder($docComment)) {
                 continue;
             }
 
             $phpcsFile->addError(
                 sprintf(
-                    'Public method %s() in %s class must have a non-empty docblock with @example tag',
+                    'Public method %s() docblock must order annotations as: @example, @param, @return, @throws',
                     $methodName,
-                    $namespace,
                 ),
                 $i,
-                'MissingDocBlock',
+                'WrongAnnotationOrder',
             );
         }
     }
@@ -109,10 +119,8 @@ class RequirePublicMethodDocBlockSniff implements Sniff
         $tokens = $phpcsFile->getTokens();
         $namespace = '';
 
-        // Search backward for a namespace declaration
         for ($i = $stackPtr - 1; $i >= 0; $i--) {
             if ($tokens[$i]['code'] === T_NAMESPACE) {
-                // Get the namespace content
                 $i++;
                 while ($i < $stackPtr) {
                     if ($tokens[$i]['code'] === T_NS_SEPARATOR || $tokens[$i]['code'] === T_STRING) {
@@ -138,7 +146,6 @@ class RequirePublicMethodDocBlockSniff implements Sniff
      */
     private function shouldEnforce(string $namespace): bool
     {
-        // Check if namespace matches Aztec\WPBrowser\*\Module\ or Aztec\WPBrowser\*\Method\
         return (
             (strpos($namespace, 'Aztec\\WPBrowser\\') === 0 && strpos($namespace, '\\Module\\') !== false) ||
             (strpos($namespace, 'Aztec\\WPBrowser\\') === 0 && strpos($namespace, '\\Method\\') !== false) ||
@@ -160,7 +167,6 @@ class RequirePublicMethodDocBlockSniff implements Sniff
         /** @var array<int, PhpcsToken> $tokens */
         $tokens = $phpcsFile->getTokens();
 
-        // Search backward for visibility modifier
         for ($i = $stackPtr - 1; $i >= 0; $i--) {
             if ($tokens[$i]['code'] === T_PUBLIC) {
                 return 'public';
@@ -175,8 +181,7 @@ class RequirePublicMethodDocBlockSniff implements Sniff
             }
 
             if ($tokens[$i]['code'] === T_OPEN_CURLY_BRACKET) {
-                // We've hit the start of the class/trait, stop looking
-                return 'public'; // Default to public if no visibility found (PHP default)
+                return 'public';
             }
         }
 
@@ -200,7 +205,6 @@ class RequirePublicMethodDocBlockSniff implements Sniff
         // Search backward for T_DOC_COMMENT_CLOSE_TAG, skipping modifiers and whitespace.
         for ($i = $stackPtr - 1; $i >= 0; $i--) {
             if ($tokens[$i]['code'] === T_DOC_COMMENT_CLOSE_TAG) {
-                // Reconstruct the full docblock content from open to close tag.
                 $openPtr = $tokens[$i]['comment_opener'];
                 $content = '';
                 for ($j = $openPtr; $j <= $i; $j++) {
@@ -217,7 +221,6 @@ class RequirePublicMethodDocBlockSniff implements Sniff
                 $tokens[$i]['code'] !== T_STATIC &&
                 $tokens[$i]['code'] !== T_ABSTRACT
             ) {
-                // We've hit something that's not a whitespace or modifier
                 return null;
             }
         }
@@ -235,5 +238,37 @@ class RequirePublicMethodDocBlockSniff implements Sniff
     private function hasExampleTag(string $docBlock): bool
     {
         return (bool)preg_match('/@example\s/i', $docBlock);
+    }
+
+    /**
+     * Check that annotations appear in the required order: @example, @param, @return, @throws.
+     *
+     * @param string $docBlock The docblock content.
+     *
+     * @return bool
+     */
+    private function hasCorrectAnnotationOrder(string $docBlock): bool
+    {
+        $order = ['@example', '@param', '@return', '@throws'];
+        $positions = [];
+
+        foreach ($order as $tag) {
+            $pos = strpos($docBlock, $tag);
+            if ($pos === false) {
+                continue;
+            }
+
+            $positions[$tag] = $pos;
+        }
+
+        $found = array_values($positions);
+
+        for ($i = 0; $i < count($found) - 1; $i++) {
+            if ($found[$i] > $found[$i + 1]) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
