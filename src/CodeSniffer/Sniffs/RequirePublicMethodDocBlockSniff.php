@@ -7,6 +7,13 @@ namespace Aztec\WPBrowser\CodeSniffer\Sniffs;
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
 
+/**
+ * phpcs returns weakly-typed token stacks (File::getTokens() is annotated only
+ * as `array`). Describe the token keys this sniff reads so PHPStan can analyse
+ * it at the strictest level without per-access casts.
+ *
+ * @phpstan-type PhpcsToken array{code: int|string, content: string, bracket_closer: int, comment_opener: int}
+ */
 class RequirePublicMethodDocBlockSniff implements Sniff
 {
     /**
@@ -29,8 +36,8 @@ class RequirePublicMethodDocBlockSniff implements Sniff
      */
     public function process(File $phpcsFile, $stackPtr): void
     {
+        /** @var array<int, PhpcsToken> $tokens */
         $tokens = $phpcsFile->getTokens();
-        $token = $tokens[$stackPtr];
 
         // Get the fully qualified namespace and class/trait name
         $namespace = $this->getNamespace($phpcsFile, $stackPtr);
@@ -47,6 +54,9 @@ class RequirePublicMethodDocBlockSniff implements Sniff
 
         // Find all methods in this class/trait
         $classOpenBrace = $phpcsFile->findNext(T_OPEN_CURLY_BRACKET, $stackPtr);
+        if ($classOpenBrace === false) {
+            return;
+        }
         $classCloseBrace = $tokens[$classOpenBrace]['bracket_closer'];
 
         // Search for all function declarations within this class/trait
@@ -73,9 +83,6 @@ class RequirePublicMethodDocBlockSniff implements Sniff
                 continue;
             }
 
-            $line = $tokens[$i]['line'];
-            $column = $tokens[$i]['column'];
-
             $phpcsFile->addError(
                 sprintf(
                     'Public method %s() in %s class must have a non-empty docblock with @example tag',
@@ -98,6 +105,7 @@ class RequirePublicMethodDocBlockSniff implements Sniff
      */
     private function getNamespace(File $phpcsFile, int $stackPtr): string
     {
+        /** @var array<int, PhpcsToken> $tokens */
         $tokens = $phpcsFile->getTokens();
         $namespace = '';
 
@@ -149,6 +157,7 @@ class RequirePublicMethodDocBlockSniff implements Sniff
      */
     private function getMethodVisibility(File $phpcsFile, int $stackPtr): string
     {
+        /** @var array<int, PhpcsToken> $tokens */
         $tokens = $phpcsFile->getTokens();
 
         // Search backward for visibility modifier
@@ -184,6 +193,7 @@ class RequirePublicMethodDocBlockSniff implements Sniff
      */
     private function getDocComment(File $phpcsFile, int $stackPtr): ?string
     {
+        /** @var array<int, PhpcsToken> $tokens */
         $tokens = $phpcsFile->getTokens();
 
         // phpcs tokenizes doc comments into individual tokens, not a single T_DOC_COMMENT.
