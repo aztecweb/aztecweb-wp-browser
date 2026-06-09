@@ -18,12 +18,40 @@ trait CheckoutMethods
     abstract protected function pageObjectProvider(): PageObjectProvider;
     abstract protected function selector(mixed $value): string;
 
+    /**
+     * Navigate to the WooCommerce checkout page and wait for the checkout form to load.
+     *
+     * @example
+     * ```php
+     * $productId = $I->haveProductInDatabase(['post_title' => 'Test Product']);
+     * $I->addProductToCart($productId);
+     * $I->amOnCheckoutPage();
+     * $I->seeElement('.wc-block-checkout');
+     * ```
+     *
+     * @return void
+     */
     public function amOnCheckoutPage(): void
     {
         $this->wpWebDriver()->amOnPage($this->wooCommerceConfig()->checkoutPageSlug());
         $this->wpWebDriver()->waitForElement('.wc-block-checkout');
     }
 
+    /**
+     * Fill a single checkout field by name, supporting both text inputs and select elements.
+     *
+     * @example
+     * ```php
+     * $I->amOnCheckoutPage();
+     * $I->fillCheckoutField('billing_first_name', 'John');
+     * $I->fillCheckoutField('billing_email', 'john@example.com');
+     * ```
+     *
+     * @param string $field  Checkout field name (e.g., 'billing_first_name', 'billing_country')
+     * @param string $value  Value to fill in the field
+     *
+     * @return void
+     */
     public function fillCheckoutField(string $field, string $value): void
     {
         /** @var CheckoutPageObject $page */
@@ -45,7 +73,23 @@ trait CheckoutMethods
     /**
      * Fill the checkout form with the given data.
      *
-     * @param array<string, mixed> $data Field names and values.
+     * @example
+     * ```php
+     * $I->amOnCheckoutPage();
+     * $checkoutData = [
+     *     'billing_first_name' => 'John',
+     *     'billing_last_name' => 'Doe',
+     *     'billing_email' => 'john@example.com',
+     *     'billing_address_1' => '123 Main St',
+     *     'billing_city' => 'New York',
+     *     'billing_postcode' => '10001',
+     * ];
+     * $I->fillCheckoutForm($checkoutData);
+     * ```
+     *
+     * @param array<string, mixed> $data Field names and string values to fill
+     *
+     * @return void
      */
     public function fillCheckoutForm(array $data): void
     {
@@ -58,6 +102,20 @@ trait CheckoutMethods
         }
     }
 
+    /**
+     * Select a payment method on the checkout page by its method ID.
+     *
+     * @example
+     * ```php
+     * $I->amOnCheckoutPage();
+     * $I->selectPaymentMethod('cod');
+     * $I->seePaymentMethodSelected('cod');
+     * ```
+     *
+     * @param string $methodId  Payment method ID (e.g., 'cod', 'bacs')
+     *
+     * @return void
+     */
     public function selectPaymentMethod(string $methodId): void
     {
         $labelSelector = sprintf('label[for="radio-control-wc-payment-method-options-%s"]', $methodId);
@@ -69,6 +127,19 @@ trait CheckoutMethods
         $this->wpWebDriver()->waitForElementVisible($containerSelector);
     }
 
+    /**
+     * Verify that a payment method is available on the checkout page.
+     *
+     * @example
+     * ```php
+     * $I->amOnCheckoutPage();
+     * $I->seePaymentMethodAvailable('cod');
+     * ```
+     *
+     * @param string $methodId  Payment method ID to verify is available
+     *
+     * @return void
+     */
     public function seePaymentMethodAvailable(string $methodId): void
     {
         $labelSelector = sprintf('label[for="radio-control-wc-payment-method-options-%s"]', $methodId);
@@ -76,12 +147,39 @@ trait CheckoutMethods
         $this->wpWebDriver()->seeElement($labelSelector);
     }
 
+    /**
+     * Verify that a payment method is not available on the checkout page.
+     *
+     * @example
+     * ```php
+     * $I->amOnCheckoutPage();
+     * $I->dontSeePaymentMethodAvailable('nonexistent_payment');
+     * ```
+     *
+     * @param string $methodId  Payment method ID to verify is not available
+     *
+     * @return void
+     */
     public function dontSeePaymentMethodAvailable(string $methodId): void
     {
         $labelSelector = sprintf('label[for="radio-control-wc-payment-method-options-%s"]', $methodId);
         $this->wpWebDriver()->dontSeeElement($labelSelector);
     }
 
+    /**
+     * Verify that a payment method is currently selected on the checkout page.
+     *
+     * @example
+     * ```php
+     * $I->amOnCheckoutPage();
+     * $I->selectPaymentMethod('cod');
+     * $I->seePaymentMethodSelected('cod');
+     * ```
+     *
+     * @param string $methodId  Payment method ID to verify is selected
+     *
+     * @return void
+     */
     public function seePaymentMethodSelected(string $methodId): void
     {
         /** @var CheckoutPageObject $page */
@@ -93,6 +191,22 @@ trait CheckoutMethods
         $this->wpWebDriver()->seeElement($containerSelector);
     }
 
+    /**
+     * Click the "Place Order" button on the checkout page to submit the order.
+     *
+     * @example
+     * ```php
+     * $I->amOnCheckoutPage();
+     * $I->fillCheckoutForm([
+     *     'billing_first_name' => 'John',
+     *     'billing_email' => 'john@example.com',
+     * ]);
+     * $I->selectPaymentMethod('cod');
+     * $I->placeOrder();
+     * ```
+     *
+     * @return void
+     */
     public function placeOrder(): void
     {
         /** @var CheckoutPageObject $page */
@@ -105,6 +219,20 @@ trait CheckoutMethods
         $this->wpWebDriver()->executeJS('document.querySelector(arguments[0]).click()', [$selector]);
     }
 
+    /**
+     * Apply a coupon code on the checkout page.
+     *
+     * @example
+     * ```php
+     * $I->amOnCheckoutPage();
+     * $I->applyCouponOnCheckout('discount-10');
+     * $I->seeCouponApplied('discount-10');
+     * ```
+     *
+     * @param string $couponCode  Coupon code to apply
+     *
+     * @return void
+     */
     public function applyCouponOnCheckout(string $couponCode): void
     {
         /** @var CheckoutPageObject $page */
@@ -116,6 +244,20 @@ trait CheckoutMethods
         $this->wpWebDriver()->click($this->selector($page::COUPON_APPLY_BUTTON_SELECTOR));
     }
 
+    /**
+     * Verify that a coupon code has been successfully applied on the checkout page.
+     *
+     * @example
+     * ```php
+     * $I->amOnCheckoutPage();
+     * $I->applyCouponOnCheckout('discount-10');
+     * $I->seeCouponApplied('discount-10');
+     * ```
+     *
+     * @param string $couponCode  Coupon code to verify was applied
+     *
+     * @return void
+     */
     public function seeCouponApplied(string $couponCode): void
     {
         /** @var CheckoutPageObject $page */
@@ -125,6 +267,19 @@ trait CheckoutMethods
         $this->wpWebDriver()->see($couponCode, $selector);
     }
 
+    /**
+     * Verify that a coupon code has not been applied on the checkout page.
+     *
+     * @example
+     * ```php
+     * $I->amOnCheckoutPage();
+     * $I->dontSeeCouponApplied('invalid-coupon');
+     * ```
+     *
+     * @param string $couponCode  Coupon code to verify was not applied
+     *
+     * @return void
+     */
     public function dontSeeCouponApplied(string $couponCode): void
     {
         /** @var CheckoutPageObject $page */
@@ -133,6 +288,21 @@ trait CheckoutMethods
         $this->wpWebDriver()->dontSee($couponCode, $selector);
     }
 
+    /**
+     * Verify that a coupon error message is displayed on the checkout page.
+     *
+     * @example
+     * ```php
+     * $I->amOnCheckoutPage();
+     * $I->applyCouponOnCheckout('invalid-coupon');
+     * $I->seeCouponError();
+     * $I->seeCouponError('Coupon');
+     * ```
+     *
+     * @param string|null $message  Optional error message text to verify (if null, just checks error container is visible)
+     *
+     * @return void
+     */
     public function seeCouponError(?string $message = null): void
     {
         /** @var CheckoutPageObject $page */
@@ -148,6 +318,21 @@ trait CheckoutMethods
         }
     }
 
+    /**
+     * Verify that a checkout error message is displayed on the checkout page.
+     *
+     * @example
+     * ```php
+     * $I->amOnCheckoutPage();
+     * $I->placeOrder();
+     * $I->seeCheckoutError();
+     * $I->seeCheckoutError('Billing');
+     * ```
+     *
+     * @param string|null $message  Optional error message text to verify (if null, just checks error container is visible)
+     *
+     * @return void
+     */
     public function seeCheckoutError(?string $message = null): void
     {
         /** @var CheckoutPageObject $page */
@@ -163,6 +348,24 @@ trait CheckoutMethods
         }
     }
 
+    /**
+     * Verify that a checkout error message is not displayed on the checkout page.
+     *
+     * @example
+     * ```php
+     * $I->amOnCheckoutPage();
+     * $checkoutData = [
+     *     'billing_first_name' => 'John',
+     *     'billing_email' => 'john@example.com',
+     * ];
+     * $I->fillCheckoutForm($checkoutData);
+     * $I->dontSeeCheckoutError();
+     * ```
+     *
+     * @param string|null $message  Optional error message text to verify is not shown (if null, checks error container is not visible)
+     *
+     * @return void
+     */
     public function dontSeeCheckoutError(?string $message = null): void
     {
         /** @var CheckoutPageObject $page */
@@ -177,6 +380,18 @@ trait CheckoutMethods
         }
     }
 
+    /**
+     * Verify that the order confirmation page (order received) is displayed.
+     *
+     * @example
+     * ```php
+     * $I->placeOrder();
+     * $I->waitForElement('.woocommerce-order, .wp-block-woocommerce-order-confirmation-status', 30);
+     * $I->seeOrderReceived();
+     * ```
+     *
+     * @return void
+     */
     public function seeOrderReceived(): void
     {
         /** @var CheckoutPageObject $page */
@@ -187,6 +402,19 @@ trait CheckoutMethods
         $this->wpWebDriver()->seeElement($this->selector($page::ORDER_RECEIVED_SELECTOR));
     }
 
+    /**
+     * Extract the order ID from the order confirmation page.
+     *
+     * @example
+     * ```php
+     * $I->placeOrder();
+     * $I->seeOrderReceived();
+     * $orderId = $I->grabOrderIdFromOrderReceived();
+     * $I->assertGreaterThan(0, $orderId);
+     * ```
+     *
+     * @return int Order ID from the confirmation page
+     */
     public function grabOrderIdFromOrderReceived(): int
     {
         /** @var CheckoutPageObject $page */
@@ -198,12 +426,42 @@ trait CheckoutMethods
         return (int) $orderText;
     }
 
+    /**
+     * Verify that a checkout field contains the expected value.
+     *
+     * @example
+     * ```php
+     * $I->amOnCheckoutPage();
+     * $I->fillCheckoutField('billing_first_name', 'John');
+     * $I->seeCheckoutFieldValue('billing_first_name', 'John');
+     * ```
+     *
+     * @param string $field  Checkout field name to verify
+     * @param string $value  Expected field value
+     *
+     * @return void
+     */
     public function seeCheckoutFieldValue(string $field, string $value): void
     {
         $selector = $this->pageObjectProvider()->checkoutPage()->getFieldSelector($field);
         $this->wpWebDriver()->seeInField($selector, $value);
     }
 
+    /**
+     * Extract the current value from a checkout field.
+     *
+     * @example
+     * ```php
+     * $I->amOnCheckoutPage();
+     * $I->fillCheckoutField('billing_first_name', 'Jane');
+     * $value = $I->grabCheckoutFieldValue('billing_first_name');
+     * $I->assertSame('Jane', $value);
+     * ```
+     *
+     * @param string $field  Checkout field name to extract value from
+     *
+     * @return string Field value (empty string if field is empty)
+     */
     public function grabCheckoutFieldValue(string $field): string
     {
         $selector = $this->pageObjectProvider()->checkoutPage()->getFieldSelector($field);
