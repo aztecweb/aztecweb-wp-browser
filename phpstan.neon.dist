@@ -3,12 +3,20 @@ parameters:
     paths:
         - src
         - tests
+    bootstrapFiles:
+        # phpcs ships its own autoloader (not composer PSR-4). Load it so
+        # PHPStan can resolve PHP_CodeSniffer types used by the custom sniff
+        # and its tests instead of excluding them from analysis.
+        - vendor/squizlabs/php_codesniffer/autoload.php
+        # phpcs defines its custom token constants (T_OPEN_CURLY_BRACKET,
+        # T_SEMICOLON, T_DOC_COMMENT_CLOSE_TAG, ...) via define() in Tokens.php,
+        # which the autoloader does not pull in. Load it so PHPStan sees them.
+        - vendor/squizlabs/php_codesniffer/src/Util/Tokens.php
     scanDirectories:
         - tests/_support
     excludePaths:
         analyse:
             - tests/_support/_generated
-            # phpcs uses a custom autoloader (not composer PSR-4), so its types
-            # are unavailable to PHPStan. Exclude the custom sniff and its tests.
-            - src/CodeSniffer
-            - tests/unit/CodeSniffer
+            # Fixtures are intentionally-malformed sample files fed to the sniff
+            # under test; they are inputs, not code to be analysed.
+            - tests/unit/CodeSniffer/Fixtures
