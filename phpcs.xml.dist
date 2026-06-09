@@ -45,6 +45,8 @@
                 <element key="tests/acceptance" value="Aztec\WPBrowser\Tests\Acceptance"/>
             </property>
         </properties>
+        <!-- Fixture files intentionally use target namespaces, not their file-path namespace. -->
+        <exclude-pattern>tests/unit/CodeSniffer/Fixtures</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue"/>
@@ -55,6 +57,13 @@
 
     <rule ref="SlevomatCodingStandard.ControlStructures.DisallowYodaComparison"/>
     <rule ref="SlevomatCodingStandard.ControlStructures.EarlyExit"/>
+
+    <!-- Docblock @example and @param lines may exceed 120 chars; ignore comments. -->
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="ignoreComments" value="true"/>
+        </properties>
+    </rule>
 
     <rule ref="SlevomatCodingStandard.Variables.UselessVariable"/>
     <rule ref="SlevomatCodingStandard.Commenting.UselessFunctionDocComment"/>

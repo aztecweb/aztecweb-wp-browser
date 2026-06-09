@@ -8,3 +8,7 @@ parameters:
     excludePaths:
         analyse:
             - tests/_support/_generated
+            # phpcs uses a custom autoloader (not composer PSR-4), so its types
+            # are unavailable to PHPStan. Exclude the custom sniff and its tests.
+            - src/CodeSniffer
+            - tests/unit/CodeSniffer
