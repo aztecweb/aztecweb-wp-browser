@@ -9,16 +9,6 @@ store behaviour directly instead of hand-rolling SQL and CSS selectors. Order
 storage (HPOS vs. legacy) is detected and encapsulated for you, so the same test
 runs unchanged in both modes.
 
-## Requirements
-
-| Dependency | Version |
-| --- | --- |
-| PHP | `^8.0` |
-| `codeception/codeception` | `^5.0` |
-| `lucatume/wp-browser` | `^4.3` |
-| WordPress | any version your suite targets |
-| WooCommerce | any version your suite targets |
-
 ## Installation
 
 ```bash
@@ -83,112 +73,6 @@ public function customerCheckoutWithCoupon(AcceptanceTester $I): void
     $I->seeCouponApplied('SAVE10');
 }
 ```
-
-## Provided modules and methods
-
-Methods are split across two Codeception modules. `WooCommerceDb` provides
-database-backed setup and assertions; `WooCommerceWebDriver` provides
-browser-backed actions and assertions. Each bullet lists related methods — see the
-linked source for full signatures and PHPDoc.
-
-### WooCommerceDb (database-backed)
-
-**Coupon** — [`CouponMethods.php`](src/WooCommerce/Method/CouponMethods.php)
-
-- `haveCouponInDatabase` / `havePercentageCouponInDatabase` /
-  `haveFixedCartCouponInDatabase` / `haveFixedProductCouponInDatabase` /
-  `haveFreeShippingCouponInDatabase` — create coupons of each discount type.
-- `haveCouponMetaInDatabase` / `haveCouponStatus` — set coupon meta and status.
-- `grabCouponMetaFromDatabase` / `grabCouponIdFromDatabase` / `grabCouponStatus` —
-  read coupon data.
-- `seeCouponInDatabase` / `seeCouponMetaInDatabase` / `seeCouponStatus` /
-  `dontSeeCouponInDatabase` / `dontSeeCouponMetaInDatabase` — assertions.
-
-**Customer** — [`CustomerMethods.php`](src/WooCommerce/Method/CustomerMethods.php)
-
-- `haveCustomerInDatabase` / `haveCustomerMetaInDatabase` /
-  `haveCustomerBillingFieldInDatabase` / `haveCustomerShippingFieldInDatabase` —
-  create customers and set their fields.
-- `grabCustomerFieldFromDatabase` / `grabCustomerMeta` /
-  `grabCustomerBillingAddress` / `grabCustomerShippingAddress` /
-  `grabCustomerIdFromDatabase` — read customer data.
-- `seeCustomerInDatabase` / `seeCustomerMetaInDatabase` /
-  `seeCustomerBillingFieldInDatabase` / `seeCustomerShippingFieldInDatabase` /
-  `dontSeeCustomerInDatabase` / `dontSeeCustomerMetaInDatabase` — assertions.
-
-**Order** — [`OrderMethods.php`](src/WooCommerce/Method/OrderMethods.php)
-
-- `haveOrderInDatabase` / `haveManyOrdersInDatabase` / `haveOrderMetaInDatabase` /
-  `haveOrderAddressInDatabase` / `haveOrderItemInDatabase` /
-  `haveOrderItemMetaInDatabase` / `haveOrderStatus` — create orders and their parts.
-- `grabOrderMeta` / `grabOrderStatus` / `grabOrderIdFromDatabase` /
-  `grabOrderItemFromDatabase` / `grabOrderItemsTableName` — read order data.
-- `seeOrderInDatabase` / `seeOrderMetaInDatabase` / `seeOrderItemInDatabase` /
-  `seeOrderItemMetaInDatabase` / `seeOrderAddressInDatabase` / `seeOrderStatus` /
-  `dontSeeOrderItemInDatabase` / `dontSeeOrderItemMetaInDatabase` — assertions
-  (HPOS/legacy criteria auto-mapped).
-
-**Product** — [`ProductMethods.php`](src/WooCommerce/Method/ProductMethods.php)
-
-- `haveProductInDatabase` / `haveManyProductsInDatabase` /
-  `haveProductMetaInDatabase` / `haveProductCategoryInDatabase` /
-  `haveProductCategoryRelationshipInDatabase` / `haveProductInCategoriesInDatabase` —
-  create products and categorise them.
-- `grabProductMetaFromDatabase` / `grabProductCategoriesFromDatabase` /
-  `grabProductCategoryIdsFromDatabase` / `grabProductIdFromDatabase` /
-  `grabProductFieldFromDatabase` / `grabProductsTableName` — read product data.
-- `seeProductInDatabase` / `seeProductMetaInDatabase` /
-  `seeProductInCategoryInDatabase` / `dontSeeProductInDatabase` /
-  `dontSeeProductMetaInDatabase` — assertions.
-
-**Subscription** — [`SubscriptionMethods.php`](src/WooCommerce/Method/SubscriptionMethods.php)
-
-- `haveSubscriptionInDatabase` / `haveSubscriptionProductInDatabase` /
-  `haveSubscriptionMetaInDatabase` / `haveSubscriptionStatus` — create
-  subscriptions and products.
-- `cancelSubscription` / `reactivateSubscription` / `expireSubscription` /
-  `suspendSubscription` / `pendingCancelSubscription` — transition status.
-- `grabSubscriptionIdFromDatabase` / `grabSubscriptionFieldFromDatabase` /
-  `grabSubscriptionMetaFromDatabase` / `grabSubscriptionStatus` — read data.
-- `seeSubscriptionInDatabase` / `seeSubscriptionMetaInDatabase` /
-  `seeSubscriptionStatus` / `dontSeeSubscriptionInDatabase` /
-  `dontSeeSubscriptionMetaInDatabase` — assertions.
-
-**Action Scheduler** — [`ActionMethods.php`](src/ActionScheduler/Method/ActionMethods.php)
-
-- `haveActionInDatabase` / `haveActionGroupInDatabase` — schedule actions and groups.
-- `runScheduledActions` / `cancelActionInDatabase` / `markActionCompleteInDatabase` —
-  drive action state.
-- `grabActionIdFromDatabase` / `grabActionStatusFromDatabase` /
-  `grabActionsFromDatabase` / `grabActionLogFromDatabase` — read action data.
-- `seeActionScheduled` / `seeActionInDatabase` / `seeActionInGroupInDatabase` /
-  `seeActionMetaInDatabase` / `dontSeeActionScheduled` — assertions.
-
-### WooCommerceWebDriver (browser-backed)
-
-**Cart** — [`CartMethods.php`](src/WooCommerce/Method/CartMethods.php)
-
-- `amOnCartPage` / `addProductToCart` / `clearCart` — navigate and mutate the cart.
-- `seeProductInCart` / `dontSeeProductInCart` / `seeCartItemQuantity` /
-  `seeCartTotalQuantity` — assertions.
-
-**Checkout** — [`CheckoutMethods.php`](src/WooCommerce/Method/CheckoutMethods.php)
-
-- `amOnCheckoutPage` / `fillCheckoutField` / `fillCheckoutForm` /
-  `selectPaymentMethod` / `placeOrder` / `applyCouponOnCheckout` — drive checkout.
-- `seePaymentMethodAvailable` / `dontSeePaymentMethodAvailable` /
-  `seePaymentMethodSelected` / `seeCouponApplied` / `dontSeeCouponApplied` /
-  `seeCouponError` / `seeCheckoutError` / `dontSeeCheckoutError` /
-  `seeOrderReceived` / `seeCheckoutFieldValue` — assertions.
-- `grabOrderIdFromOrderReceived` / `grabCheckoutFieldValue` — read page data.
-
-**Customer (browser)** — [`CustomerBrowserMethods.php`](src/WooCommerce/Method/CustomerBrowserMethods.php)
-
-- `amOnMyAccountPage` — navigate to the My Account page.
-
-**Order (browser)** — [`OrderBrowserMethods.php`](src/WooCommerce/Method/OrderBrowserMethods.php)
-
-- `amOnAdminOrderPage` — open an order's admin edit page (HPOS/legacy URL auto-resolved).
 
 ## HPOS support
 
