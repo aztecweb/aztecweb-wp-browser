@@ -69,20 +69,22 @@ class RequirePublicMethodDocBlockSniff implements Sniff
 
             // Check if the method has a docblock with @example
             $docComment = $this->getDocComment($phpcsFile, $i);
-            if (!$docComment || !$this->hasExampleTag($docComment)) {
-                $line = $tokens[$i]['line'];
-                $column = $tokens[$i]['column'];
-
-                $phpcsFile->addError(
-                    sprintf(
-                        'Public method %s() in %s class must have a non-empty docblock with @example tag',
-                        $methodName,
-                        $namespace,
-                    ),
-                    $i,
-                    'MissingDocBlock',
-                );
+            if ($docComment && $this->hasExampleTag($docComment)) {
+                continue;
             }
+
+            $line = $tokens[$i]['line'];
+            $column = $tokens[$i]['column'];
+
+            $phpcsFile->addError(
+                sprintf(
+                    'Public method %s() in %s class must have a non-empty docblock with @example tag',
+                    $methodName,
+                    $namespace,
+                ),
+                $i,
+                'MissingDocBlock',
+            );
         }
     }
 
@@ -153,11 +155,17 @@ class RequirePublicMethodDocBlockSniff implements Sniff
         for ($i = $stackPtr - 1; $i >= 0; $i--) {
             if ($tokens[$i]['code'] === T_PUBLIC) {
                 return 'public';
-            } elseif ($tokens[$i]['code'] === T_PROTECTED) {
+            }
+
+            if ($tokens[$i]['code'] === T_PROTECTED) {
                 return 'protected';
-            } elseif ($tokens[$i]['code'] === T_PRIVATE) {
+            }
+
+            if ($tokens[$i]['code'] === T_PRIVATE) {
                 return 'private';
-            } elseif ($tokens[$i]['code'] === T_OPEN_CURLY_BRACKET) {
+            }
+
+            if ($tokens[$i]['code'] === T_OPEN_CURLY_BRACKET) {
                 // We've hit the start of the class/trait, stop looking
                 return 'public'; // Default to public if no visibility found (PHP default)
             }
@@ -178,11 +186,20 @@ class RequirePublicMethodDocBlockSniff implements Sniff
     {
         $tokens = $phpcsFile->getTokens();
 
-        // Search backward for a docblock comment
+        // phpcs tokenizes doc comments into individual tokens, not a single T_DOC_COMMENT.
+        // Search backward for T_DOC_COMMENT_CLOSE_TAG, skipping modifiers and whitespace.
         for ($i = $stackPtr - 1; $i >= 0; $i--) {
-            if ($tokens[$i]['code'] === T_DOC_COMMENT) {
-                return $tokens[$i]['content'];
-            } elseif (
+            if ($tokens[$i]['code'] === T_DOC_COMMENT_CLOSE_TAG) {
+                // Reconstruct the full docblock content from open to close tag.
+                $openPtr = $tokens[$i]['comment_opener'];
+                $content = '';
+                for ($j = $openPtr; $j <= $i; $j++) {
+                    $content .= $tokens[$j]['content'];
+                }
+                return $content;
+            }
+
+            if (
                 $tokens[$i]['code'] !== T_WHITESPACE &&
                 $tokens[$i]['code'] !== T_PUBLIC &&
                 $tokens[$i]['code'] !== T_PROTECTED &&
