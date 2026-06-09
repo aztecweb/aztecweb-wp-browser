@@ -105,8 +105,11 @@ bin/test bash resources/install.sh   # bootstrap the SQLite WordPress site (idem
 bin/test codecept build              # rebuild actor classes after method signature changes
 bin/test codecept run acceptance     # run the acceptance suite
 bin/test codecept run acceptance CouponCest   # run a single Cest
+bin/serve                                    # start WP-CLI server at http://localhost:8080/ for manual browsing
 composer check                       # validate composer.json, run PHPStan and PHPCS
 ```
+
+The port defaults to `8080` and can be overridden by setting `WP_SERVER_PORT` in a `.env` file.
 
 `composer install` wires up the pre-push hook by running
 `git config core.hooksPath .githooks` (the `post-install-cmd` script). The hook
