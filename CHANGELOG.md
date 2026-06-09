@@ -24,25 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `.github/workflows/acceptance.yml` — CI workflow that runs the acceptance suite against PHP 8.0 and 8.4 on every push and pull request, using the published GHCR runner image.
 - `.github/workflows/build-test-runner.yml` — manual-trigger workflow (`workflow_dispatch` only) that builds the image for both PHP variants and pushes to GHCR as `${repo}-runner:php{N}` plus an immutable `:vYYYYMMDDThhmmssZ-php{N}` content tag. Automatic triggers (push, cron) are deferred to [#13](https://github.com/aztecweb/aztecweb-wp-browser/issues/13).
 - Consumer-facing `README.md`: requirements, installation with the `suite.yml` snippet (short-form and FQN fallback), quick-start Cest, a per-domain method index across `WooCommerceDb` and `WooCommerceWebDriver`, an HPOS note, an architecture paragraph linking the ADRs, and local-development/contributing sections ([#8](https://github.com/aztecweb/aztecweb-wp-browser/issues/8)).
-
-### Changed
-
-- **Breaking:** replaced the monolithic `Aztec\WPBrowser\AztecWPBrowser` module with a pair of Plugin Modules — `WooCommerceDb` (database helpers) and `WooCommerceWebDriver` (browser helpers). Every WooCommerce concern moved under the `Aztec\WPBrowser\WooCommerce\` subnamespace, and Action Scheduler moved to its own `Aztec\WPBrowser\ActionScheduler\` subnamespace with its Method Trait renamed `ActionMethods`. Consumers must update `suite.yml` to enable the new modules ([#6](https://github.com/aztecweb/aztecweb-wp-browser/issues/6)).
-- Added the more-specific `Aztec\WPBrowser\Tests\Support\` → `tests/_support/` PSR-4 prefix so `dump-autoload --strict-psr` is clean ([#2](https://github.com/aztecweb/aztecweb-wp-browser/issues/2)).
-- `composer.json` pins `config.platform.php` to `8.0.0` so dependency resolution targets the minimum supported PHP version.
-- `codeception.yml` now enables `BuiltInServerController` and `ChromeDriverController` plus the `lucatume/wp-browser` dev commands (`dev:start`, `dev:stop`, `dev:restart`, `dev:info`, `wp:db:import`, `wp:db:export`, `run:original`, `run:all`).
-- `tests/acceptance.suite.yml` switched from MySQL/Selenium service hosts to SQLite via the sqlite-database-integration drop-in and chromedriver on `localhost`.
-- `public/wp-config.php` defines `DB_ENGINE` (default `sqlite`) so the sqlite-database-integration plugin engages from a single switch.
-- `wp-cli.yml` points at the new `public/wp/` core install.
-- `composer.json` caps `symfony/filesystem` and `symfony/process` to `<8.0` so `composer update` resolves Symfony 6.x under PHP 8.0 (matching `lucatume/wp-browser` constraints). The acceptance CI uses `composer update` instead of `install` so each PHP variant resolves packages compatible with its runtime.
-
-### Fixed
-
-- `CustomerMethods` used the spread operator on an associative array, which PHPStan rejects (string keys); replaced with `array_merge` so `composer check` passes.
-
-### Removed
-
-- `Dockerfile.test`, `docker-compose.test.yml`, `docker-compose.local.yml`, the docker-compose-driven `Makefile`, and `.env.test`.
-- `install-woocommerce.sh` and `install-woocommerce-subscriptions.sh` shell scripts superseded by `resources/install.sh`.
-- `tests/_support/_generated/` and `tests/_data/dump.sql` removed from version control (added to `.gitignore`); both are regenerated locally by the test bootstrap.
-- `@plugins/` directory and `@setup-wordpress.sh` script removed in favor of `resources/install.sh`.
+- Two Plugin Modules — `WooCommerceDb` (database helpers) and `WooCommerceWebDriver` (browser helpers) — with every WooCommerce concern organised under the `Aztec\WPBrowser\WooCommerce\` subnamespace, and Action Scheduler under its own `Aztec\WPBrowser\ActionScheduler\` subnamespace with the `ActionMethods` trait ([#6](https://github.com/aztecweb/aztecweb-wp-browser/issues/6)).
+- PSR-4 autoloading for the `Aztec\WPBrowser\` namespace, including the `Aztec\WPBrowser\Tests\Support\` → `tests/_support/` prefix so `dump-autoload --strict-psr` is clean ([#2](https://github.com/aztecweb/aztecweb-wp-browser/issues/2)).
+- `composer.json` pins `config.platform.php` to `8.0.0` so dependency resolution targets the minimum supported PHP version, and caps `symfony/filesystem`/`symfony/process` to `<8.0` so `composer update` resolves Symfony 6.x under PHP 8.0 (matching `lucatume/wp-browser` constraints). The acceptance CI uses `composer update` instead of `install` so each PHP variant resolves packages compatible with its runtime.
+- `codeception.yml` enables `BuiltInServerController` and `ChromeDriverController` plus the `lucatume/wp-browser` dev commands (`dev:start`, `dev:stop`, `dev:restart`, `dev:info`, `wp:db:import`, `wp:db:export`, `run:original`, `run:all`).
+- SQLite-backed acceptance suite: `tests/acceptance.suite.yml` runs against the sqlite-database-integration drop-in with chromedriver on `localhost`, `public/wp-config.php` defines `DB_ENGINE` (default `sqlite`) to engage the plugin from a single switch, and `wp-cli.yml` points at the `public/wp/` core install.
