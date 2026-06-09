@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-06-09
+
 ### Added
 
 - `LICENSE` — MIT license (copyright 2026 Aztec Online) ([#2](https://github.com/aztecweb/aztecweb-wp-browser/issues/2)).
@@ -29,3 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `composer.json` pins `config.platform.php` to `8.0.0` so dependency resolution targets the minimum supported PHP version, and caps `symfony/filesystem`/`symfony/process` to `<8.0` so `composer update` resolves Symfony 6.x under PHP 8.0 (matching `lucatume/wp-browser` constraints). The acceptance CI uses `composer update` instead of `install` so each PHP variant resolves packages compatible with its runtime.
 - `codeception.yml` enables `BuiltInServerController` and `ChromeDriverController` plus the `lucatume/wp-browser` dev commands (`dev:start`, `dev:stop`, `dev:restart`, `dev:info`, `wp:db:import`, `wp:db:export`, `run:original`, `run:all`).
 - SQLite-backed acceptance suite: `tests/acceptance.suite.yml` runs against the sqlite-database-integration drop-in with chromedriver on `localhost`, `public/wp-config.php` defines `DB_ENGINE` (default `sqlite`) to engage the plugin from a single switch, and `wp-cli.yml` points at the `public/wp/` core install.
+
+[Unreleased]: https://github.com/aztecweb/aztecweb-wp-browser/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/aztecweb/aztecweb-wp-browser/releases/tag/v0.1.0
