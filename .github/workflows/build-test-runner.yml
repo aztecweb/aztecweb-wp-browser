@@ -2,6 +2,8 @@ name: Build test runner image
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
 
 # Minimum permissions. `id-token: write` is required for OIDC-backed
 # signing of the build provenance attestation; `attestations: write`
@@ -26,15 +28,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Pin Chromium per PHP variant. The version must exist in that PHP base's
-        # Alpine community repo (php8.0 -> Alpine 3.16 -> Chromium 102 only;
-        # php8.4 -> Alpine 3.23 -> Chromium 148). Verify with
+        # PHP 8.0 Chromium is pinned: Alpine 3.16 is EOL with no upstream updates.
+        # PHP 8.4 Chromium floats: picks latest from Alpine 3.23 on each rebuild.
+        # Verify Chromium availability with:
         # `docker run --rm php:<ver>-cli-alpine sh -c 'apk update; apk policy chromium'`.
         include:
           - php_version: '8.0'
             chromium_version: '102.0.5005.182-r0'
           - php_version: '8.4'
-            chromium_version: '148.0.7778.178-r0'
+            chromium_version: ''
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -57,7 +59,32 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push
+      - name: 'Pass 1: Build test image (amd64 only, load to docker daemon)'
+        id: build_test
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
+        with:
+          context: .
+          file: Dockerfile
+          push: false
+          load: true
+          platforms: linux/amd64
+          build-args: |
+            PHP_VERSION=${{ matrix.php_version }}
+            CHROMIUM_VERSION=${{ matrix.chromium_version }}
+          tags: test-runner:php${{ matrix.php_version }}
+          cache-from: type=gha,scope=test-runner-php${{ matrix.php_version }}
+          cache-to: type=gha,mode=max,scope=test-runner-php${{ matrix.php_version }}
+
+      - name: Bootstrap WordPress in test image
+        run: docker run --rm -v "$PWD:/var/www/html" -w /var/www/html test-runner:php${{ matrix.php_version }} bash resources/install.sh
+
+      - name: Install PHP dependencies in test image
+        run: docker run --rm -v "$PWD:/var/www/html" -w /var/www/html test-runner:php${{ matrix.php_version }} composer install
+
+      - name: Run acceptance tests
+        run: docker run --rm -v "$PWD:/var/www/html" -w /var/www/html test-runner:php${{ matrix.php_version }} codecept run acceptance
+
+      - name: 'Pass 2: Build and push (amd64 + arm64, only if tests passed)'
         id: build
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
