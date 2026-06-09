@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `LICENSE` — MIT license (copyright 2026 Aztec Online) ([#2](https://github.com/aztecweb/aztecweb-wp-browser/issues/2)).
+- Expanded `composer.json` distribution metadata: richer `description`, `keywords`, `homepage`, `authors`, `support.issues`/`support.source`, and `config.sort-packages` ([#2](https://github.com/aztecweb/aztecweb-wp-browser/issues/2)).
+- Static-analysis baseline: PHPStan at level max and PHPCS (PSR-12 plus a curated Slevomat ruleset), exposed via a `composer check` script ([#3](https://github.com/aztecweb/aztecweb-wp-browser/issues/3)).
+- Custom PHPCS sniff `RequirePublicMethodDocBlockSniff` (`src/CodeSniffer/Sniffs/`) enforcing wp-browser-style docblocks with an `@example` tag on every public method of Plugin Modules (`*\Module\`) and Method Traits (`*\Method\`) ([#7](https://github.com/aztecweb/aztecweb-wp-browser/issues/7)).
+- PHPDoc backfill across all public methods of the Plugin Modules and Method Traits using the full wp-browser skeleton (summary → `@example` → `@param` → `@return` → `@throws`) ([#7](https://github.com/aztecweb/aztecweb-wp-browser/issues/7)).
+- `src/aliases.php` — Class Alias Trick so consumers can reference the Plugin Modules by short name (`WooCommerceDb`, `WooCommerceWebDriver`) in `suite.yml` ([#6](https://github.com/aztecweb/aztecweb-wp-browser/issues/6)).
+- `.githooks/pre-push` — pre-push hook that runs the impacted acceptance tests before pushing, mapping changed traits to their Cest classes and falling back to the full suite for shared-infrastructure changes ([#5](https://github.com/aztecweb/aztecweb-wp-browser/issues/5)).
 - Slim test runner image (`Dockerfile`) shipping PHP, Chromium, chromedriver, SQLite and Composer. WordPress, WooCommerce and the library source come from a bind-mount of the repo — the image does not bake any app code, so a rebuild is only needed when the system-level toolchain changes.
 - Composer-managed WordPress tree under `public/` (`roots/wordpress-no-content`, WooCommerce, Storefront, sqlite-database-integration, `wp-cli/wp-cli-bundle`) wired through `composer/installers`. `vendor/bin/wp` is the canonical WP-CLI entrypoint.
 - `bin/test` wrapper that runs any command inside the image with the repo bind-mounted at `/var/www/html`.
@@ -20,11 +27,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Breaking:** replaced the monolithic `Aztec\WPBrowser\AztecWPBrowser` module with a pair of Plugin Modules — `WooCommerceDb` (database helpers) and `WooCommerceWebDriver` (browser helpers). Every WooCommerce concern moved under the `Aztec\WPBrowser\WooCommerce\` subnamespace, and Action Scheduler moved to its own `Aztec\WPBrowser\ActionScheduler\` subnamespace with its Method Trait renamed `ActionMethods`. Consumers must update `suite.yml` to enable the new modules ([#6](https://github.com/aztecweb/aztecweb-wp-browser/issues/6)).
+- Added the more-specific `Aztec\WPBrowser\Tests\Support\` → `tests/_support/` PSR-4 prefix so `dump-autoload --strict-psr` is clean ([#2](https://github.com/aztecweb/aztecweb-wp-browser/issues/2)).
+- `composer.json` pins `config.platform.php` to `8.0.0` so dependency resolution targets the minimum supported PHP version.
 - `codeception.yml` now enables `BuiltInServerController` and `ChromeDriverController` plus the `lucatume/wp-browser` dev commands (`dev:start`, `dev:stop`, `dev:restart`, `dev:info`, `wp:db:import`, `wp:db:export`, `run:original`, `run:all`).
 - `tests/acceptance.suite.yml` switched from MySQL/Selenium service hosts to SQLite via the sqlite-database-integration drop-in and chromedriver on `localhost`.
 - `public/wp-config.php` defines `DB_ENGINE` (default `sqlite`) so the sqlite-database-integration plugin engages from a single switch.
 - `wp-cli.yml` points at the new `public/wp/` core install.
 - `composer.json` caps `symfony/filesystem` and `symfony/process` to `<8.0` so `composer update` resolves Symfony 6.x under PHP 8.0 (matching `lucatume/wp-browser` constraints). The acceptance CI uses `composer update` instead of `install` so each PHP variant resolves packages compatible with its runtime.
+
+### Fixed
+
+- `CustomerMethods` used the spread operator on an associative array, which PHPStan rejects (string keys); replaced with `array_merge` so `composer check` passes.
 
 ### Removed
 
