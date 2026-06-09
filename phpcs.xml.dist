@@ -2,6 +2,13 @@
 <ruleset name="AztecWPBrowser">
     <description>Coding standard for aztecweb/aztecweb-wp-browser.</description>
 
+    <config name="installed_paths" value="vendor/phpcompatibility/php-compatibility,vendor/phpcsstandards/phpcsutils,vendor/slevomat/coding-standard,src/CodeSniffer"/>
+
+    <!-- Sniff is for library methods only; test files need no @example. -->
+    <rule ref="AztecWPBrowser.Docblock.RequirePublicMethodDocBlock">
+        <exclude-pattern>tests</exclude-pattern>
+    </rule>
+
     <file>src</file>
     <file>tests</file>
 
@@ -47,6 +54,8 @@
         </properties>
         <!-- Fixture files intentionally use target namespaces, not their file-path namespace. -->
         <exclude-pattern>tests/unit/CodeSniffer/Fixtures</exclude-pattern>
+        <!-- PHPCS standard uses AztecWPBrowser\ namespace, not the PSR-4 Aztec\WPBrowser\ root. -->
+        <exclude-pattern>src/CodeSniffer/AztecWPBrowser</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue"/>

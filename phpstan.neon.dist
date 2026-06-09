@@ -16,7 +16,7 @@ parameters:
         - tests/_support
     excludePaths:
         analyse:
-            - tests/_support/_generated
+            - tests/_support
             # Fixtures are intentionally-malformed sample files fed to the sniff
             # under test; they are inputs, not code to be analysed.
             - tests/unit/CodeSniffer/Fixtures
