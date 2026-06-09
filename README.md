@@ -38,12 +38,24 @@ the workflow's UTC build timestamp.
 
 ### Building and publishing
 
-A maintainer fires the
-[`build-test-runner`](.github/workflows/build-test-runner.yml) workflow by
-hand from the GitHub Actions UI (or `gh workflow run build-test-runner.yml`).
-There is no push trigger or cron schedule yet — automatic rebuilds are being
-designed separately in
-[#13](https://github.com/aztecweb/aztecweb-wp-browser/issues/13).
+The [`build-test-runner`](.github/workflows/build-test-runner.yml) workflow
+builds and publishes the image automatically every Monday at 06:00 UTC to pick
+up upstream security patches (Alpine packages, Chromium). A maintainer can also
+trigger a rebuild manually from the GitHub Actions UI or via:
+
+```bash
+gh workflow run build-test-runner.yml
+```
+
+The workflow enforces a **test gate**: the acceptance suite must pass before any
+image is published. If tests fail, no image is pushed — neither the floating
+`:phpN` tag nor the immutable `:vYYYYMMDDThhmmssZ-phpN` tag.
+
+**Chromium versioning:**
+- **PHP 8.0**: Chromium is permanently pinned to `102.0.5005.182-r0` (Alpine
+  3.16 is EOL with no upstream updates)
+- **PHP 8.4**: Chromium floats — the latest version is picked up from Alpine
+  3.23 on each weekly rebuild
 
 ### Browsing the site from the host
 
