@@ -42,7 +42,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create Release
-        uses: softprops/action-gh-release@69032c65d51b7acc75d03dfd4cff0dd5d6d8d86d # v1.4.0
+        uses: softprops/action-gh-release@v1
         with:
           body: ${{ steps.release-notes.outputs.release_notes }}
           draft: false
