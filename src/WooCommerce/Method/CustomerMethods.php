@@ -61,7 +61,7 @@ trait CustomerMethods
         $userId = $this->wpDb()->haveUserInDatabase(
             $userLogin,
             $userRole,
-            ['user_email' => $userEmail, ...$overrides],
+            array_merge(['user_email' => $userEmail], $overrides),
         );
 
         foreach ($billing as $key => $value) {
