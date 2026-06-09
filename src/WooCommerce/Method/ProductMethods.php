@@ -11,7 +11,20 @@ trait ProductMethods
     abstract protected function wpDb(): WPDb;
 
     /**
-     * @param array<string, mixed> $overrides
+     * Creates a product category in the database.
+     *
+     * @example
+     * ```php
+     * $categoryId = $I->haveProductCategoryInDatabase('electronics', [
+     *     'name' => 'Electronics',
+     *     'description' => 'Electronic products',
+     * ]);
+     * ```
+     *
+     * @param string               $slug      The category slug.
+     * @param array<string, mixed> $overrides Override term data (name, description, parent, count).
+     *
+     * @return int The created category term ID.
      */
     public function haveProductCategoryInDatabase(string $slug, array $overrides = []): int
     {
@@ -33,13 +46,41 @@ trait ProductMethods
         return $termIds[0];
     }
 
+    /**
+     * Adds a product to a category.
+     *
+     * @example
+     * ```php
+     * $I->haveProductCategoryRelationshipInDatabase($productId, $categoryId);
+     * ```
+     *
+     * @param int $productId  The product post ID.
+     * @param int $categoryId The category term ID.
+     *
+     * @return void
+     */
     public function haveProductCategoryRelationshipInDatabase(int $productId, int $categoryId): void
     {
         $this->wpDb()->haveTermRelationshipInDatabase($productId, $categoryId);
     }
 
     /**
-     * @param array<string, mixed> $overrides
+     * Creates a product in the database with default meta values.
+     *
+     * @example
+     * ```php
+     * $productId = $I->haveProductInDatabase([
+     *     'post_title' => 'Test Product',
+     *     'meta' => [
+     *         '_price' => '25.00',
+     *         '_sku' => 'TEST-SKU-001',
+     *     ],
+     * ]);
+     * ```
+     *
+     * @param array<string, mixed> $overrides Post and meta data overrides. Meta is passed under the 'meta' key.
+     *
+     * @return int The created product post ID.
      */
     public function haveProductInDatabase(array $overrides = []): int
     {
@@ -75,13 +116,37 @@ trait ProductMethods
         return $productId;
     }
 
+    /**
+     * Adds meta data to a product.
+     *
+     * @example
+     * ```php
+     * $metaId = $I->haveProductMetaInDatabase($productId, '_price', '99.99');
+     * ```
+     *
+     * @param int   $productId The product post ID.
+     * @param string $key     The meta key.
+     * @param mixed  $value    The meta value.
+     *
+     * @return int The created post meta ID.
+     */
     public function haveProductMetaInDatabase(int $productId, string $key, mixed $value): int
     {
         return $this->wpDb()->havePostMetaInDatabase($productId, $key, $value);
     }
 
     /**
-     * @param array<int, int> $categoryIds
+     * Adds a product to multiple categories.
+     *
+     * @example
+     * ```php
+     * $I->haveProductInCategoriesInDatabase($productId, [$categoryId1, $categoryId2]);
+     * ```
+     *
+     * @param int              $productId   The product post ID.
+     * @param array<int, int>  $categoryIds Array of category term IDs.
+     *
+     * @return void
      */
     public function haveProductInCategoriesInDatabase(int $productId, array $categoryIds): void
     {
@@ -90,13 +155,36 @@ trait ProductMethods
         }
     }
 
+    /**
+     * Retrieves product meta data by key.
+     *
+     * @example
+     * ```php
+     * $price = $I->grabProductMetaFromDatabase($productId, '_price', true);
+     * ```
+     *
+     * @param int    $productId The product post ID.
+     * @param string $key      The meta key to retrieve.
+     * @param bool   $single   Whether to return a single value or array of values.
+     *
+     * @return mixed The meta value(s).
+     */
     public function grabProductMetaFromDatabase(int $productId, string $key, bool $single = false): mixed
     {
         return $this->wpDb()->grabPostMetaFromDatabase($productId, $key, $single);
     }
 
     /**
-     * @return array<int, int>
+     * Retrieves all category IDs assigned to a product.
+     *
+     * @example
+     * ```php
+     * $categoryIds = $I->grabProductCategoriesFromDatabase($productId);
+     * ```
+     *
+     * @param int $productId The product post ID.
+     *
+     * @return array<int, int> Array of category term IDs.
      */
     public function grabProductCategoriesFromDatabase(int $productId): array
     {
@@ -113,6 +201,19 @@ trait ProductMethods
         return $result;
     }
 
+    /**
+     * Asserts a product is in a category.
+     *
+     * @example
+     * ```php
+     * $I->seeProductInCategoryInDatabase($productId, $categoryId);
+     * ```
+     *
+     * @param int $productId  The product post ID.
+     * @param int $categoryId The category term ID.
+     *
+     * @return void
+     */
     public function seeProductInCategoryInDatabase(int $productId, int $categoryId): void
     {
         $this->wpDb()->seeInDatabase(
@@ -125,7 +226,16 @@ trait ProductMethods
     }
 
     /**
-     * @param array<string, mixed> $criteria
+     * Retrieves a product ID by criteria.
+     *
+     * @example
+     * ```php
+     * $productId = $I->grabProductIdFromDatabase(['post_title' => 'Test Product']);
+     * ```
+     *
+     * @param array<string, mixed> $criteria Query criteria (post_status, post_title, etc.).
+     *
+     * @return int|false The product ID, or false if not found.
      */
     public function grabProductIdFromDatabase(array $criteria): int|false
     {
@@ -143,13 +253,39 @@ trait ProductMethods
         return is_numeric($id) ? (int)$id : false;
     }
 
+    /**
+     * Retrieves a product post field value.
+     *
+     * @example
+     * ```php
+     * $status = $I->grabProductFieldFromDatabase($productId, 'post_status');
+     * ```
+     *
+     * @param int    $id    The product post ID.
+     * @param string $field The post field name (post_title, post_status, etc.).
+     *
+     * @return mixed The field value.
+     */
     public function grabProductFieldFromDatabase(int $id, string $field): mixed
     {
         return $this->wpDb()->grabPostFieldFromDatabase($id, $field);
     }
 
     /**
-     * @param array<string, mixed> $criteria
+     * Asserts a product exists in the database.
+     *
+     * @example
+     * ```php
+     * $I->seeProductInDatabase([
+     *     'ID' => $productId,
+     *     'post_status' => 'publish',
+     *     'post_title' => 'Test Product',
+     * ]);
+     * ```
+     *
+     * @param array<string, mixed> $criteria Query criteria (ID, post_status, post_title, etc.).
+     *
+     * @return void
      */
     public function seeProductInDatabase(array $criteria): void
     {
@@ -158,7 +294,20 @@ trait ProductMethods
     }
 
     /**
-     * @param array<string, mixed> $criteria
+     * Asserts product meta exists in the database.
+     *
+     * @example
+     * ```php
+     * $I->seeProductMetaInDatabase([
+     *     'product_id' => $productId,
+     *     'meta_key' => '_price',
+     *     'meta_value' => '25.00',
+     * ]);
+     * ```
+     *
+     * @param array<string, mixed> $criteria Query criteria (product_id, meta_key, meta_value, etc.).
+     *
+     * @return void
      */
     public function seeProductMetaInDatabase(array $criteria): void
     {
@@ -171,7 +320,16 @@ trait ProductMethods
     }
 
     /**
-     * @param array<string, mixed> $criteria
+     * Asserts a product does not exist in the database.
+     *
+     * @example
+     * ```php
+     * $I->dontSeeProductInDatabase(['ID' => $productId]);
+     * ```
+     *
+     * @param array<string, mixed> $criteria Query criteria (ID, post_status, post_title, etc.).
+     *
+     * @return void
      */
     public function dontSeeProductInDatabase(array $criteria): void
     {
@@ -179,13 +337,35 @@ trait ProductMethods
         $this->wpDb()->dontSeePostInDatabase($criteria);
     }
 
+    /**
+     * Retrieves the posts table name.
+     *
+     * @example
+     * ```php
+     * $tableName = $I->grabProductsTableName();
+     * ```
+     *
+     * @return string The posts table name.
+     */
     public function grabProductsTableName(): string
     {
         return $this->wpDb()->grabPostsTableName();
     }
 
     /**
-     * @param array<string, mixed> $criteria
+     * Asserts product meta does not exist in the database.
+     *
+     * @example
+     * ```php
+     * $I->dontSeeProductMetaInDatabase([
+     *     'product_id' => $productId,
+     *     'meta_key' => '_price',
+     * ]);
+     * ```
+     *
+     * @param array<string, mixed> $criteria Query criteria (product_id, meta_key, meta_value, etc.).
+     *
+     * @return void
      */
     public function dontSeeProductMetaInDatabase(array $criteria): void
     {
@@ -198,8 +378,19 @@ trait ProductMethods
     }
 
     /**
-     * @param array<string, mixed> $overrides
-     * @return array<int, int>
+     * Creates multiple products in the database.
+     *
+     * @example
+     * ```php
+     * $productIds = $I->haveManyProductsInDatabase(5, [
+     *     'post_title' => 'Product',
+     * ]);
+     * ```
+     *
+     * @param int                  $count     The number of products to create.
+     * @param array<string, mixed> $overrides Post and meta data overrides.
+     *
+     * @return array<int, int> Array of created product post IDs.
      */
     public function haveManyProductsInDatabase(int $count, array $overrides = []): array
     {
@@ -221,7 +412,16 @@ trait ProductMethods
     }
 
     /**
-     * @return array<int, int>
+     * Retrieves all category IDs assigned to a product.
+     *
+     * @example
+     * ```php
+     * $categoryIds = $I->grabProductCategoryIdsFromDatabase($productId);
+     * ```
+     *
+     * @param int $productId The product post ID.
+     *
+     * @return array<int, int> Array of category term IDs.
      */
     public function grabProductCategoryIdsFromDatabase(int $productId): array
     {
