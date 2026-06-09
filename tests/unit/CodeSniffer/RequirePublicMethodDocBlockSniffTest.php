@@ -7,7 +7,7 @@ namespace Aztec\WPBrowser\Tests\Unit\CodeSniffer;
 use Codeception\Test\Unit;
 
 /**
- * @covers \Aztec\WPBrowser\CodeSniffer\Sniffs\RequirePublicMethodDocBlockSniff
+ * @covers \AztecWPBrowser\Sniffs\Docblock\RequirePublicMethodDocBlockSniff
  */
 class RequirePublicMethodDocBlockSniffTest extends Unit
 {
@@ -22,6 +22,9 @@ class RequirePublicMethodDocBlockSniffTest extends Unit
         }
 
         require_once dirname(__DIR__, 3) . '/vendor/squizlabs/php_codesniffer/autoload.php';
+        // Tokens.php defines phpcs token constants (T_DOC_COMMENT_CLOSE_TAG, etc.)
+        // not loaded by the autoloader alone.
+        require_once dirname(__DIR__, 3) . '/vendor/squizlabs/php_codesniffer/src/Util/Tokens.php';
         // Runner normally defines this; define it here for standalone test usage.
         if (!defined('PHP_CODESNIFFER_VERBOSITY')) {
             define('PHP_CODESNIFFER_VERBOSITY', 0);
@@ -79,6 +82,28 @@ class RequirePublicMethodDocBlockSniffTest extends Unit
         $this->assertEmpty($violations);
     }
 
+    public function testInvalidModuleDocblockParamBeforeExample(): void
+    {
+        $violations = $this->runSniff(__DIR__ . '/Fixtures/InvalidModuleDocblockParamBeforeExample.php');
+        $this->assertCount(1, $violations);
+        $this->assertStringContainsString('@example', $violations[0]['message']);
+        $this->assertStringContainsString('@param', $violations[0]['message']);
+    }
+
+    public function testInvalidModuleDocblockReturnBeforeExample(): void
+    {
+        $violations = $this->runSniff(__DIR__ . '/Fixtures/InvalidModuleDocblockReturnBeforeExample.php');
+        $this->assertCount(1, $violations);
+        $this->assertStringContainsString('@example', $violations[0]['message']);
+        $this->assertStringContainsString('@return', $violations[0]['message']);
+    }
+
+    public function testValidModuleWithLifecycleMethod(): void
+    {
+        $violations = $this->runSniff(__DIR__ . '/Fixtures/ValidModuleWithLifecycleMethod.php');
+        $this->assertEmpty($violations);
+    }
+
     /**
      * Run the RequirePublicMethodDocBlockSniff on a fixture file and return violations.
      *
@@ -86,9 +111,12 @@ class RequirePublicMethodDocBlockSniffTest extends Unit
      */
     private function runSniff(string $fixtureFile): array
     {
-        $sniffPath = dirname(__DIR__, 3) . '/src/CodeSniffer/Sniffs/RequirePublicMethodDocBlockSniff.php';
+        $sniffPath = dirname(__DIR__, 3)
+            . '/src/CodeSniffer/AztecWPBrowser/Sniffs/Docblock/RequirePublicMethodDocBlockSniff.php';
 
-        $config = new \PHP_CodeSniffer\Config(['--no-cache', '-q', '--report=full']);
+        // Specify a standard to prevent phpcs.xml.dist from being auto-loaded,
+        // which would apply its exclude-patterns to the test fixture files.
+        $config = new \PHP_CodeSniffer\Config(['--no-cache', '-q', '--report=full', '--standard=PSR12']);
         $config->cache = false;
 
         $ruleset = new \PHP_CodeSniffer\Ruleset($config);
