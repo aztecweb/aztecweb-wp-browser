@@ -31,3 +31,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Dockerfile.test`, `docker-compose.test.yml`, `docker-compose.local.yml`, the docker-compose-driven `Makefile`, and `.env.test`.
 - `install-woocommerce.sh` and `install-woocommerce-subscriptions.sh` shell scripts superseded by `resources/install.sh`.
 - `tests/_support/_generated/` and `tests/_data/dump.sql` removed from version control (added to `.gitignore`); both are regenerated locally by the test bootstrap.
+- `@plugins/` directory and `@setup-wordpress.sh` script removed in favor of `resources/install.sh`.

@@ -79,11 +79,7 @@ The following methods were renamed to comply with `lucatume/wp-browser` naming c
 
 ## Installation Infrastructure
 
-WooCommerce Subscriptions is a premium plugin. The following files are added to support its installation:
-
-- `install-woocommerce-subscriptions.sh` — copies plugin from local zip/directory
-- Makefile target `test-install-subscriptions`
-- `setup-wordpress.sh` — conditionally activates plugin if present
+WooCommerce Subscriptions is a premium plugin. Its installation is managed through `resources/install.sh` which handles plugin setup and activation.
 
 ## Acceptance Tests
 
