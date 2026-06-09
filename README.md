@@ -102,6 +102,7 @@ This repo runs its own test suite inside a self-contained Docker image via the
 ```bash
 bin/test composer install            # install deps (also installs the pre-push hook)
 bin/test bash resources/install.sh   # bootstrap the SQLite WordPress site (idempotent)
+bin/test codecept build              # rebuild actor classes after method signature changes
 bin/test codecept run acceptance     # run the acceptance suite
 bin/test codecept run acceptance CouponCest   # run a single Cest
 composer check                       # validate composer.json, run PHPStan and PHPCS
