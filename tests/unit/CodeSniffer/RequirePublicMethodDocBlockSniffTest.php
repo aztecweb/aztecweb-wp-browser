@@ -99,7 +99,9 @@ class RequirePublicMethodDocBlockSniffTest extends Unit
         $file->process();
 
         $violations = [];
-        foreach ($file->getErrors() as $line => $lineErrors) {
+        /** @var array<int, array<int, array<int, array{message: string}>>> $errors */
+        $errors = $file->getErrors();
+        foreach ($errors as $line => $lineErrors) {
             foreach ($lineErrors as $colErrors) {
                 foreach ($colErrors as $error) {
                     $violations[] = [
