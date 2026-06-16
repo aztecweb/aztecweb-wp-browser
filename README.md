@@ -143,7 +143,7 @@ image is published. If tests fail, no image is pushed — neither the floating
 - **PHP 8.0**: Chromium is permanently pinned to `102.0.5005.182-r0` (Alpine
   3.16 is EOL with no upstream updates)
 - **PHP 8.4**: Chromium floats — the latest version is picked up from Alpine
-  3.23 on each weekly rebuild
+  on each weekly rebuild
 
 ### Running the CI workflow locally with `act`
 

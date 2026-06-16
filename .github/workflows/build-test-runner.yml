@@ -29,7 +29,7 @@ jobs:
       fail-fast: false
       matrix:
         # PHP 8.0 Chromium is pinned: Alpine 3.16 is EOL with no upstream updates.
-        # PHP 8.4 Chromium floats: picks latest from Alpine 3.23 on each rebuild.
+        # PHP 8.4 Chromium floats: picks latest from Alpine on each rebuild.
         # Verify Chromium availability with:
         # `docker run --rm php:<ver>-cli-alpine sh -c 'apk update; apk policy chromium'`.
         include:
