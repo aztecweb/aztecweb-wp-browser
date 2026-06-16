@@ -86,6 +86,7 @@ jobs:
 
       - name: 'Pass 2: Build and push (amd64 + arm64, only if tests passed)'
         id: build
+        if: ${{ !env.ACT }}
         uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
           context: .
@@ -104,6 +105,7 @@ jobs:
           sbom: true
 
       - name: Attest build provenance
+        if: ${{ !env.ACT }}
         uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4.1.0
         with:
           subject-name: ${{ env.REGISTRY }}/${{ steps.image.outputs.name }}
