@@ -13,7 +13,7 @@ ARG RUNNER_GID
 # silently tracking the base Alpine (php8.0/Alpine3.16 -> Chromium 102,
 # php8.4/Alpine -> latest Chromium version). The build matrix passes 
 # CHROMIUM_VERSION per variant; it must exist in that base Alpine's community
-# repo # (verify with `apk policy chromium`). Leave empty to take the repo
+# repo (verify with `apk policy chromium`). Leave empty to take the repo
 # default.
 ARG CHROMIUM_VERSION=
 
