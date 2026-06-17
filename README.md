@@ -94,6 +94,10 @@ is encapsulated behind the order storage interfaces so tests stay storage-agnost
 See [`CONTEXT.md`](CONTEXT.md) for shared vocabulary and [`docs/adr/`](docs/adr/)
 for the full design rationale.
 
+## Agent support
+
+This library is agent-ready. [`AGENTS.md`](AGENTS.md) is the entry-point index for AI agents working in this repo: it covers vocabulary, standards, commands, and design rationale.
+
 ## Local development
 
 This repo runs its own test suite inside a self-contained Docker image via the
