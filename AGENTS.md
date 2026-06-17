@@ -1,33 +1,14 @@
 # AGENTS.md
 
-Entry point for anyone — human or AI agent — working **in** this repository.
-
-`aztecweb-wp-browser` is a library of **Plugin Modules** for WordPress acceptance
-testing, built as composition extensions over
-[`lucatume/wp-browser`](https://github.com/lucatume/wp-browser). For how the
-library is *used* by test authors, see [`README.md`](README.md); consumer-facing
-orientation ships separately as an installable skill, not here.
+Entry point for AI agents working in this repository.
 
 ## Working in this repo
 
-- **Vocabulary** — read [`CONTEXT.md`](CONTEXT.md) first. It defines the shared
-  language (Plugin Module, Method Trait, Plugin Subnamespace, Sibling Module,
-  Actor, Class Alias Trick, HPOS) used everywhere. Match it before naming new
-  concepts.
-- **Architecture, standards & process** — see [`CONTRIBUTING.md`](CONTRIBUTING.md)
-  for the Plugin Module / Method Trait composition pattern, the mandatory
-  Codeception / wp-browser / WPDb standards, the docblock convention, the
-  build-after-signature-change rule, and the maintainer agent workflows.
-- **Design rationale** — see [`docs/adr/`](docs/adr/). Read the relevant ADR
-  before changing behavior in the area it covers.
+- **Vocabulary** — read [`CONTEXT.md`](CONTEXT.md) before naming anything. Match its terminology.
+- **Standards** — see [`CONTRIBUTING.md`](CONTRIBUTING.md) for architecture patterns, Codeception / wp-browser / WPDb conventions, the docblock rule, and agent workflows.
+- **Design rationale** — read the relevant ADR in [`docs/adr/`](docs/adr/) before changing behavior in that area.
 
 ## Commands
-
-This repo runs its own suite inside a self-contained Docker test runner via the
-`bin/test` wrapper, which bind-mounts the repo at `/var/www/html`. (`bin/test` is
-library-internal; consumers run their own tests with `vendor/bin/codecept`.) See
-[`README.md`](README.md) § "Local development" for the full reference and the
-`act` workflow.
 
 ```bash
 # One-time: install PHP dependencies (also wires up the pre-push hook)
