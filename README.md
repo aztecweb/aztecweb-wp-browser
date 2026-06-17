@@ -218,8 +218,9 @@ extra flags. To force a clean rebuild, prune the daemon cache
 
 Contributions go through pull request: review is required, CI must be green, and
 new public methods on the modules and method traits must carry the full PHPDoc
-skeleton (see the docblock convention in [`CLAUDE.md`](CLAUDE.md), which also
-documents the guidelines for AI coding assistants).
+skeleton (see the docblock convention in [`CONTRIBUTING.md`](CONTRIBUTING.md)).
+[`AGENTS.md`](AGENTS.md) is the entry point for working in this repo, including
+guidelines for AI coding assistants.
 
 ## License
 
