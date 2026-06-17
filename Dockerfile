@@ -11,9 +11,10 @@ ARG RUNNER_GID
 # release, and the two packages must match each other. Pin them explicitly per
 # PHP variant so the browser version is reproducible and visible instead of
 # silently tracking the base Alpine (php8.0/Alpine3.16 -> Chromium 102,
-# php8.4/Alpine3.23 -> Chromium 148). The build matrix passes CHROMIUM_VERSION
-# per variant; it must exist in that base Alpine's community repo
-# (verify with `apk policy chromium`). Leave empty to take the repo default.
+# php8.4/Alpine -> latest Chromium version). The build matrix passes 
+# CHROMIUM_VERSION per variant; it must exist in that base Alpine's community
+# repo (verify with `apk policy chromium`). Leave empty to take the repo
+# default.
 ARG CHROMIUM_VERSION=
 
 ENV COMPOSER_NO_INTERACTION=1 \

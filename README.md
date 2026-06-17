@@ -118,13 +118,69 @@ changed files, and falls back to the full acceptance suite when shared
 infrastructure changes. In an emergency you can bypass it with
 `git push --no-verify` — but CI is the authoritative gate.
 
+### Running against PHP 8.0
+
+The default image ships PHP 8.4 and the committed `composer.lock` is resolved
+against PHP 8.4. Running against the PHP 8.0 image requires resolving
+dependencies fresh inside that image, because some packages locked for 8.4 do
+not support 8.0.
+
+```bash
+# Remove the vendor directory so Composer starts clean
+rm -rf vendor
+
+# Resolve dependencies for PHP 8.0 (rewrites composer.lock)
+AZTEC_TEST_IMAGE=ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.0 \
+    bin/test composer update
+
+# Bootstrap the site (required after a clean vendor install)
+AZTEC_TEST_IMAGE=ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.0 \
+    bin/test bash resources/install.sh
+
+# Run the suite
+AZTEC_TEST_IMAGE=ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.0 \
+    bin/test
+```
+
+> **Note:** `composer update` rewrites `composer.lock` with PHP-8.0-compatible
+> package versions (Symfony 6.x, older Codeception 5.x releases). Do not commit
+> the rewritten lock file — restore it afterwards with `git checkout composer.lock`
+> and reinstall for your usual image: `bin/test composer install`.
+
+## Image tags
+
+The image is published per PHP variant (`:php8.0`, `:php8.4`), plus an
+immutable per-build content tag (`:vYYYYMMDDThhmmssZ-php{N}`) generated from
+the workflow's UTC build timestamp.
+
+## Building and publishing
+
+The [`build-test-runner`](.github/workflows/build-test-runner.yml) workflow
+builds and publishes the image automatically every Monday at 06:00 UTC to pick
+up upstream security patches (Alpine packages, Chromium). A maintainer can also
+trigger a rebuild manually from the GitHub Actions UI or via:
+
+```bash
+gh workflow run build-test-runner.yml
+```
+
+The workflow enforces a **test gate**: the acceptance suite must pass before any
+image is published. If tests fail, no image is pushed — neither the floating
+`:phpN` tag nor the immutable `:vYYYYMMDDThhmmssZ-phpN` tag.
+
+**Chromium versioning:**
+- **PHP 8.0**: Chromium is permanently pinned to `102.0.5005.182-r0` (Alpine
+  3.16 is EOL with no upstream updates)
+- **PHP 8.4**: Chromium floats — the latest version is picked up from Alpine
+  on each weekly rebuild
+
 ### Running the CI workflow locally with `act`
 
 [`act`](https://github.com/nektos/act) lets you run GitHub Actions workflows on
 your machine without pushing to GitHub.
 
 ```bash
-act push -j acceptance \
+act workflow_dispatch -j build \
     --network bridge \
     -s GITHUB_TOKEN=$(gh auth token)
 ```
@@ -136,7 +192,7 @@ Codeception inside the container.
 The workflow matrix covers PHP 8.0 and 8.4. To target a single version:
 
 ```bash
-act push -j acceptance \
+act workflow_dispatch -j build \
     --matrix php_version:8.0 \
     --network bridge \
     -s GITHUB_TOKEN=$(gh auth token)
@@ -145,6 +201,18 @@ act push -j acceptance \
 > **Note:** `GITHUB_TOKEN` is required to pull the runner image from GHCR.
 > `$(gh auth token)` uses your existing GitHub CLI session. Alternatively,
 > pass a personal access token with `read:packages` scope.
+
+**Caching across local runs.** GitHub's cache service is unavailable under
+`act`, so the buildx `gha` cache backend errors out
+([nektos/act#1916](https://github.com/nektos/act/issues/1916)). The workflow
+detects `act` (via `$ACT`) and disables that backend, skipping the buildx
+container builder so the image builds on the default docker driver — layer
+reuse then comes for free from the host daemon's own build cache. Composer
+downloads are cached in the per-version named volume
+`aztec-wp-browser-composer-php<version>`. Both persist between runs with no
+extra flags. To force a clean rebuild, prune the daemon cache
+(`docker builder prune`) or drop the volume
+(`docker volume rm aztec-wp-browser-composer-php8.4`).
 
 ## Contributing
 

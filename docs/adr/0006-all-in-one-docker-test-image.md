@@ -20,5 +20,9 @@ it via `docker run -v $PWD:/var/www/html`. WordPress runs against SQLite
 - One source of truth for the test environment (the image's Dockerfile).
 - WordPress runs against SQLite, which is not the production DB — passing tests on SQLite but failing on MySQL is a known risk class. Mitigation: a smoke test that an HPOS order round-trips correctly on SQLite is a Phase 3 acceptance criterion; periodic MySQL-target validation runs are recommended before tagging stable releases.
 - `Dockerfile.test`, `docker-compose.test.yml`, `docker-compose.local.yml`, and Makefile docker targets are removed when this image lands.
-- A separate workflow (`.github/workflows/build-test-runner.yml`) builds and publishes the image to GHCR on Dockerfile changes, manual dispatch, or a scheduled cron.
+- A separate workflow (`.github/workflows/build-test-runner.yml`) builds and publishes the image to GHCR. The workflow:
+  - Triggers on a weekly cron schedule (Monday 06:00 UTC) to pick up upstream security patches, plus manual dispatch for on-demand rebuilds.
+  - Enforces a test gate: the acceptance suite must pass before any image is published. On test failure, no image is pushed.
+  - Splits the build into two passes: a local test build (amd64 only with `load: true`) followed by a conditional multi-platform push (amd64 + arm64) only if tests pass. The GHA layer cache from the first pass makes the amd64 re-build in the second pass fast.
+  - PHP 8.0 Chromium is permanently pinned (`102.0.5005.182-r0`; Alpine 3.16 is EOL). PHP 8.4 Chromium floats to pick the latest version from Alpine on each weekly rebuild.
 - The pre-push hook and a `bin/test` wrapper script invoke the image locally so contributors don't have to memorize the `docker run` invocation.
