@@ -151,7 +151,7 @@ image is published. If tests fail, no image is pushed — neither the floating
 your machine without pushing to GitHub.
 
 ```bash
-act push -j acceptance \
+act workflow_dispatch -j build \
     --network bridge \
     -s GITHUB_TOKEN=$(gh auth token)
 ```
@@ -163,7 +163,7 @@ Codeception inside the container.
 The workflow matrix covers PHP 8.0 and 8.4. To target a single version:
 
 ```bash
-act push -j acceptance \
+act workflow_dispatch -j build \
     --matrix php_version:8.0 \
     --network bridge \
     -s GITHUB_TOKEN=$(gh auth token)
@@ -172,6 +172,18 @@ act push -j acceptance \
 > **Note:** `GITHUB_TOKEN` is required to pull the runner image from GHCR.
 > `$(gh auth token)` uses your existing GitHub CLI session. Alternatively,
 > pass a personal access token with `read:packages` scope.
+
+**Caching across local runs.** GitHub's cache service is unavailable under
+`act`, so the buildx `gha` cache backend errors out
+([nektos/act#1916](https://github.com/nektos/act/issues/1916)). The workflow
+detects `act` (via `$ACT`) and disables that backend, skipping the buildx
+container builder so the image builds on the default docker driver — layer
+reuse then comes for free from the host daemon's own build cache. Composer
+downloads are cached in the per-version named volume
+`aztec-wp-browser-composer-php<version>`. Both persist between runs with no
+extra flags. To force a clean rebuild, prune the daemon cache
+(`docker builder prune`) or drop the volume
+(`docker volume rm aztec-wp-browser-composer-php8.4`).
 
 ## Contributing
 
