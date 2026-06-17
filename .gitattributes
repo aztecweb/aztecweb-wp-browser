@@ -1,0 +1,5 @@
+# Keep contributor/agent meta-docs out of the Composer dist tarball.
+# These are internal entry points for people working *in* this repo, not
+# consumer documentation (README.md ships; see issue #36).
+/AGENTS.md export-ignore
+/CLAUDE.md export-ignore
