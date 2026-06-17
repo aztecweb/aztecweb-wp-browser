@@ -21,6 +21,7 @@ bin/test bash resources/install.sh
 bin/test
 bin/test codecept run acceptance
 bin/test codecept run acceptance CouponCest
+bin/test codecept run acceptance CouponCest:testMethodName
 
 # Rebuild actor classes — required after changing a module/trait method signature
 bin/test codecept build
