@@ -100,11 +100,6 @@ class LegacyOrderStorage extends AbstractLegacyStorage implements OrderStorageIn
         return $metaId;
     }
 
-    public function getAdminOrderEditUrl(int $orderId): string
-    {
-        return "post.php?post={$orderId}&action=edit";
-    }
-
     /**
      * Map criteria to legacy (wp_posts) format.
      *

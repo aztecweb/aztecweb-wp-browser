@@ -15,6 +15,20 @@ use lucatume\WPBrowser\Utils\Ports;
 class Acceptance extends Module
 {
     /**
+     * Declare the store-wide order-storage mode for the browser layer.
+     *
+     * Reconfigures the WooCommerceWebDriver `legacyOrderStorage` flag at
+     * runtime so a single suite can exercise admin order URLs under both
+     * storage modes. Mirrors what a suite.yml override would do.
+     *
+     * @param bool $legacy `true` for legacy (wp_posts), `false` for HPOS.
+     */
+    public function setLegacyOrderStorage(bool $legacy): void
+    {
+        $this->getModule('WooCommerceWebDriver')->_reconfigure(['legacyOrderStorage' => $legacy]);
+    }
+
+    /**
      * Wait for WooCommerce to be fully loaded.
      */
     public function waitForWooCommerce(): void
