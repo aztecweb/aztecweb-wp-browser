@@ -25,6 +25,28 @@ class Acceptance extends Module
     }
 
     /**
+     * Override WooCommerceWebDriver page-slug config for the current test.
+     *
+     * Mirrors a per-slug override in suite.yml so acceptance tests can exercise
+     * a renamed page without a second suite. Pair with
+     * resetWooCommerceWebDriverConfig() to restore the declared defaults.
+     *
+     * @param array<string, string> $config
+     */
+    public function overrideWooCommerceWebDriverConfig(array $config): void
+    {
+        $this->getModule('WooCommerceWebDriver')->_reconfigure($config);
+    }
+
+    /**
+     * Restore WooCommerceWebDriver config to its declared defaults.
+     */
+    public function resetWooCommerceWebDriverConfig(): void
+    {
+        $this->getModule('WooCommerceWebDriver')->_resetConfig();
+    }
+
+    /**
      * Restart the PHP built-in server, dropping any in-flight request.
      */
     public function restartBuiltInServer(): void

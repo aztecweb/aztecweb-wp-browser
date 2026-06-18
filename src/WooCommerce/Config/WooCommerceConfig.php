@@ -4,42 +4,35 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\WooCommerce\Config;
 
-use lucatume\WPBrowser\Module\WPDb;
-
+/**
+ * Holds the WooCommerce page slugs the browser layer navigates to.
+ *
+ * Slugs are declared in the WooCommerceWebDriver module config (with
+ * WooCommerce-convention defaults) rather than resolved from the database, so
+ * navigation never queries the system under test. See
+ * docs/adr/0008-webdriver-store-shape-via-config.md.
+ */
 class WooCommerceConfig
 {
-    /** @var array<string, string> */
-    private array $slugCache = [];
-
-    public function __construct(private WPDb $wpDb)
-    {
+    public function __construct(
+        private string $cartPageSlug,
+        private string $checkoutPageSlug,
+        private string $myAccountPageSlug,
+    ) {
     }
 
     public function cartPageSlug(): string
     {
-        return $this->pageSlug('woocommerce_cart_page_id');
+        return $this->cartPageSlug;
     }
 
     public function checkoutPageSlug(): string
     {
-        return $this->pageSlug('woocommerce_checkout_page_id');
+        return $this->checkoutPageSlug;
     }
 
     public function myAccountPageSlug(): string
     {
-        return $this->pageSlug('woocommerce_myaccount_page_id');
-    }
-
-    private function pageSlug(string $pageIdOption): string
-    {
-        if (!isset($this->slugCache[$pageIdOption])) {
-            $pageId = $this->wpDb->grabOptionFromDatabase($pageIdOption);
-            $pageId = is_numeric($pageId) ? (int) $pageId : 0;
-            $slug = $this->wpDb->grabPostFieldFromDatabase($pageId, 'post_name');
-            $slug = is_string($slug) ? $slug : '';
-            $this->slugCache[$pageIdOption] = '/' . $slug;
-        }
-
-        return $this->slugCache[$pageIdOption];
+        return $this->myAccountPageSlug;
     }
 }

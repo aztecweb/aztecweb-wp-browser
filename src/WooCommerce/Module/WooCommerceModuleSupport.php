@@ -9,8 +9,6 @@ use lucatume\WPBrowser\Module\WPDb;
 
 trait WooCommerceModuleSupport
 {
-    private ?WooCommerceConfig $wooCommerceConfig = null;
-
     protected function wpDb(): WPDb
     {
         $module = $this->getModule('WPDb');
@@ -21,7 +19,18 @@ trait WooCommerceModuleSupport
 
     protected function wooCommerceConfig(): WooCommerceConfig
     {
-        return $this->wooCommerceConfig ??= new WooCommerceConfig($this->wpDb());
+        return new WooCommerceConfig(
+            $this->pageSlugConfig('cartPageSlug'),
+            $this->pageSlugConfig('checkoutPageSlug'),
+            $this->pageSlugConfig('myAccountPageSlug'),
+        );
+    }
+
+    private function pageSlugConfig(string $key): string
+    {
+        $value = $this->_getConfig($key);
+
+        return is_string($value) ? $value : '';
     }
 
     /**
