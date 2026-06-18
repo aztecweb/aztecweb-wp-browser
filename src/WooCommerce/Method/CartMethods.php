@@ -8,14 +8,11 @@ use Aztec\WPBrowser\WooCommerce\Config\WooCommerceConfig;
 use Aztec\WPBrowser\WooCommerce\PageObject\CartPageObject;
 use Aztec\WPBrowser\WooCommerce\PageObject\PageObjectProvider;
 use Codeception\Util\Locator;
-use lucatume\WPBrowser\Module\WPDb;
 use lucatume\WPBrowser\Module\WPWebDriver;
 
 trait CartMethods
 {
     abstract protected function wpWebDriver(): WPWebDriver;
-
-    abstract protected function wpDb(): WPDb;
 
     abstract protected function wooCommerceConfig(): WooCommerceConfig;
 
@@ -70,17 +67,15 @@ trait CartMethods
      * $productId = $I->haveProductInDatabase(['post_title' => 'Cart Product']);
      * $I->addProductToCart($productId);
      * $I->amOnCartPage();
-     * $I->seeProductInCart($productId);
+     * $I->seeProductInCart('Cart Product');
      * ```
      *
-     * @param int $productId  Product ID to verify in the cart
+     * @param string $productName  On-screen product name to verify in the cart
      *
      * @return void
      */
-    public function seeProductInCart(int $productId): void
+    public function seeProductInCart(string $productName): void
     {
-        $productName = $this->wpDb()->grabPostFieldFromDatabase($productId, 'post_title');
-        $productName = is_string($productName) ? $productName : '';
         /** @var CartPageObject $cartPage */
         $cartPage = $this->pageObjectProvider()->cartPage();
 
@@ -92,19 +87,16 @@ trait CartMethods
      *
      * @example
      * ```php
-     * $productId = $I->haveProductInDatabase(['post_title' => 'Missing Product']);
      * $I->amOnCartPage();
-     * $I->dontSeeProductInCart($productId);
+     * $I->dontSeeProductInCart('Missing Product');
      * ```
      *
-     * @param int $productId  Product ID to verify is not in the cart
+     * @param string $productName  On-screen product name to verify is not in the cart
      *
      * @return void
      */
-    public function dontSeeProductInCart(int $productId): void
+    public function dontSeeProductInCart(string $productName): void
     {
-        $productName = $this->wpDb()->grabPostFieldFromDatabase($productId, 'post_title');
-        $productName = is_string($productName) ? $productName : '';
         /** @var CartPageObject $cartPage */
         $cartPage = $this->pageObjectProvider()->cartPage();
 
@@ -119,18 +111,16 @@ trait CartMethods
      * $productId = $I->haveProductInDatabase(['post_title' => 'Quantity Test']);
      * $I->addProductToCart($productId, 3);
      * $I->amOnCartPage();
-     * $I->seeCartItemQuantity($productId, 3);
+     * $I->seeCartItemQuantity('Quantity Test', 3);
      * ```
      *
-     * @param int $productId  Product ID to verify quantity for
-     * @param int $quantity   Expected quantity in the cart
+     * @param string $productName  On-screen product name to verify quantity for
+     * @param int    $quantity     Expected quantity in the cart
      *
      * @return void
      */
-    public function seeCartItemQuantity(int $productId, int $quantity): void
+    public function seeCartItemQuantity(string $productName, int $quantity): void
     {
-        $productName = $this->wpDb()->grabPostFieldFromDatabase($productId, 'post_title');
-        $productName = is_string($productName) ? $productName : '';
         /** @var CartPageObject $cartPage */
         $cartPage = $this->pageObjectProvider()->cartPage();
         $cartItemXpath = Locator::contains($this->selector($cartPage::CART_ITEM_SELECTOR), $productName);
