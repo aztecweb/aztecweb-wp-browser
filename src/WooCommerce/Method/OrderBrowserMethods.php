@@ -4,27 +4,27 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\WooCommerce\Method;
 
-use Aztec\WPBrowser\WooCommerce\OrderStorage\HPOSOrderStorage;
-use Aztec\WPBrowser\WooCommerce\OrderStorage\LegacyOrderStorage;
-use Aztec\WPBrowser\WooCommerce\OrderStorage\OrderStorageInterface;
-use Aztec\WPBrowser\WooCommerce\Storage\HposState;
-use lucatume\WPBrowser\Module\WPDb;
+use Aztec\WPBrowser\WooCommerce\Browser\AdminOrderUrlResolver;
 use lucatume\WPBrowser\Module\WPWebDriver;
 
 trait OrderBrowserMethods
 {
-    abstract protected function wpDb(): WPDb;
-
     abstract protected function wpWebDriver(): WPWebDriver;
+
+    abstract public function _getConfig(?string $key = null): mixed;
 
     /**
      * Navigate to the admin order edit page for a given order.
+     *
+     * The order-storage mode is read from the `legacyOrderStorage` config flag
+     * (default `false`, i.e. HPOS) — the browser layer never inspects the
+     * database to build this URL. See ADR-0008.
      *
      * @example
      * ```php
      * $orderId = $I->haveOrderInDatabase(['status' => 'processing']);
      * $I->amOnAdminOrderPage($orderId);
-     * $I->seeInCurrentUrl('order/' . $orderId);
+     * $I->seeInCurrentUrl('action=edit');
      * ```
      *
      * @param int $orderId  Order ID to view in the admin
@@ -33,15 +33,9 @@ trait OrderBrowserMethods
      */
     public function amOnAdminOrderPage(int $orderId): void
     {
-        $this->wpWebDriver()->amOnAdminPage($this->resolveOrderStorage()->getAdminOrderEditUrl($orderId));
-    }
+        $legacyOrderStorage = (bool) $this->_getConfig('legacyOrderStorage');
+        $url = (new AdminOrderUrlResolver())->resolve($orderId, $legacyOrderStorage);
 
-    private function resolveOrderStorage(): OrderStorageInterface
-    {
-        $wpDb = $this->wpDb();
-
-        return HposState::isEnabled($wpDb)
-            ? new HPOSOrderStorage($wpDb)
-            : new LegacyOrderStorage($wpDb);
+        $this->wpWebDriver()->amOnAdminPage($url);
     }
 }
