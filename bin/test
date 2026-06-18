@@ -42,6 +42,14 @@ fi
 
 DOCKER_FLAGS+=(--user "$(id -u):$(id -g)")
 
+# In a git worktree .git is a file whose gitdir pointer is an absolute host
+# path. Mount the common git dir at that same path so git works inside the
+# container (needed for composer post-install-cmd hooks, for example).
+if [ -f "$REPO_ROOT/.git" ]; then
+    COMMON_GIT_DIR="$(git -C "$REPO_ROOT" rev-parse --git-common-dir)"
+    DOCKER_FLAGS+=(-v "$COMMON_GIT_DIR:$COMMON_GIT_DIR")
+fi
+
 exec "$DOCKER" run "${DOCKER_FLAGS[@]}" \
     -v "$REPO_ROOT:/var/www/html" \
     -w /var/www/html \
