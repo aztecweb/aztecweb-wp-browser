@@ -64,9 +64,9 @@ public function customerCheckoutWithCoupon(AcceptanceTester $I): void
     $productId = $I->haveProductInDatabase(['post_title' => 'Test Product']);
     $I->havePercentageCouponInDatabase('SAVE10', 10.0);
 
-    $I->amOnCartPage();
     $I->addProductToCart($productId);
-    $I->seeProductInCart($productId);
+    $I->amOnCartPage();
+    $I->seeProductInCart('Test Product');
 
     $I->amOnCheckoutPage();
     $I->applyCouponOnCheckout('SAVE10');
