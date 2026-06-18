@@ -32,7 +32,7 @@ The test pseudo-user (`$I` in Cest files), assembled by Codeception from the pub
 _Avoid_: Tester (reserved for the concrete class name `AcceptanceTester`).
 
 **HPOS**:
-WooCommerce's High-Performance Order Storage feature — orders persisted in custom tables (`wp_wc_orders` family) rather than `wp_posts`/`wp_postmeta`; **detected privately inside `WooCommerceDb`** with no public actor method exposing the state.
+WooCommerce's High-Performance Order Storage feature — orders persisted in custom tables (`wp_wc_orders` family) rather than `wp_posts`/`wp_postmeta`. Handled per layer: `WooCommerceDb` **detects it from the database**; `WooCommerceWebDriver` must never query the database, so it is **told the order-storage mode via a single config flag** (`legacyOrderStorage`, default `false`) that governs every HPOS-dependent browser behavior. Never exposed as a public actor method.
 _Avoid_: Custom orders table, COT, HPOS mode.
 
 **First-class library**:
@@ -45,7 +45,7 @@ _Avoid_: Production-ready (vague), enterprise-grade (marketing).
 - A **Plugin Module** is composed of one or more **Method Traits** via `use` statements.
 - A **Plugin Module** declares **Sibling Module** requirements in `_initialize()` and accesses them via `getModule()`.
 - The **Class Alias Trick** maps `\Codeception\Module\X` to a **Plugin Module**'s real class so consumers reference it by short name.
-- **HPOS** is internal to the WooCommerce **Plugin Subnamespace**; the WebDriver **Plugin Module** has no awareness of it.
+- **HPOS** handling is split by layer: `WooCommerceDb` **detects** it from the database, while `WooCommerceWebDriver` is **declared** the order-storage mode through one config flag (`legacyOrderStorage`) and never queries the DB. A single flag — not per-screen flags — so an impossible mixed state (one screen HPOS, another legacy) cannot be expressed. Neither layer exposes HPOS on the public actor API.
 
 ## Example dialogue
 
@@ -59,7 +59,7 @@ _Avoid_: Production-ready (vague), enterprise-grade (marketing).
 >
 > **Contributor:** "Why is there no `$I->isHposEnabled()`?"
 >
-> **Maintainer:** "**HPOS** is a backend storage detail; the browser layer has no business knowing about it. Methods that need HPOS-aware behavior handle it internally. If a page object ever needs the answer, it detects HPOS itself — it doesn't ask a Plugin Module."
+> **Maintainer:** "**HPOS** stays off the actor — there's no `$I->isHposEnabled()`. The DB layer detects it from the database; the browser layer can't touch the database, so it's told the order-storage mode once via the `legacyOrderStorage` config flag and routes admin URLs from that. One flag for the whole browser layer, never a public actor method."
 
 ## Flagged ambiguities
 
