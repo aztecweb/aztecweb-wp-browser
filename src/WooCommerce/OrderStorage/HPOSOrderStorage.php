@@ -114,11 +114,6 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
         ], $overrides));
     }
 
-    public function getAdminOrderEditUrl(int $orderId): string
-    {
-        return "admin.php?page=wc-orders&action=edit&id={$orderId}";
-    }
-
     /**
      * Map criteria from legacy (wp_posts) format to HPOS (wc_orders) format.
      *

@@ -11,6 +11,7 @@ class OrderCest
     public function _before(AcceptanceTester $I): void
     {
         $I->haveOptionInDatabase('woocommerce_custom_orders_table_enabled', 'no');
+        $I->setLegacyOrderStorage(true);
     }
 
     public function testHaveOrderInDatabase(AcceptanceTester $I): void

@@ -27,6 +27,11 @@ class WooCommerceWebDriver extends Module
         'cartPageSlug' => '/cart',
         'checkoutPageSlug' => '/checkout',
         'myAccountPageSlug' => '/my-account',
+        // Store-wide order-storage mode. `false` (HPOS) is the WooCommerce
+        // default; set `true` in suite.yml for sites still on legacy
+        // (wp_posts) order storage. Drives admin order URLs via
+        // AdminOrderUrlResolver — see ADR-0008.
+        'legacyOrderStorage' => false,
     ];
 
     private ?PageObjectProvider $pageObjectProvider = null;
