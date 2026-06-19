@@ -7,7 +7,7 @@
 # Maps each changed file to a Cest class. Files that match shared infrastructure
 # trigger a full acceptance test suite run.
 
-set -e
+set -ex
 
 AZTEC_TEST_IMAGE=${AZTEC_TEST_IMAGE:-php8.4}
 
@@ -97,5 +97,5 @@ else
         -v "$PWD:/var/www/html" \
         -w /var/www/html \
         ghcr.io/aztecweb/aztecweb-wp-browser-runner:$AZTEC_TEST_IMAGE \
-        vendor/bin/codecept run acceptance "${CESTS[@]}" unit
+        bash -c "vendor/bin/codecept run acceptance ${CESTS[*]} && vendor/bin/codecept run unit"
 fi
