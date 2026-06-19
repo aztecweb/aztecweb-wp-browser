@@ -124,8 +124,10 @@ trait CartMethods
         /** @var CartPageObject $cartPage */
         $cartPage = $this->pageObjectProvider()->cartPage();
         $cartItemXpath = Locator::contains($this->selector($cartPage::CART_ITEM_SELECTOR), $productName);
+        $quantitySelector = $cartPage->cartItemQuantitySelector($cartItemXpath);
+        $this->wpWebDriver()->waitForElement($quantitySelector);
         $cartItemQuantity = $this->wpWebDriver()->grabAttributeFrom(
-            $cartPage->cartItemQuantitySelector($cartItemXpath),
+            $quantitySelector,
             'value',
         );
 

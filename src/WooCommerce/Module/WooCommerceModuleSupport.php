@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Aztec\WPBrowser\WooCommerce\Module;
 
 use Aztec\WPBrowser\WooCommerce\Config\WooCommerceConfig;
+use Codeception\Exception\ModuleException;
 use lucatume\WPBrowser\Module\WPDb;
 
 trait WooCommerceModuleSupport
 {
-    private ?WooCommerceConfig $wooCommerceConfig = null;
-
     protected function wpDb(): WPDb
     {
         $module = $this->getModule('WPDb');
@@ -21,7 +20,22 @@ trait WooCommerceModuleSupport
 
     protected function wooCommerceConfig(): WooCommerceConfig
     {
-        return $this->wooCommerceConfig ??= new WooCommerceConfig($this->wpDb());
+        return new WooCommerceConfig(
+            $this->pageSlugConfig('cartPageSlug'),
+            $this->pageSlugConfig('checkoutPageSlug'),
+            $this->pageSlugConfig('myAccountPageSlug'),
+        );
+    }
+
+    private function pageSlugConfig(string $key): string
+    {
+        $value = $this->_getConfig($key);
+
+        if (!is_string($value)) {
+            throw new ModuleException($this, "Config key \"{$key}\" must be a string slug (e.g. \"/cart\").");
+        }
+
+        return $value;
     }
 
     /**

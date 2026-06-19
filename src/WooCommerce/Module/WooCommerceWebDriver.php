@@ -24,6 +24,9 @@ class WooCommerceWebDriver extends Module
     /** @var array<string, mixed> */
     protected array $config = [
         'pageObjects' => [],
+        'cartPageSlug' => '/cart',
+        'checkoutPageSlug' => '/checkout',
+        'myAccountPageSlug' => '/my-account',
         // Store-wide order-storage mode. `false` (HPOS) is the WooCommerce
         // default; set `true` in suite.yml for sites still on legacy
         // (wp_posts) order storage. Drives admin order URLs via
@@ -46,7 +49,7 @@ class WooCommerceWebDriver extends Module
             throw new ModuleException(
                 $this,
                 'WooCommerceWebDriver requires the WPDb module to be enabled in the same suite '
-                . '(it reads WooCommerce configuration directly from the database).',
+                . '(it reads product and cart data directly from the database).',
             );
         }
     }
