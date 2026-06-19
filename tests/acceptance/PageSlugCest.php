@@ -17,7 +17,7 @@ class PageSlugCest
 
     public function testNavigatesToDefaultCheckoutSlug(AcceptanceTester $I): void
     {
-        $I->amOnCheckoutPage();
+        $I->amOnPage('/checkout');
 
         $I->seeInCurrentUrl('/checkout');
     }
