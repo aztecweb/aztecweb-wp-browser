@@ -72,21 +72,30 @@ if [ $RUN_ALL -eq 0 ] && [ ${#CESTS[@]} -gt 0 ]; then
     CESTS=($(printf '%s\n' "${CESTS[@]}" | sort -u))
 fi
 
+# Install dependencies and bootstrap test site
+echo "Installing dependencies and bootstrapping test site..."
+docker run \
+    --rm \
+    -v "$PWD:/var/www/html" \
+    -w /var/www/html \
+    ghcr.io/aztecweb/aztecweb-wp-browser-runner:$AZTEC_TEST_IMAGE \
+    bash -c "composer update && bash resources/install.sh"
+
 # Run tests
 if [ $RUN_ALL -eq 1 ] || [ ${#CESTS[@]} -eq 0 ]; then
-    echo "Running full acceptance suite..."
+    echo "Running full test suite..."
     docker run \
         --rm \
         -v "$PWD:/var/www/html" \
         -w /var/www/html \
         ghcr.io/aztecweb/aztecweb-wp-browser-runner:$AZTEC_TEST_IMAGE \
-        vendor/bin/codecept run acceptance
+        vendor/bin/codecept run
 else
-    echo "Running impacted tests: ${CESTS[*]}"
+    echo "Running impacted tests: ${CESTS[*]} + unit"
     docker run \
         --rm \
         -v "$PWD:/var/www/html" \
         -w /var/www/html \
         ghcr.io/aztecweb/aztecweb-wp-browser-runner:$AZTEC_TEST_IMAGE \
-        vendor/bin/codecept run acceptance "${CESTS[@]}"
+        bash -c "vendor/bin/codecept run acceptance ${CESTS[*]} && vendor/bin/codecept run unit"
 fi
