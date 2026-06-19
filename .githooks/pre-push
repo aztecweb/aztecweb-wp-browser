@@ -7,7 +7,7 @@
 # Maps each changed file to a Cest class. Files that match shared infrastructure
 # trigger a full acceptance test suite run.
 
-set -ex
+set -e
 
 AZTEC_TEST_IMAGE=${AZTEC_TEST_IMAGE:-php8.4}
 
