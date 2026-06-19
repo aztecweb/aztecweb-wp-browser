@@ -67,19 +67,25 @@ fi
 
 # Run tests
 if [ $RUN_ALL -eq 1 ] || [ ${#CESTS[@]} -eq 0 ]; then
-    echo "Running full acceptance suite..."
+    echo "Running full acceptance and unit suites..."
     docker run \
         --rm \
         -v "$PWD:/var/www/html" \
         -w /var/www/html \
         ghcr.io/aztecweb/aztecweb-wp-browser-runner:$AZTEC_TEST_IMAGE \
-        vendor/bin/codecept run acceptance
+        vendor/bin/codecept run
 else
-    echo "Running impacted tests: ${CESTS[*]}"
+    echo "Running impacted tests: ${CESTS[*]} + unit"
     docker run \
         --rm \
         -v "$PWD:/var/www/html" \
         -w /var/www/html \
         ghcr.io/aztecweb/aztecweb-wp-browser-runner:$AZTEC_TEST_IMAGE \
         vendor/bin/codecept run acceptance "${CESTS[@]}"
+    docker run \
+        --rm \
+        -v "$PWD:/var/www/html" \
+        -w /var/www/html \
+        ghcr.io/aztecweb/aztecweb-wp-browser-runner:$AZTEC_TEST_IMAGE \
+        vendor/bin/codecept run unit
 fi
