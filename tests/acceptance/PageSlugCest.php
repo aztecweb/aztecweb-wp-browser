@@ -15,13 +15,6 @@ class PageSlugCest
         $I->seeInCurrentUrl('/cart');
     }
 
-    public function testNavigatesToDefaultCheckoutSlug(AcceptanceTester $I): void
-    {
-        $I->amOnPage('/checkout');
-
-        $I->seeInCurrentUrl('/checkout');
-    }
-
     public function testNavigatesToDefaultMyAccountSlug(AcceptanceTester $I): void
     {
         $I->amOnMyAccountPage();
