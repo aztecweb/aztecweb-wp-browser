@@ -50,8 +50,11 @@ if [ -f "$REPO_ROOT/.git" ]; then
     DOCKER_FLAGS+=(-v "$COMMON_GIT_DIR:$COMMON_GIT_DIR")
 fi
 
+# Persist Composer's download cache across container runs to avoid re-downloading packages.
+# The named volume is keyed by a fixed name and survives container --rm cleanup.
 exec "$DOCKER" run "${DOCKER_FLAGS[@]}" \
     -v "$REPO_ROOT:/var/www/html" \
+    -v "aztec-wp-browser-composer:/tmp/composer" \
     -w /var/www/html \
     "$IMAGE" \
     "$@"
