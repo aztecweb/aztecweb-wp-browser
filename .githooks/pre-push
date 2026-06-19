@@ -28,6 +28,13 @@ if [ -z "$CHANGED_FILES" ]; then
     exit 1
 fi
 
+# Skip tests if no PHP files were changed
+PHP_CHANGED=$(echo "$CHANGED_FILES" | grep '\.php$' || true)
+if [ -z "$PHP_CHANGED" ]; then
+    echo "No PHP files changed; skipping tests."
+    exit 0
+fi
+
 # Map changed files to Cest classes
 declare -a CESTS
 RUN_ALL=0
