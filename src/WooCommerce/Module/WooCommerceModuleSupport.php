@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Aztec\WPBrowser\WooCommerce\Module;
 
 use Aztec\WPBrowser\WooCommerce\Config\WooCommerceConfig;
+use Codeception\Exception\ModuleException;
 use lucatume\WPBrowser\Module\WPDb;
 
 trait WooCommerceModuleSupport
@@ -30,7 +31,11 @@ trait WooCommerceModuleSupport
     {
         $value = $this->_getConfig($key);
 
-        return is_string($value) ? $value : '';
+        if (!is_string($value)) {
+            throw new ModuleException($this, "Config key \"{$key}\" must be a string slug (e.g. \"/cart\").");
+        }
+
+        return $value;
     }
 
     /**
