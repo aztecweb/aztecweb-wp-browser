@@ -4,14 +4,6 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\WooCommerce\Config;
 
-/**
- * Holds the WooCommerce page slugs the browser layer navigates to.
- *
- * Slugs are declared in the WooCommerceWebDriver module config (with
- * WooCommerce-convention defaults) rather than resolved from the database, so
- * navigation never queries the system under test. See
- * docs/adr/0008-webdriver-store-shape-via-config.md.
- */
 class WooCommerceConfig
 {
     public function __construct(
