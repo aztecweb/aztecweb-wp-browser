@@ -7,50 +7,51 @@ description: Write WooCommerce Codeception tests (Cests) in a project that insta
 
 You are working in a project that installs **`aztecweb/aztecweb-wp-browser`** as a dev dependency. The goal is to **write tests as Cests** that exercise WooCommerce behavior through the actor methods the library already provides — and to keep the suite green.
 
+## The method reference is your `vendor/` tree — not this skill
+
+This skill embeds **no method catalog**: a frozen list would drift from the library version you actually installed. The canonical reference is the source on disk. For any method's exact name, signature, accepted argument keys, and a worked call, read its docblock in:
+
+```
+vendor/aztecweb/aztecweb-wp-browser/src/**/Method/*Methods.php
+```
+
+Every public method carries (100% coverage, enforced by a sniff):
+
+- an **`@example`** block — a canonical, copy-ready call;
+- **`@param` / `@phpstan-type`** annotations — the argument shape, i.e. the allowed keys and value types.
+
+Grep these files to discover what exists (e.g. `grep -rl 'function haveCoupon' vendor/aztecweb/aztecweb-wp-browser/src`), then mirror the signature and `@example` you find. Treat the docblock — never this skill — as the source of truth for method shapes.
+
 ## Primary deliverable: Cests
 
-Tests live in **Cest classes**, one per domain (`ProductCest`, `CouponCest`, `OrderCest`, …), under the suite's test directory. Each test method drives WooCommerce through library actor methods:
+Tests live in **Cest classes**, one per domain (`ProductCest`, `CouponCest`, `OrderCest`, …), under the suite's test directory. Each test method sets up state with a **`have*InDatabase`** builder and asserts with the companion **`see*InDatabase`** method:
 
 ```php
 <?php
-declare(strict_types=1);
 
 class ProductCest
 {
-    public function seesProductPrice(AcceptanceTester $I): void
+    public function seeProduct(AcceptanceTester $I): void
     {
+        // exact args for every call → the method's @example block in vendor/
         $productId = $I->haveProductInDatabase(['post_title' => 'Beanie']);
-        $I->haveProductMetaInDatabase($productId, '_price', '10.00');   // positional
-
         $I->seeProductInDatabase(['ID' => $productId, 'post_title' => 'Beanie']);
-        $I->seeProductMetaInDatabase([                                  // criteria array
-            'product_id' => $productId,   // remapped to post_id internally
-            'meta_key'   => '_price',
-            'meta_value' => '10.00',
-        ]);
     }
 }
 ```
 
-The suite's actor (`AcceptanceTester`, or whatever the suite defines) already exposes every library method — see [REFERENCE.md](./REFERENCE.md) for the inventory. Prefer these over raw SQL or hand-rolled setup.
+The suite's actor (`AcceptanceTester`, or whatever the suite defines) exposes every library method. Prefer these over raw SQL or hand-rolled setup.
 
 ## Support: a Helper, only when needed
 
 If several Cests repeat the same custom setup the library doesn't provide, extract it into a **Codeception Helper** (support code) — `tests/_support/Helper/{Name}.php`, a class extending `\Codeception\Module` that reaches library methods via `getModule()` — then enable that Helper and rebuild. A Helper is support, not the goal; reach for one only to remove duplication across Cests. See [REFERENCE.md](./REFERENCE.md) for an example. Do **not** create Method Traits or Plugin Modules, and do **not** edit the library under `vendor/`; that structure is an override path, used only when explicitly requested.
 
-## Calling conventions
+## Two calling conventions the docblocks assume
 
-Mirror the library's signatures when you call them (full inventory in [REFERENCE.md](./REFERENCE.md)):
+The `@example` blocks are self-explanatory, but two library-wide patterns are worth stating so the examples read correctly:
 
-| Kind | Signature | Note |
-|------|-----------|------|
-| Create | `have{Entity}InDatabase(array $overrides)` | returns `int` ID |
-| Create meta | `have{Entity}MetaInDatabase(int $id, string $key, mixed $value)` | **positional** args |
-| Retrieve ID | `grab{Entity}IdFromDatabase(array $criteria)` | returns `int\|false` |
-| Verify | `see{Entity}InDatabase(array $criteria)` | — |
-| Verify meta | `see{Entity}MetaInDatabase(array $criteria)` | **criteria array** |
-
-`see`/`dontSee` meta methods take `array $criteria` and remap the friendly id, accepting **either** form — posts (product, coupon): `product_id`/`coupon_id` → `post_id`; users (customer): `customer_id` → `user_id`. Pass **real DB column names**, not abstractions (`order_item_name`, not `name`); the exception is `haveOrderAddressInDatabase`, which uses abstract fields (`first_name`, `last_name`) to unify HPOS and Legacy.
+- **`have*MetaInDatabase`** takes **positional** args — `($id, $key, $value)`.
+- **`see*MetaInDatabase`** takes a **criteria array** and remaps a friendly id to the underlying column (e.g. `product_id` → `post_id`). Pass **real DB column names**, not abstractions. The exact keys each method accepts are in its `@param` annotation — read them there, don't guess.
 
 ## Suite configuration
 
@@ -63,7 +64,7 @@ It is desirable that the project already has this configuration; if it does, jus
 1. List the behaviors to test; group them by domain (one Cest per domain).
 2. **Baseline:** run the suite and confirm it is green before changing anything — `vendor/bin/codecept run {suite}`.
 3. Confirm the suite enables `WooCommerceDb`/`WooCommerceWebDriver` (see *Suite configuration*).
-4. Write the Cests using library actor methods (REFERENCE.md); cover success and failure, and both storage modes for order/subscription tests (see *HPOS vs Legacy* in REFERENCE.md).
+4. Write the Cests using library actor methods — read each method's `@example` and `@param` in `vendor/aztecweb/aztecweb-wp-browser/src/**/Method/*Methods.php` for its shape; cover success and failure.
 5. Only if reusable custom setup is missing, add a Helper method (support), enable it, and run `vendor/bin/codecept build`.
 6. **Done** = the new tests pass **and** the previously-green suite is still green — `vendor/bin/codecept run {suite}`.
 

@@ -1,41 +1,13 @@
-# REFERENCE — WooCommerce method conventions
+# REFERENCE — WooCommerce testing detail
 
-Curated, project-specific detail for `write-woocommerce-tests`. For the full Codeception / WPDb / WPWebDriver API, read the source directly — this file does not reproduce it.
+Project-specific detail for `write-woocommerce-tests` that the procedure in [SKILL.md](./SKILL.md) reaches for on demand. It deliberately holds **no method catalog** — method names, signatures, argument keys, and worked calls live in the docblocks (`@example`, `@param` / `@phpstan-type`) of `vendor/aztecweb/aztecweb-wp-browser/src/**/Method/*Methods.php`. Read those; they are the source of truth and cannot drift from your installed version.
 
-## Read the source
+## Reading source beyond the Method docblocks
 
-- **Library Method Traits** (canonical naming reference — read, don't edit): `vendor/aztecweb/aztecweb-wp-browser/src/WooCommerce/Method/`
-- **Library Plugin Modules** the Helper delegates to via `getModule()`: `.../src/WooCommerce/Module/{WooCommerceDb,WooCommerceWebDriver}.php`
-- **Storage split** (HPOS/Legacy): `.../src/WooCommerce/OrderStorage/`, `.../src/WooCommerce/SubscriptionStorage/`
-- **WPDb / WPWebDriver**: `vendor/lucatume/wp-browser/src/Module/{WPDb,WPWebDriver}.php`
-- **WooCommerce source**: WooCommerce is a **plugin in the target WordPress site**, not a Composer package. Its directory is **dynamic** — do not assume `wp-content/plugins/`. Locate it in the site under test (e.g. `wp plugin path woocommerce` via WP-CLI, or the site's configured plugins dir) and read the source there, plus the [WooCommerce code reference](https://woocommerce.github.io/code-reference/)
+The Method docblocks cover the library's actor methods. For everything they build on, read the source directly:
 
-## Entity → table → method
-
-| Entity | WP table | Verify entity | Verify meta | Grab field | Meta id remap |
-|--------|----------|---------------|-------------|------------|---------------|
-| Product | wp_posts | `seeProductInDatabase` | `seeProductMetaInDatabase` | `grabProductFieldFromDatabase` | `product_id` → `post_id` |
-| Coupon | wp_posts | `seeCouponInDatabase` | `seeCouponMetaInDatabase` | — | `coupon_id` → `post_id` |
-| Customer | wp_users | `seeCustomerInDatabase` | `seeCustomerMetaInDatabase` | `grabCustomerFieldFromDatabase` | `customer_id` → `user_id` |
-| Order | wc_orders (HPOS) / wp_posts (Legacy) | `seeOrderInDatabase` | `seeOrderMetaInDatabase` | — | via `OrderStorage` |
-| Subscription | wc_orders / wp_posts | `seeSubscriptionInDatabase` | `seeSubscriptionMetaInDatabase` | `grabSubscriptionFieldFromDatabase` | via `SubscriptionStorage` |
-
-## Method inventory by entity (library-provided, mirror these)
-
-- **Product** — `have{Product,ProductCategory,ManyProducts}InDatabase`, `haveProductMetaInDatabase`, `haveProductInCategoriesInDatabase`, `grabProduct{Id,Field,Meta,Categories,CategoryIds}FromDatabase`, `see/dontSeeProduct[Meta]InDatabase`, `seeProductInCategoryInDatabase`, `grabProductsTableName`
-- **Coupon** — `haveCouponInDatabase`, `have{Percentage,FixedCart,FixedProduct,FreeShipping}CouponInDatabase`, `haveCouponMetaInDatabase`, `{have,see,grab}CouponStatus`, `grabCouponIdFromDatabase`, `see/dontSeeCoupon[Meta]InDatabase`
-- **Customer** — `haveCustomerInDatabase`, `haveCustomer{Meta,BillingField,ShippingField}InDatabase`, `grabCustomer{Id,Field,Meta,BillingAddress,ShippingAddress}`, `see/dontSeeCustomer[Meta]InDatabase`, `seeCustomer{Billing,Shipping}FieldInDatabase`
-- **Order** — `have{Order,ManyOrders,OrderMeta,OrderAddress,OrderItem,OrderItemMeta}InDatabase`, `{have,see,grab}OrderStatus`, `grabOrder{Id,Item}FromDatabase`, `grabOrderMeta`, `see/dontSeeOrder{,Item,ItemMeta}InDatabase`, `seeOrderAddressInDatabase`, `grabOrderItemsTableName`
-- **Subscription** — `haveSubscription[Meta,Product]InDatabase`, `grabSubscription{Id,Field,Meta,Status}`, `{cancel,reactivate,expire,suspend,pendingCancel}Subscription`, `haveSubscriptionStatus`, `see/dontSeeSubscription[Meta]InDatabase`, `seeSubscriptionStatus`
-- **Cart** (browser) — `amOnCartPage`, `addProductToCart`, `see/dontSeeProductInCart`, `seeCartItemQuantity`, `seeCartTotalQuantity`, `clearCart`
-- **Checkout** (browser) — `amOnCheckoutPage`, `fillCheckoutField`, `fillCheckoutForm`, `selectPaymentMethod`, `placeOrder`, `applyCouponOnCheckout`, `seeCouponApplied`, `seeOrderReceived`, `grabOrderIdFromOrderReceived`
-
-## Method contract (library-specific rules)
-
-- `grab…IdFromDatabase` returns `int|false` — return `false` when absent, never `assertIsNumeric` or throw.
-- `see…InDatabase` / `see…MetaInDatabase` delegate to WPDb and never `throw` manually — let the assertion fail.
-- `have…MetaInDatabase(int $id, string $key, mixed $value)` uses **positional** args; `see…MetaInDatabase(array $criteria)` uses a **criteria array** and remaps the friendly id (see table).
-- Every file: `declare(strict_types=1);`, full param/return type hints, PSR-4 namespace.
+- **WPDb / WPWebDriver** (what the library delegates to): `vendor/lucatume/wp-browser/src/Module/{WPDb,WPWebDriver}.php`
+- **Storage split** (HPOS/Legacy internals): `vendor/aztecweb/aztecweb-wp-browser/src/WooCommerce/{OrderStorage,SubscriptionStorage}/`
 
 ## HPOS vs Legacy
 
@@ -47,7 +19,7 @@ $this->getModule('WooCommerceWebDriver')->_reconfigure(['legacyOrderStorage' => 
 
 ## Helper example (support)
 
-A Helper composes library actor methods to remove duplication across Cests — support code, not the primary deliverable:
+A Helper composes library actor methods to remove duplication across Cests — support code, not the primary deliverable. Read the exact method shapes it calls from their docblocks:
 
 ```php
 public function haveProductOnSaleInDatabase(float $regular, float $sale): int
