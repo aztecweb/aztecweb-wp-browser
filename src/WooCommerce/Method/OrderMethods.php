@@ -7,6 +7,48 @@ namespace Aztec\WPBrowser\WooCommerce\Method;
 use Aztec\WPBrowser\WooCommerce\OrderStorage\OrderStorageInterface;
 use lucatume\WPBrowser\Module\WPDb;
 
+/**
+ * @phpstan-type OrderStatus 'wc-pending'|'wc-processing'|'wc-on-hold'|'wc-completed'|'wc-cancelled'|'wc-refunded'|'wc-failed'|'wc-checkout-draft'
+ * @phpstan-type OrderAddressType 'billing'|'shipping'
+ * @phpstan-type OrderAddress array{
+ *     first_name?: string,
+ *     last_name?: string,
+ *     company?: string,
+ *     address_1?: string,
+ *     address_2?: string,
+ *     city?: string,
+ *     state?: string,
+ *     postcode?: string,
+ *     country?: string,
+ *     email?: string,
+ *     phone?: string,
+ *     ...
+ * }
+ * @phpstan-type OrderItemType 'line_item'|'fee'|'shipping'|'coupon'|'tax'
+ * @phpstan-type OrderItemOverrides array{
+ *     order_item_name?: string,
+ *     order_item_type?: OrderItemType,
+ *     meta?: array<string, mixed>,
+ *     ...
+ * }
+ * @phpstan-type OrderOverrides array{
+ *     status?: OrderStatus,
+ *     customer_id?: int,
+ *     currency?: string,
+ *     total_amount?: string,
+ *     tax_amount?: string,
+ *     billing_email?: string,
+ *     payment_method?: string,
+ *     payment_method_title?: string,
+ *     transaction_id?: string,
+ *     customer_note?: string,
+ *     parent_order_id?: int,
+ *     address?: array{billing?: OrderAddress, shipping?: OrderAddress},
+ *     items?: list<OrderItemOverrides>,
+ *     meta?: array<string, mixed>,
+ *     ...
+ * }
+ */
 trait OrderMethods
 {
     abstract protected function wpDb(): WPDb;
@@ -24,7 +66,7 @@ trait OrderMethods
      * $I->seeOrderInDatabase(['id' => $orderId, 'status' => 'processing']);
      * ```
      *
-     * @param array<string, mixed> $overrides Order data overrides (status, customer_id, etc.). Behavior depends on storage mode (HPOS or Legacy)
+     * @param OrderOverrides $overrides Order data overrides (status, customer_id, etc.). Behavior depends on storage mode (HPOS or Legacy)
      *
      * @return int The created order ID
      */
@@ -149,9 +191,9 @@ trait OrderMethods
      * $I->assertGreaterThan(0, $addressId);
      * ```
      *
-     * @param int                  $orderId      Order ID
-     * @param string               $addressType  Address type ('billing' or 'shipping')
-     * @param array<string, mixed> $overrides    Address fields (first_name, last_name, company, address_1, address_2, city, state, postcode, country, email, phone)
+     * @param int             $orderId      Order ID
+     * @param OrderAddressType $addressType  Address type ('billing' or 'shipping')
+     * @param OrderAddress     $overrides    Address fields (first_name, last_name, company, address_1, address_2, city, state, postcode, country, email, phone)
      *
      * @return int Address ID
      */
@@ -174,8 +216,8 @@ trait OrderMethods
      * $I->assertGreaterThan(0, $itemId);
      * ```
      *
-     * @param int                  $orderId   Order ID
-     * @param array<string, mixed> $overrides Line item data (order_item_name, order_item_type, meta array for item meta)
+     * @param int                $orderId   Order ID
+     * @param OrderItemOverrides $overrides Line item data (order_item_name, order_item_type, meta array for item meta)
      *
      * @return int Order item ID
      */
@@ -404,8 +446,8 @@ trait OrderMethods
      * $I->seeOrderAddressInDatabase('billing', ['first_name' => 'John']);
      * ```
      *
-     * @param string               $type     Address type ('billing' or 'shipping')
-     * @param array<string, mixed> $criteria Database query criteria for address fields
+     * @param OrderAddressType $type     Address type ('billing' or 'shipping')
+     * @param OrderAddress     $criteria Database query criteria for address fields
      *
      * @return void
      */
@@ -442,8 +484,8 @@ trait OrderMethods
      * }
      * ```
      *
-     * @param int                  $count     Number of orders to create
-     * @param array<string, mixed> $overrides Order data overrides applied to each order
+     * @param int            $count     Number of orders to create
+     * @param OrderOverrides $overrides Order data overrides applied to each order
      *
      * @return array<int, int> Array of created order IDs
      */

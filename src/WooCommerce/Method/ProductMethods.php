@@ -6,6 +6,36 @@ namespace Aztec\WPBrowser\WooCommerce\Method;
 
 use lucatume\WPBrowser\Module\WPDb;
 
+/**
+ * @phpstan-type ProductStatus 'publish'|'draft'|'pending'|'private'|'trash'
+ * @phpstan-type ProductStockStatus 'instock'|'outofstock'|'onbackorder'
+ * @phpstan-type ProductTaxStatus 'taxable'|'shipping'|'none'
+ * @phpstan-type ProductYesNo 'yes'|'no'
+ * @phpstan-type ProductBackorders 'no'|'notify'|'yes'
+ * @phpstan-type ProductMeta array{
+ *     _price?: string,
+ *     _regular_price?: string,
+ *     _sale_price?: string,
+ *     _sku?: string,
+ *     _stock_status?: ProductStockStatus,
+ *     _tax_status?: ProductTaxStatus,
+ *     _tax_class?: string,
+ *     _manage_stock?: ProductYesNo,
+ *     _backorders?: ProductBackorders,
+ *     _sold_individually?: ProductYesNo,
+ *     _virtual?: ProductYesNo,
+ *     _downloadable?: ProductYesNo,
+ *     ...
+ * }
+ * @phpstan-type ProductOverrides array{
+ *     post_type?: string,
+ *     post_status?: ProductStatus,
+ *     post_title?: string,
+ *     post_name?: string,
+ *     meta?: ProductMeta,
+ *     ...
+ * }
+ */
 trait ProductMethods
 {
     abstract protected function wpDb(): WPDb;
@@ -78,7 +108,7 @@ trait ProductMethods
      * ]);
      * ```
      *
-     * @param array<string, mixed> $overrides Post and meta data overrides. Meta is passed under the 'meta' key.
+     * @param ProductOverrides $overrides Post and meta data overrides. Meta is passed under the 'meta' key.
      *
      * @return int The created product post ID.
      */
@@ -387,16 +417,15 @@ trait ProductMethods
      * ]);
      * ```
      *
-     * @param int                  $count     The number of products to create.
-     * @param array<string, mixed> $overrides Post and meta data overrides.
+     * @param int              $count     The number of products to create.
+     * @param ProductOverrides $overrides Post and meta data overrides.
      *
      * @return array<int, int> Array of created product post IDs.
      */
     public function haveManyProductsInDatabase(int $count, array $overrides = []): array
     {
         $createdIds = [];
-        $baseTitleValue = $overrides['post_title'] ?? 'Product';
-        $baseTitle = is_string($baseTitleValue) ? $baseTitleValue : 'Product';
+        $baseTitle = $overrides['post_title'] ?? 'Product';
 
         for ($i = 1; $i <= $count; $i++) {
             $productData = array_merge($overrides, [

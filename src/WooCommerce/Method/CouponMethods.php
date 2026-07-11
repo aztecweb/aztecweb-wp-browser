@@ -6,6 +6,36 @@ namespace Aztec\WPBrowser\WooCommerce\Method;
 
 use lucatume\WPBrowser\Module\WPDb;
 
+/**
+ * @phpstan-type CouponStatus 'publish'|'draft'|'pending'|'private'|'trash'
+ * @phpstan-type CouponDiscountType 'percent'|'fixed_cart'|'fixed_product'
+ * @phpstan-type CouponYesNo 'yes'|'no'
+ * @phpstan-type CouponMeta array{
+ *     discount_type?: CouponDiscountType,
+ *     coupon_amount?: string|float,
+ *     free_shipping?: CouponYesNo,
+ *     minimum_amount?: string,
+ *     usage_limit?: string|int,
+ *     usage_limit_per_user?: string|int,
+ *     limit_usage_to_x_items?: string|int,
+ *     product_ids?: string,
+ *     exclude_product_ids?: string,
+ *     product_categories?: string,
+ *     exclude_product_categories?: string,
+ *     individual_use?: CouponYesNo,
+ *     usage_count?: string|int,
+ *     ...
+ * }
+ * @phpstan-type CouponOverrides array{
+ *     code?: string,
+ *     post_type?: string,
+ *     post_status?: CouponStatus,
+ *     post_title?: string,
+ *     post_name?: string,
+ *     meta?: CouponMeta,
+ *     ...
+ * }
+ */
 trait CouponMethods
 {
     abstract protected function wpDb(): WPDb;
@@ -24,13 +54,13 @@ trait CouponMethods
      * ]);
      * ```
      *
-     * @param array<string, mixed> $overrides Post and meta data overrides. Meta is passed under the 'meta' key.
+     * @param CouponOverrides $overrides Post and meta data overrides. Meta is passed under the 'meta' key.
      *
      * @return int The coupon post ID.
      */
     public function haveCouponInDatabase(array $overrides = []): int
     {
-        $meta = isset($overrides['meta']) && is_array($overrides['meta']) ? $overrides['meta'] : [];
+        $meta = $overrides['meta'] ?? [];
         unset($overrides['meta']);
 
         $couponData = array_merge([
@@ -79,18 +109,16 @@ trait CouponMethods
      * ]);
      * ```
      *
-     * @param string               $code       The coupon code.
-     * @param float                $percentage The discount percentage (0-100).
-     * @param array<string, mixed> $overrides  Post and meta data overrides.
+     * @param string          $code       The coupon code.
+     * @param float           $percentage The discount percentage (0-100).
+     * @param CouponOverrides $overrides  Post and meta data overrides.
      *
      * @return int The coupon post ID.
      */
     public function havePercentageCouponInDatabase(string $code, float $percentage, array $overrides = []): int
     {
         $overrides['code'] = $code;
-        if (!isset($overrides['meta']) || !is_array($overrides['meta'])) {
-            $overrides['meta'] = [];
-        }
+        $overrides['meta'] ??= [];
         $overrides['meta']['discount_type'] = 'percent';
         $overrides['meta']['coupon_amount'] = $percentage;
 
@@ -105,18 +133,16 @@ trait CouponMethods
      * $couponId = $I->haveFixedCartCouponInDatabase('FIXED5', 5.00);
      * ```
      *
-     * @param string               $code      The coupon code.
-     * @param float                $amount    The discount amount in shop currency.
-     * @param array<string, mixed> $overrides Post and meta data overrides.
+     * @param string          $code      The coupon code.
+     * @param float           $amount    The discount amount in shop currency.
+     * @param CouponOverrides $overrides Post and meta data overrides.
      *
      * @return int The coupon post ID.
      */
     public function haveFixedCartCouponInDatabase(string $code, float $amount, array $overrides = []): int
     {
         $overrides['code'] = $code;
-        if (!isset($overrides['meta']) || !is_array($overrides['meta'])) {
-            $overrides['meta'] = [];
-        }
+        $overrides['meta'] ??= [];
         $overrides['meta']['discount_type'] = 'fixed_cart';
         $overrides['meta']['coupon_amount'] = $amount;
 
@@ -131,18 +157,16 @@ trait CouponMethods
      * $couponId = $I->haveFixedProductCouponInDatabase('PROD10', 10.00);
      * ```
      *
-     * @param string               $code      The coupon code.
-     * @param float                $amount    The discount amount in shop currency.
-     * @param array<string, mixed> $overrides Post and meta data overrides.
+     * @param string          $code      The coupon code.
+     * @param float           $amount    The discount amount in shop currency.
+     * @param CouponOverrides $overrides Post and meta data overrides.
      *
      * @return int The coupon post ID.
      */
     public function haveFixedProductCouponInDatabase(string $code, float $amount, array $overrides = []): int
     {
         $overrides['code'] = $code;
-        if (!isset($overrides['meta']) || !is_array($overrides['meta'])) {
-            $overrides['meta'] = [];
-        }
+        $overrides['meta'] ??= [];
         $overrides['meta']['discount_type'] = 'fixed_product';
         $overrides['meta']['coupon_amount'] = $amount;
 
@@ -157,17 +181,15 @@ trait CouponMethods
      * $couponId = $I->haveFreeShippingCouponInDatabase('FREESHIPPING');
      * ```
      *
-     * @param string               $code      The coupon code.
-     * @param array<string, mixed> $overrides Post and meta data overrides.
+     * @param string          $code      The coupon code.
+     * @param CouponOverrides $overrides Post and meta data overrides.
      *
      * @return int The coupon post ID.
      */
     public function haveFreeShippingCouponInDatabase(string $code, array $overrides = []): int
     {
         $overrides['code'] = $code;
-        if (!isset($overrides['meta']) || !is_array($overrides['meta'])) {
-            $overrides['meta'] = [];
-        }
+        $overrides['meta'] ??= [];
         $overrides['meta']['discount_type'] = 'fixed_cart';
         $overrides['meta']['free_shipping'] = 'yes';
 
