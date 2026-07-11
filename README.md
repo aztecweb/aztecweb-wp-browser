@@ -74,6 +74,21 @@ public function customerCheckoutWithCoupon(AcceptanceTester $I): void
 }
 ```
 
+## Writing tests with an AI coding agent
+
+This library is **agent-ready**: it declares an installable **skill** that orients a
+coding agent to write WooCommerce acceptance Cests using the actor methods above.
+Install it into your project with:
+
+```bash
+npx skills add aztecweb/aztecweb-wp-browser/skills/write-woocommerce-tests
+```
+
+The skill defers at runtime to your installed `vendor/` tree, so its guidance always
+matches the library version you actually have. The project only **declares** the
+skill — activation is consumer-driven, with no auto-discovery from inside `vendor/`
+and no post-install hook.
+
 ## HPOS support
 
 HPOS (High-Performance Order Storage) is **auto-detected** from the
