@@ -1,5 +1,29 @@
-# Keep contributor/agent meta-docs out of the Composer dist tarball.
-# These are internal entry points for people working *in* this repo, not
-# consumer documentation (README.md ships; see issue #36).
+# Keep the Composer dist tarball lean: only ship what a consumer (human or
+# agent) needs to install and use the library. Everything below is internal
+# tooling, contributor/agent meta-docs, or the library's own test suite —
+# not consumer-facing. See issue #38.
+#
+# Shipped (NOT export-ignored): src/, skills/, README.md, LICENSE,
+# composer.json, composer.lock, CHANGELOG.md.
+
 /AGENTS.md export-ignore
 /CLAUDE.md export-ignore
+/CONTRIBUTING.md export-ignore
+/CONTEXT.md export-ignore
+/tests export-ignore
+/docs export-ignore
+/prd export-ignore
+/bin export-ignore
+/Dockerfile export-ignore
+/codeception.yml export-ignore
+/wp-cli.yml export-ignore
+/public export-ignore
+/resources export-ignore
+/phpcs.xml.dist export-ignore
+/phpstan.neon.dist export-ignore
+/.github export-ignore
+/.githooks export-ignore
+/.claude export-ignore
+/.env.example export-ignore
+/.gitignore export-ignore
+/.gitattributes export-ignore
