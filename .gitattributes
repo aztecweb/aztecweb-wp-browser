@@ -3,8 +3,10 @@
 # tooling, contributor/agent meta-docs, or the library's own test suite —
 # not consumer-facing. See issue #38.
 #
-# Shipped (NOT export-ignored): src/, skills/, README.md, LICENSE,
-# composer.json, composer.lock, CHANGELOG.md.
+# Shipped (NOT export-ignored): src/, README.md, LICENSE,
+# composer.json, composer.lock, CHANGELOG.md. The skills/ directory is
+# excluded from the dist tarball: it's installed from the remote skill
+# repo instead of from vendor/.
 
 /AGENTS.md export-ignore
 /CHANGELOG.md export-ignore
@@ -12,6 +14,7 @@
 /CONTRIBUTING.md export-ignore
 /CONTEXT.md export-ignore
 /tests export-ignore
+/skills export-ignore
 /docs export-ignore
 /prd export-ignore
 /bin export-ignore
