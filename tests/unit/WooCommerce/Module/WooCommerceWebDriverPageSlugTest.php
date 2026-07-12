@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\Tests\Unit\WooCommerce\Module;
 
-use Aztec\WPBrowser\WooCommerce\Config\WooCommerceConfig;
 use Aztec\WPBrowser\WooCommerce\Module\WooCommerceWebDriver;
 use Codeception\Test\Unit;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -15,11 +14,11 @@ class WooCommerceWebDriverPageSlugTest extends Unit
 {
     public function testDefaultsToWooCommerceConventionSlugs(): void
     {
-        $config = $this->wooCommerceConfigOf($this->module());
+        $module = $this->module();
 
-        $this->assertSame('/cart', $config->cartPageSlug());
-        $this->assertSame('/checkout', $config->checkoutPageSlug());
-        $this->assertSame('/my-account', $config->myAccountPageSlug());
+        $this->assertSame('/cart', $this->invoke($module, 'cartPageSlug'));
+        $this->assertSame('/checkout', $this->invoke($module, 'checkoutPageSlug'));
+        $this->assertSame('/my-account', $this->invoke($module, 'myAccountPageSlug'));
     }
 
     public function testEachSlugIsIndependentlyOverridable(): void
@@ -28,11 +27,28 @@ class WooCommerceWebDriverPageSlugTest extends Unit
             'checkoutPageSlug' => '/finalizar-compra',
         ]);
 
-        $config = $this->wooCommerceConfigOf($module);
+        $this->assertSame('/cart', $this->invoke($module, 'cartPageSlug'), 'untouched slug keeps its default');
+        $this->assertSame(
+            '/finalizar-compra',
+            $this->invoke($module, 'checkoutPageSlug'),
+            'overridden slug wins',
+        );
+        $this->assertSame(
+            '/my-account',
+            $this->invoke($module, 'myAccountPageSlug'),
+            'untouched slug keeps its default',
+        );
+    }
 
-        $this->assertSame('/cart', $config->cartPageSlug(), 'untouched slug keeps its default');
-        $this->assertSame('/finalizar-compra', $config->checkoutPageSlug(), 'overridden slug wins');
-        $this->assertSame('/my-account', $config->myAccountPageSlug(), 'untouched slug keeps its default');
+    private function invoke(WooCommerceWebDriver $module, string $method): string
+    {
+        $reflection = new ReflectionMethod($module, $method);
+        $reflection->setAccessible(true);
+
+        $value = $reflection->invoke($module);
+        $this->assertIsString($value);
+
+        return $value;
     }
 
     /**
@@ -55,16 +71,5 @@ class WooCommerceWebDriverPageSlugTest extends Unit
         }
 
         return $module;
-    }
-
-    private function wooCommerceConfigOf(WooCommerceWebDriver $module): WooCommerceConfig
-    {
-        $method = new ReflectionMethod($module, 'wooCommerceConfig');
-        $method->setAccessible(true);
-
-        $config = $method->invoke($module);
-        assert($config instanceof WooCommerceConfig);
-
-        return $config;
     }
 }

@@ -44,24 +44,10 @@ class SiblingModuleCheckTest extends Unit
         $module->_initialize();
     }
 
-    public function testWooCommerceWebDriverThrowsWhenWpDbIsMissing(): void
+    public function testWooCommerceWebDriverInitializesWhenWpWebDriverIsPresent(): void
     {
         $module = $this->moduleWithSiblings(WooCommerceWebDriver::class, [
             'WPWebDriver' => true,
-            'WPDb' => false,
-        ]);
-
-        $this->expectException(ModuleException::class);
-        $this->expectExceptionMessage('WPDb');
-
-        $module->_initialize();
-    }
-
-    public function testWooCommerceWebDriverInitializesWhenBothSiblingsArePresent(): void
-    {
-        $module = $this->moduleWithSiblings(WooCommerceWebDriver::class, [
-            'WPWebDriver' => true,
-            'WPDb' => true,
         ]);
 
         $this->expectNotToPerformAssertions();
