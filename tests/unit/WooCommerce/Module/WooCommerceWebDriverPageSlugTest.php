@@ -46,7 +46,7 @@ class WooCommerceWebDriverPageSlugTest extends Unit
         $reflection->setAccessible(true);
 
         $value = $reflection->invoke($module);
-        assert(is_string($value));
+        $this->assertIsString($value);
 
         return $value;
     }
