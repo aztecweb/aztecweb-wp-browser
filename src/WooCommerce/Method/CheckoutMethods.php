@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\WooCommerce\Method;
 
-use Aztec\WPBrowser\WooCommerce\Config\WooCommerceConfig;
 use Aztec\WPBrowser\WooCommerce\PageObject\CheckoutPageObject;
 use Aztec\WPBrowser\WooCommerce\PageObject\PageObjectProvider;
-use lucatume\WPBrowser\Module\WPDb;
 use lucatume\WPBrowser\Module\WPWebDriver;
 
 trait CheckoutMethods
 {
     abstract protected function wpWebDriver(): WPWebDriver;
-    abstract protected function wpDb(): WPDb;
-    abstract protected function wooCommerceConfig(): WooCommerceConfig;
+    abstract protected function checkoutPageSlug(): string;
     abstract protected function pageObjectProvider(): PageObjectProvider;
     abstract protected function selector(mixed $value): string;
 
@@ -33,7 +30,7 @@ trait CheckoutMethods
      */
     public function amOnCheckoutPage(): void
     {
-        $this->wpWebDriver()->amOnPage($this->wooCommerceConfig()->checkoutPageSlug());
+        $this->wpWebDriver()->amOnPage($this->checkoutPageSlug());
         $this->wpWebDriver()->waitForElement('.wc-block-checkout');
     }
 

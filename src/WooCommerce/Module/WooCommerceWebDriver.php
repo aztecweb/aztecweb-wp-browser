@@ -19,7 +19,6 @@ class WooCommerceWebDriver extends Module
     use CheckoutMethods;
     use CustomerBrowserMethods;
     use OrderBrowserMethods;
-    use WooCommerceModuleSupport;
 
     /** @var array<string, mixed> */
     protected array $config = [
@@ -44,14 +43,6 @@ class WooCommerceWebDriver extends Module
                 'WooCommerceWebDriver requires the WPWebDriver module to be enabled in the same suite.',
             );
         }
-
-        if (! $this->hasModule('WPDb')) {
-            throw new ModuleException(
-                $this,
-                'WooCommerceWebDriver requires the WPDb module to be enabled in the same suite '
-                . '(it reads product and cart data directly from the database).',
-            );
-        }
     }
 
     protected function wpWebDriver(): WPWebDriver
@@ -71,5 +62,45 @@ class WooCommerceWebDriver extends Module
         }
 
         return $this->pageObjectProvider;
+    }
+
+    protected function cartPageSlug(): string
+    {
+        return $this->pageSlugConfig('cartPageSlug');
+    }
+
+    protected function checkoutPageSlug(): string
+    {
+        return $this->pageSlugConfig('checkoutPageSlug');
+    }
+
+    protected function myAccountPageSlug(): string
+    {
+        return $this->pageSlugConfig('myAccountPageSlug');
+    }
+
+    private function pageSlugConfig(string $key): string
+    {
+        $value = $this->_getConfig($key);
+
+        if (!is_string($value)) {
+            throw new ModuleException($this, "Config key \"{$key}\" must be a string slug (e.g. \"/cart\").");
+        }
+
+        return $value;
+    }
+
+    /**
+     * Narrow a page-object selector constant to a string.
+     *
+     * Page objects expose their selectors as untyped class constants because
+     * the package targets PHP 8.0+, where typed class constants are not
+     * available. Reading such a constant through a (non-final, overridable)
+     * page-object instance therefore widens to mixed under static analysis.
+     * Selectors are always strings, so this safely narrows the value.
+     */
+    protected function selector(mixed $value): string
+    {
+        return is_string($value) ? $value : '';
     }
 }

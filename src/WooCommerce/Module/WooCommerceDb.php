@@ -19,6 +19,7 @@ use Aztec\WPBrowser\WooCommerce\SubscriptionStorage\LegacySubscriptionStorage;
 use Aztec\WPBrowser\WooCommerce\SubscriptionStorage\SubscriptionStorageInterface;
 use Codeception\Exception\ModuleException;
 use Codeception\Module;
+use lucatume\WPBrowser\Module\WPDb;
 
 class WooCommerceDb extends Module
 {
@@ -28,7 +29,6 @@ class WooCommerceDb extends Module
     use OrderMethods;
     use ProductMethods;
     use SubscriptionMethods;
-    use WooCommerceModuleSupport;
 
     public function _initialize(): void
     {
@@ -38,6 +38,14 @@ class WooCommerceDb extends Module
                 'WooCommerceDb requires the WPDb module to be enabled in the same suite.',
             );
         }
+    }
+
+    protected function wpDb(): WPDb
+    {
+        $module = $this->getModule('WPDb');
+        assert($module instanceof WPDb);
+
+        return $module;
     }
 
     protected function isHposEnabled(): bool

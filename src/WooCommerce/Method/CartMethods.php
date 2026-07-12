@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\WooCommerce\Method;
 
-use Aztec\WPBrowser\WooCommerce\Config\WooCommerceConfig;
 use Aztec\WPBrowser\WooCommerce\PageObject\CartPageObject;
 use Aztec\WPBrowser\WooCommerce\PageObject\PageObjectProvider;
 use Codeception\Util\Locator;
@@ -14,7 +13,7 @@ trait CartMethods
 {
     abstract protected function wpWebDriver(): WPWebDriver;
 
-    abstract protected function wooCommerceConfig(): WooCommerceConfig;
+    abstract protected function cartPageSlug(): string;
 
     abstract protected function pageObjectProvider(): PageObjectProvider;
 
@@ -33,7 +32,7 @@ trait CartMethods
      */
     public function amOnCartPage(): void
     {
-        $this->wpWebDriver()->amOnPage($this->wooCommerceConfig()->cartPageSlug());
+        $this->wpWebDriver()->amOnPage($this->cartPageSlug());
     }
 
     /**
