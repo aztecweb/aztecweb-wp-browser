@@ -38,11 +38,18 @@ trait CartMethods
     /**
      * Add a product to the cart via the add-to-cart query parameter.
      *
+     * Leaves the browser wherever the store sends the add-to-cart request: the
+     * cart page when WooCommerce's "Add to cart behaviour" setting is enabled,
+     * the page set by the `woocommerce_add_to_cart_redirect` filter when one is,
+     * otherwise the requested URL. Navigate explicitly before asserting on cart
+     * or checkout contents.
+     *
      * @example
      * ```php
      * $productId = $I->haveProductInDatabase(['post_title' => 'Test Product']);
      * $I->addProductToCart($productId, 2);
-     * $I->seeElement('.woocommerce-message');
+     * $I->amOnCartPage();
+     * $I->seeProductInCart('Test Product');
      * ```
      *
      * @param int $productId  Product ID to add to the cart
@@ -53,9 +60,6 @@ trait CartMethods
     public function addProductToCart(int $productId, int $quantity = 1): void
     {
         $this->wpWebDriver()->amOnPage("/?add-to-cart=$productId&quantity=$quantity");
-        /** @var CartPageObject $cartPage */
-        $cartPage = $this->pageObjectProvider()->cartPage();
-        $this->wpWebDriver()->waitForElement($this->selector($cartPage::PRODUCT_ADDED_TO_CART_MESSAGE_SELECTOR));
     }
 
     /**
