@@ -206,6 +206,19 @@ class SubscriptionHPOSCest
         ]);
     }
 
+    public function testSeeSubscriptionMetaWithPostId(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase();
+
+        $I->haveSubscriptionMetaInDatabase($subscriptionId, '_hpos_meta_post_id', 'value_post_id');
+
+        $I->seeSubscriptionMetaInDatabase([
+            'post_id' => $subscriptionId,
+            'meta_key' => '_hpos_meta_post_id',
+            'meta_value' => 'value_post_id',
+        ]);
+    }
+
     public function testHaveSubscriptionMetaTargetsWcOrdersMetaTable(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase();

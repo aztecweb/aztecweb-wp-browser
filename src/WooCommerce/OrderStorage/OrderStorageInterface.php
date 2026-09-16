@@ -45,8 +45,6 @@ interface OrderStorageInterface extends WooCommerceStorageInterface
 
     public function haveOrderItemMetaInDatabase(int $orderItemId, string $metaKey, mixed $metaValue): int;
 
-    public function getMetaIdColumnName(): string;
-
     /**
      * Map and add address type to address criteria.
      *

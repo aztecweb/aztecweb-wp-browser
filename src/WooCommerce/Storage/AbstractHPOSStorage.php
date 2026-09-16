@@ -25,6 +25,11 @@ abstract class AbstractHPOSStorage extends AbstractStorage
         return $this->grabWcOrdersMetaTableName();
     }
 
+    public function getMetaIdColumnName(): string
+    {
+        return 'order_id';
+    }
+
     /**
      * Map criteria to HPOS (wc_orders) format.
      *
@@ -41,29 +46,12 @@ abstract class AbstractHPOSStorage extends AbstractStorage
         return $mapped;
     }
 
-    /**
-     * Map meta query criteria to HPOS (wc_orders_meta) format.
-     *
-     * @param array<string, mixed> $criteria Database query criteria.
-     * @return array<string, mixed> Mapped criteria.
-     */
-    public function mapMetaCriteria(array $criteria): array
-    {
-        $entityKey = $this->getEntityIdKey();
-        if (isset($criteria[$entityKey])) {
-            $criteria['order_id'] = $criteria[$entityKey];
-            unset($criteria[$entityKey]);
-        }
-
-        return $criteria;
-    }
-
     protected function grabEntityMeta(int $entityId, string $key, bool $single = false): mixed
     {
         $grabbed = $this->wpDb->grabColumnFromDatabase(
             $this->grabWcOrdersMetaTableName(),
             'meta_value',
-            ['order_id' => $entityId, 'meta_key' => $key],
+            [$this->getMetaIdColumnName() => $entityId, 'meta_key' => $key],
         );
 
         $values = array_reduce($grabbed, static function (array $metaValues, $value): array {
@@ -78,7 +66,7 @@ abstract class AbstractHPOSStorage extends AbstractStorage
     protected function haveEntityMetaInDatabase(int $entityId, string $key, mixed $value): int
     {
         return $this->wpDb->haveInDatabase($this->grabWcOrdersMetaTableName(), [
-            'order_id' => $entityId,
+            $this->getMetaIdColumnName() => $entityId,
             'meta_key' => $key,
             'meta_value' => Serializer::maybeSerialize($value),
         ]);

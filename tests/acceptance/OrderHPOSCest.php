@@ -464,6 +464,37 @@ class OrderHPOSCest
         }
     }
 
+    public function testSeeOrderMetaIsScopedToTheGivenOrder(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase();
+        $otherOrderId = $I->haveOrderInDatabase();
+
+        $I->haveOrderMetaInDatabase($orderId, '_scoped_meta', 'scoped_value');
+
+        $I->seeOrderMetaInDatabase([
+            'order_id' => $orderId,
+            'meta_key' => '_scoped_meta',
+        ]);
+
+        $I->dontSeeOrderMetaInDatabase([
+            'order_id' => $otherOrderId,
+            'meta_key' => '_scoped_meta',
+        ]);
+    }
+
+    public function testSeeOrderMetaWithPostId(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase();
+
+        $I->haveOrderMetaInDatabase($orderId, '_hpos_meta_post_id', 'value_post_id');
+
+        $I->seeOrderMetaInDatabase([
+            'post_id' => $orderId,
+            'meta_key' => '_hpos_meta_post_id',
+            'meta_value' => 'value_post_id',
+        ]);
+    }
+
     public function testHaveOrderMetaTargetsWcOrdersMetaTable(AcceptanceTester $I): void
     {
         $orderId = $I->haveOrderInDatabase();

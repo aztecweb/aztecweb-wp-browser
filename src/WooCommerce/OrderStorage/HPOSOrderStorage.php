@@ -163,11 +163,6 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
         );
     }
 
-    public function getMetaIdColumnName(): string
-    {
-        return 'order_id';
-    }
-
     public function getOrderAddressTableName(): string
     {
         return $this->grabOrderAddressesTableName();
