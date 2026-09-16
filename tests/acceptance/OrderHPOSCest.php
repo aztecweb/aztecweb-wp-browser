@@ -464,6 +464,24 @@ class OrderHPOSCest
         }
     }
 
+    public function testHaveOrderMetaTargetsWcOrdersMetaTable(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase();
+
+        $I->haveOrderMetaInDatabase($orderId, '_hpos_meta_location', 'hpos_value');
+
+        $I->seeInDatabase('wp_wc_orders_meta', [
+            'order_id' => $orderId,
+            'meta_key' => '_hpos_meta_location',
+            'meta_value' => 'hpos_value',
+        ]);
+
+        $I->dontSeeInDatabase('wp_postmeta', [
+            'post_id' => $orderId,
+            'meta_key' => '_hpos_meta_location',
+        ]);
+    }
+
     public function testSeeOrderItemMetaWithOrderId(AcceptanceTester $I): void
     {
         $orderId = $I->haveOrderInDatabase();

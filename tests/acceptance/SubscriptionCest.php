@@ -216,6 +216,24 @@ class SubscriptionCest
         ]);
     }
 
+    public function testHaveSubscriptionMetaTargetsPostmetaTable(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase();
+
+        $I->haveSubscriptionMetaInDatabase($subscriptionId, '_legacy_meta_location', 'legacy_value');
+
+        $I->seeInDatabase('wp_postmeta', [
+            'post_id' => $subscriptionId,
+            'meta_key' => '_legacy_meta_location',
+            'meta_value' => 'legacy_value',
+        ]);
+
+        $I->dontSeeInDatabase('wp_wc_orders_meta', [
+            'order_id' => $subscriptionId,
+            'meta_key' => '_legacy_meta_location',
+        ]);
+    }
+
     public function testSeeSubscriptionStatus(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase([

@@ -11,6 +11,11 @@ trait HPOSStorageTrait
         return $this->wpDb->grabTablePrefix() . 'wc_orders';
     }
 
+    protected function grabWcOrdersMetaTableName(): string
+    {
+        return $this->wpDb->grabTablePrefix() . 'wc_orders_meta';
+    }
+
     protected function generateId(): int
     {
         $maxOrderId = $this->wpDb->grabLatestEntryByFromDatabase($this->grabWcOrdersTableName(), 'id');

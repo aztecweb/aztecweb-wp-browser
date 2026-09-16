@@ -206,16 +206,21 @@ class SubscriptionHPOSCest
         ]);
     }
 
-    public function testSeeSubscriptionMetaWithPostId(AcceptanceTester $I): void
+    public function testHaveSubscriptionMetaTargetsWcOrdersMetaTable(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase();
 
         $I->haveSubscriptionMetaInDatabase($subscriptionId, '_hpos_meta2', 'value2');
 
-        $I->seeSubscriptionMetaInDatabase([
-            'post_id' => $subscriptionId,
+        $I->seeInDatabase('wp_wc_orders_meta', [
+            'order_id' => $subscriptionId,
             'meta_key' => '_hpos_meta2',
             'meta_value' => 'value2',
+        ]);
+
+        $I->dontSeeInDatabase('wp_postmeta', [
+            'post_id' => $subscriptionId,
+            'meta_key' => '_hpos_meta2',
         ]);
     }
 
@@ -301,6 +306,31 @@ class SubscriptionHPOSCest
             'meta_key' => '_billing_interval',
             'meta_value' => '1',
         ]);
+    }
+
+    public function testSubscriptionDefaultMetaTargetsWcOrdersMetaTable(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase();
+
+        $defaultKeys = [
+            '_billing_period',
+            '_billing_interval',
+            '_subscription_start_date',
+            '_subscription_expiry_date',
+            '_subscription_end_date',
+        ];
+
+        foreach ($defaultKeys as $metaKey) {
+            $I->seeInDatabase('wp_wc_orders_meta', [
+                'order_id' => $subscriptionId,
+                'meta_key' => $metaKey,
+            ]);
+
+            $I->dontSeeInDatabase('wp_postmeta', [
+                'post_id' => $subscriptionId,
+                'meta_key' => $metaKey,
+            ]);
+        }
     }
 
     public function testHaveSubscriptionProductInDatabase(AcceptanceTester $I): void
