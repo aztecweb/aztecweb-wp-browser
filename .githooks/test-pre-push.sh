@@ -32,26 +32,32 @@ map_file_to_cests() {
     local file="$1"
 
     case "$file" in
-        src/Method/CartMethods.php)
-            echo "CartCest"
+        src/WooCommerce/Method/CartMethods.php)
+            echo "CartCest CheckoutCest PageSlugCest"
             ;;
-        src/Method/CheckoutMethods.php)
+        src/WooCommerce/Method/CheckoutMethods.php)
             echo "CheckoutCest"
             ;;
-        src/Method/CouponMethods.php)
+        src/WooCommerce/Method/CouponMethods.php)
             echo "CouponCest"
             ;;
-        src/Method/CustomerMethods.php)
+        src/WooCommerce/Method/CustomerMethods.php)
             echo "CustomerCest"
             ;;
-        src/Method/OrderMethods.php)
-            echo "OrderCest"
+        src/WooCommerce/Method/CustomerBrowserMethods.php)
+            echo "CustomerCest PageSlugCest"
             ;;
-        src/Method/ProductMethods.php)
-            echo "ProductCest"
+        src/WooCommerce/Method/OrderMethods.php|src/WooCommerce/Method/OrderBrowserMethods.php)
+            echo "OrderCest OrderHPOSCest"
+            ;;
+        src/WooCommerce/Method/ProductMethods.php)
+            echo "ProductCest CartCest CheckoutCest SubscriptionCest SubscriptionHPOSCest"
+            ;;
+        src/WooCommerce/Method/SubscriptionMethods.php)
+            echo "SubscriptionCest SubscriptionHPOSCest"
             ;;
         # Files that trigger RUN_ALL (shared infrastructure)
-        src/aliases.php|src/AztecWPBrowser.php|src/Config/*|src/Page/*|src/OrderStorage/*|src/Storage/*|src/SubscriptionStorage/*|composer.json|composer.lock|phpstan.neon.dist|phpcs.xml.dist|tests/_support/*|tests/acceptance/*)
+        src/aliases.php|src/WooCommerce/Module/*|src/WooCommerce/Browser/*|src/WooCommerce/PageObject/*|src/WooCommerce/OrderStorage/*|src/WooCommerce/Storage/*|src/WooCommerce/SubscriptionStorage/*|composer.json|composer.lock|phpstan.neon.dist|phpcs.xml.dist|tests/_support/*|tests/acceptance/*)
             echo "RUN_ALL"
             ;;
         *)
@@ -77,7 +83,7 @@ process_changed_files() {
         if [ "$result" = "RUN_ALL" ]; then
             run_all=1
         elif [ -n "$result" ]; then
-            cests_array+=("$result")
+            cests_array+=($result)
         fi
     done
 
@@ -90,7 +96,7 @@ process_changed_files() {
 }
 
 # Test 1: Single trait file maps to corresponding Cest
-result=$(process_changed_files "src/Method/CouponMethods.php")
+result=$(process_changed_files "src/WooCommerce/Method/CouponMethods.php")
 assert_equals "CouponCest" "$result" "Single trait file maps to Cest"
 
 # Test 2: aliases.php triggers RUN_ALL
@@ -98,15 +104,15 @@ result=$(process_changed_files "src/aliases.php")
 assert_equals "RUN_ALL" "$result" "aliases.php triggers RUN_ALL"
 
 # Test 3: Multiple trait files return union of Cests
-result=$(process_changed_files "src/Method/CouponMethods.php" "src/Method/ProductMethods.php")
-assert_equals "CouponCest ProductCest" "$result" "Multiple trait files return union"
+result=$(process_changed_files "src/WooCommerce/Method/CouponMethods.php" "src/WooCommerce/Method/ProductMethods.php")
+assert_equals "CartCest CheckoutCest CouponCest ProductCest SubscriptionCest SubscriptionHPOSCest" "$result" "Multiple trait files return union"
 
 # Test 4: Duplicate files don't duplicate output
-result=$(process_changed_files "src/Method/CouponMethods.php" "src/Method/CouponMethods.php")
+result=$(process_changed_files "src/WooCommerce/Method/CouponMethods.php" "src/WooCommerce/Method/CouponMethods.php")
 assert_equals "CouponCest" "$result" "Duplicate files don't duplicate output"
 
 # Test 5: Mix of trait and infrastructure changes triggers RUN_ALL
-result=$(process_changed_files "src/Method/CouponMethods.php" "src/Config/WooCommerceConfig.php")
+result=$(process_changed_files "src/WooCommerce/Method/CouponMethods.php" "src/WooCommerce/Storage/HposState.php")
 assert_equals "RUN_ALL" "$result" "Infrastructure changes trigger RUN_ALL"
 
 # Test 6: No changed files aborts the push
@@ -122,8 +128,12 @@ result=$(process_changed_files "tests/_support/Helper/CustomHelper.php")
 assert_equals "RUN_ALL" "$result" "Test support files trigger RUN_ALL"
 
 # Test 9: Page Object changes trigger RUN_ALL
-result=$(process_changed_files "src/Page/CartPageObject.php")
+result=$(process_changed_files "src/WooCommerce/PageObject/CartPageObject.php")
 assert_equals "RUN_ALL" "$result" "Page object changes trigger RUN_ALL"
+
+# Test 10: A trait exercised by both storage variants maps to both Cests
+result=$(process_changed_files "src/WooCommerce/Method/OrderMethods.php")
+assert_equals "OrderCest OrderHPOSCest" "$result" "Order trait maps to Legacy and HPOS Cests"
 
 # Print summary
 echo ""

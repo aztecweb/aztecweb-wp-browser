@@ -40,31 +40,47 @@ if [ -z "$PHP_CHANGED" ]; then
 fi
 
 # Map changed files to Cest classes
+#
+# A Method Trait maps to every Cest that exercises it, not just the Cest of the
+# same name: the builders in ProductMethods, for example, seed the fixtures the
+# cart, checkout and subscription Cests assert on, so a change there is only
+# verified if those run too. Paths are the post-Plugin-Subnamespace layout
+# (`src/<Plugin>/...`). A file that matches nothing falls through to the full
+# suite below, which is what covers the traits without acceptance coverage of
+# their own (ActionScheduler's ActionMethods) and everything under
+# src/CodeSniffer/.
 declare -a CESTS
 RUN_ALL=0
 
 for file in $CHANGED_FILES; do
     case "$file" in
-        src/Method/CartMethods.php)
-            CESTS+=("CartCest")
+        src/WooCommerce/Method/CartMethods.php)
+            CESTS+=(CartCest CheckoutCest PageSlugCest)
             ;;
-        src/Method/CheckoutMethods.php)
-            CESTS+=("CheckoutCest")
+        src/WooCommerce/Method/CheckoutMethods.php)
+            CESTS+=(CheckoutCest)
             ;;
-        src/Method/CouponMethods.php)
-            CESTS+=("CouponCest")
+        src/WooCommerce/Method/CouponMethods.php)
+            CESTS+=(CouponCest)
             ;;
-        src/Method/CustomerMethods.php)
-            CESTS+=("CustomerCest")
+        src/WooCommerce/Method/CustomerMethods.php)
+            CESTS+=(CustomerCest)
             ;;
-        src/Method/OrderMethods.php)
-            CESTS+=("OrderCest")
+        src/WooCommerce/Method/CustomerBrowserMethods.php)
+            CESTS+=(CustomerCest PageSlugCest)
             ;;
-        src/Method/ProductMethods.php)
-            CESTS+=("ProductCest")
+        # Both order Cests: the same methods run against Legacy and HPOS storage.
+        src/WooCommerce/Method/OrderMethods.php|src/WooCommerce/Method/OrderBrowserMethods.php)
+            CESTS+=(OrderCest OrderHPOSCest)
+            ;;
+        src/WooCommerce/Method/ProductMethods.php)
+            CESTS+=(ProductCest CartCest CheckoutCest SubscriptionCest SubscriptionHPOSCest)
+            ;;
+        src/WooCommerce/Method/SubscriptionMethods.php)
+            CESTS+=(SubscriptionCest SubscriptionHPOSCest)
             ;;
         # Shared infrastructure: triggers full suite
-        src/aliases.php|src/AztecWPBrowser.php|src/Config/*|src/Page/*|src/OrderStorage/*|src/Storage/*|src/SubscriptionStorage/*|composer.json|composer.lock|phpstan.neon.dist|phpcs.xml.dist|tests/_support/*|tests/acceptance/*)
+        src/aliases.php|src/WooCommerce/Module/*|src/WooCommerce/Browser/*|src/WooCommerce/PageObject/*|src/WooCommerce/OrderStorage/*|src/WooCommerce/Storage/*|src/WooCommerce/SubscriptionStorage/*|composer.json|composer.lock|phpstan.neon.dist|phpcs.xml.dist|tests/_support/*|tests/acceptance/*)
             RUN_ALL=1
             break
             ;;
@@ -90,6 +106,7 @@ if [ $RUN_ALL -eq 1 ] || [ ${#CESTS[@]} -eq 0 ]; then
     "$TEST" codecept run
 else
     echo "Running impacted tests: ${CESTS[*]} + unit"
+
     # `codecept run` only accepts a single optional "test" argument, so passing
     # multiple Cest names positionally fails once we have 2+ impacted classes.
     # Use --filter instead: it matches against the test signature
