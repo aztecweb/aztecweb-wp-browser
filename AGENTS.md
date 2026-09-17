@@ -11,6 +11,16 @@ Entry point for AI agents working in this repository.
 ## Commands
 
 ```bash
+# One-time: authenticate to the registry — the runner image is a private
+# package, and the CLI does not request read:packages when it first logs in.
+# Without this every bin/test command below is denied by the registry.
+gh auth refresh -s read:packages
+gh auth token | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
+
+# One-time: suite parameters — codeception.yml reads .env, which is gitignored,
+# so a fresh clone has none and Codeception refuses to start without it
+cp .env.example .env
+
 # One-time: install PHP dependencies (also wires up the pre-push hook)
 bin/test composer install
 
