@@ -349,6 +349,26 @@ trait OrderMethods
     }
 
     /**
+     * Verify that order meta does not exist in the database with the given criteria.
+     *
+     * @example
+     * ```php
+     * $orderId = $I->haveOrderInDatabase();
+     * $I->dontSeeOrderMetaInDatabase(['order_id' => $orderId, 'meta_key' => '_deleted']);
+     * ```
+     *
+     * @param array<string, mixed> $criteria Database query criteria (e.g., ['order_id' => 123, 'meta_key' => '_deleted']). Supports storage-agnostic keys
+     *
+     * @return void
+     */
+    public function dontSeeOrderMetaInDatabase(array $criteria): void
+    {
+        $tableName = $this->orderStorage()->getMetaTableName();
+        $mappedCriteria = $this->orderStorage()->mapMetaCriteria($criteria);
+        $this->wpDb()->dontSeeInDatabase($tableName, $mappedCriteria);
+    }
+
+    /**
      * Verify that an order item exists in the database with the given criteria.
      *
      * @example

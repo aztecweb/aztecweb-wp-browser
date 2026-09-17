@@ -12,6 +12,8 @@ interface WooCommerceStorageInterface
 
     public function getIdColumnName(): string;
 
+    public function getMetaIdColumnName(): string;
+
     /**
      * Map query criteria to storage format.
      *
