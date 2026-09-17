@@ -120,14 +120,17 @@ machine before the first run. Without it every `bin/test` command fails with
 missing login:
 
 ```bash
+# The GitHub CLI does not request read:packages when it first authenticates,
+# so add the scope before handing its token to Docker
+gh auth refresh -s read:packages
 gh auth token | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
 ```
 
-Any personal access token carrying the `read:packages` scope works; the command
-above borrows one from the GitHub CLI. Docker stores the credential, so this is
-a one-time step. If the login succeeds and the pull is still denied, the account
-has not been granted read access to the package — ask an organization owner for
-it.
+Any personal access token carrying the `read:packages` scope works just as well.
+Docker stores the credential, so this is a one-time step. If the login succeeds
+and the pull is still denied, the account has not been granted read access to
+the package — ask an organization owner for it. The two failures are
+indistinguishable from the command output, which is why it is worth stating.
 
 ```bash
 cp .env.example .env                         # one-time: suite parameters (gitignored)
