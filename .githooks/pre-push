@@ -9,7 +9,11 @@
 
 set -e
 
-AZTEC_TEST_IMAGE=${AZTEC_TEST_IMAGE:-php8.4}
+# Every container invocation goes through bin/test, which forwards the calling
+# user and group to the container, mounts the git common dir for worktrees and
+# persists the Composer cache. Image selection is bin/test's too, through
+# AZTEC_TEST_IMAGE (a full image reference — see README).
+TEST="$(git rev-parse --show-toplevel)/bin/test"
 
 # Determine changed files
 # First, try to get files since tracking branch (most common case)
@@ -73,29 +77,18 @@ if [ $RUN_ALL -eq 0 ] && [ ${#CESTS[@]} -gt 0 ]; then
 fi
 
 # Install dependencies and bootstrap test site
+#
+# `composer install`, never `update`: the hook is a verification gate, so it must
+# run against the locked versions and leave composer.lock untouched in the
+# working tree of whoever is pushing.
 echo "Installing dependencies and bootstrapping test site..."
-docker run \
-    --rm \
-    -v "$PWD:/var/www/html" \
-    -w /var/www/html \
-    ghcr.io/aztecweb/aztecweb-wp-browser-runner:$AZTEC_TEST_IMAGE \
-    bash -c "composer update && bash resources/install.sh"
+"$TEST" bash -c "composer install && bash resources/install.sh"
 
 # Run tests
 if [ $RUN_ALL -eq 1 ] || [ ${#CESTS[@]} -eq 0 ]; then
     echo "Running full test suite..."
-    docker run \
-        --rm \
-        -v "$PWD:/var/www/html" \
-        -w /var/www/html \
-        ghcr.io/aztecweb/aztecweb-wp-browser-runner:$AZTEC_TEST_IMAGE \
-        vendor/bin/codecept run
+    "$TEST" codecept run
 else
     echo "Running impacted tests: ${CESTS[*]} + unit"
-    docker run \
-        --rm \
-        -v "$PWD:/var/www/html" \
-        -w /var/www/html \
-        ghcr.io/aztecweb/aztecweb-wp-browser-runner:$AZTEC_TEST_IMAGE \
-        bash -c "vendor/bin/codecept run acceptance ${CESTS[*]} && vendor/bin/codecept run unit"
+    "$TEST" bash -c "codecept run acceptance ${CESTS[*]} && codecept run unit"
 fi
