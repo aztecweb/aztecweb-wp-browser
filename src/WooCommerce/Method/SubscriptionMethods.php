@@ -214,6 +214,8 @@ trait SubscriptionMethods
      * $I->seeSubscriptionStatus($subscriptionId, 'wc-on-hold');
      * ```
      *
+     * Accepts WC statuses with or without the `wc-` prefix. Non-WC statuses pass through unchanged.
+     *
      * @param int    $subscriptionId  Subscription ID to modify
      * @param string $status          New subscription status
      *

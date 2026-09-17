@@ -166,6 +166,8 @@ trait OrderMethods
      * $I->seeOrderStatus($orderId, 'completed');
      * ```
      *
+     * Accepts WC statuses with or without the `wc-` prefix. Non-WC statuses pass through unchanged.
+     *
      * @param int    $orderId    Order ID to modify
      * @param string $newStatus  New order status to set
      *

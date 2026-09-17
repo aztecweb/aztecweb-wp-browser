@@ -74,6 +74,34 @@ class OrderCest
         ]);
     }
 
+    public function testHaveOrderStatusNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'post_status' => 'wc-pending',
+        ]);
+
+        $I->haveOrderStatus($orderId, 'active');
+
+        $I->seeOrderInDatabase([
+            'ID' => $orderId,
+            'post_status' => 'wc-active',
+        ]);
+    }
+
+    public function testHaveOrderStatusPassesThroughNonWcStatus(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'post_status' => 'wc-pending',
+        ]);
+
+        $I->haveOrderStatus($orderId, 'trash');
+
+        $I->seeOrderInDatabase([
+            'ID' => $orderId,
+            'post_status' => 'trash',
+        ]);
+    }
+
     public function testSeeOrderStatus(AcceptanceTester $I): void
     {
         $orderId = $I->haveOrderInDatabase([

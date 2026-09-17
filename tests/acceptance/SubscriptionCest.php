@@ -147,6 +147,20 @@ class SubscriptionCest
         ]);
     }
 
+    public function testHaveSubscriptionStatusNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'wc-pending',
+        ]);
+
+        $I->haveSubscriptionStatus($subscriptionId, 'expired');
+
+        $I->seeSubscriptionInDatabase([
+            'ID' => $subscriptionId,
+            'post_status' => 'wc-expired',
+        ]);
+    }
+
     public function testCancelSubscription(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase([

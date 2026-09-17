@@ -71,6 +71,20 @@ class OrderHPOSCest
         ]);
     }
 
+    public function testHaveOrderStatusNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'status' => 'wc-pending',
+        ]);
+
+        $I->haveOrderStatus($orderId, 'active');
+
+        $I->seeInDatabase('wp_wc_orders', [
+            'id' => $orderId,
+            'status' => 'wc-active',
+        ]);
+    }
+
     public function testSeeOrderStatus(AcceptanceTester $I): void
     {
         $orderId = $I->haveOrderInDatabase([

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\WooCommerce\Storage;
 
+use Aztec\WPBrowser\Normalizer\StatusNormalizer;
+
 abstract class AbstractHPOSStorage extends AbstractStorage
 {
     use HPOSStorageTrait;
@@ -48,7 +50,7 @@ abstract class AbstractHPOSStorage extends AbstractStorage
     {
         $this->wpDb->updateInDatabase(
             $this->grabWcOrdersTableName(),
-            ['status' => $status],
+            ['status' => StatusNormalizer::normalize($status)],
             ['id' => $entityId],
         );
     }
