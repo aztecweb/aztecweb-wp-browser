@@ -60,6 +60,10 @@ map_file_to_cests() {
         src/aliases.php|src/WooCommerce/Module/*|src/WooCommerce/Browser/*|src/WooCommerce/PageObject/*|src/WooCommerce/OrderStorage/*|src/WooCommerce/Storage/*|src/WooCommerce/SubscriptionStorage/*|composer.json|composer.lock|phpstan.neon.dist|phpcs.xml.dist|tests/_support/*|tests/acceptance/*)
             echo "RUN_ALL"
             ;;
+        # Catch-all for shipped code with no arm of its own, mirroring the hook.
+        src/*.php)
+            echo "RUN_ALL"
+            ;;
         *)
             echo ""
             ;;
@@ -147,7 +151,12 @@ ROOT="$(dirname "${BASH_SOURCE[0]}")/.."
 missing_paths=""
 while read -r path; do
     case "$path" in
-        *'*') [ -d "$ROOT/${path%/*}" ] || missing_paths="$missing_paths $path" ;;
+        # Glob arms (`src/WooCommerce/Module/*`, `src/*.php`): the wildcard can
+        # sit anywhere, so check the directory preceding the first one.
+        *'*'*)
+            prefix="${path%%\**}"
+            [ -d "$ROOT/${prefix%/}" ] || missing_paths="$missing_paths $path"
+            ;;
         *) [ -e "$ROOT/$path" ] || missing_paths="$missing_paths $path" ;;
     esac
 done < <(grep -oE '(src|tests)/[A-Za-z0-9_/.*-]+' "$HOOK" | sort -u)
@@ -159,6 +168,26 @@ while read -r cest; do
     [ -f "$ROOT/tests/acceptance/$cest.php" ] || missing_cests="$missing_cests $cest"
 done < <(grep -oE '\b[A-Za-z]+Cest\b' "$HOOK" | sort -u)
 assert_equals "" "$missing_cests" "Every Cest mapped by the hook exists in tests/acceptance/"
+
+# Test 13: Shipped code with no arm of its own triggers RUN_ALL
+#
+# ActionMethods has no acceptance Cest and the sniffs are covered by the unit
+# suite, so neither can map to a Cest. They must still widen the run rather than
+# resolve to nothing, which is what the catch-all arm guarantees.
+result=$(process_changed_files "src/ActionScheduler/Method/ActionMethods.php")
+assert_equals "RUN_ALL" "$result" "Unmapped trait triggers RUN_ALL"
+
+# Test 14: Files under src/CodeSniffer/ trigger RUN_ALL
+result=$(process_changed_files "src/CodeSniffer/AztecWPBrowser/Sniffs/Docblock/RequirePublicMethodDocBlockSniff.php")
+assert_equals "RUN_ALL" "$result" "Sniff changes trigger RUN_ALL"
+
+# Test 15: An unmapped file alongside a mapped one still widens the run
+#
+# The case that made the fall-through comment wrong: before the catch-all, the
+# unmapped file matched no arm at all, so the selection stayed at whatever the
+# mapped file contributed and the push passed having never exercised the change.
+result=$(process_changed_files "src/WooCommerce/Method/CouponMethods.php" "src/ActionScheduler/Method/ActionMethods.php")
+assert_equals "RUN_ALL" "$result" "Unmapped file alongside a mapped one triggers RUN_ALL"
 
 # Print summary
 echo ""

@@ -46,10 +46,14 @@ fi
 # same name: the builders in ProductMethods, for example, seed the fixtures the
 # cart, checkout and subscription Cests assert on, so a change there is only
 # verified if those run too. Paths are the post-Plugin-Subnamespace layout
-# (`src/<Plugin>/...`). A file that matches nothing falls through to the full
-# suite below, which is what covers the traits without acceptance coverage of
-# their own (ActionScheduler's ActionMethods) and everything under
-# src/CodeSniffer/.
+# (`src/<Plugin>/...`).
+#
+# The `src/*.php` catch-all at the end of the case is what covers the code with
+# no acceptance coverage of its own — ActionScheduler's ActionMethods, all of
+# src/CodeSniffer/, and any subnamespace added later. It has to be an explicit
+# arm, not a fall-through: a file no arm matches leaves the selection untouched,
+# so without it changing an unmapped file alongside a mapped one would narrow
+# the run to the mapped Cest and silently skip everything else.
 declare -a CESTS
 RUN_ALL=0
 
@@ -82,6 +86,12 @@ for file in $CHANGED_FILES; do
             ;;
         # Shared infrastructure: triggers full suite
         src/aliases.php|src/WooCommerce/Module/*|src/WooCommerce/Browser/*|src/WooCommerce/PageObject/*|src/WooCommerce/OrderStorage/*|src/WooCommerce/Storage/*|src/WooCommerce/SubscriptionStorage/*|composer.json|composer.lock|phpstan.neon.dist|phpcs.xml.dist|tests/_support/*|tests/acceptance/*)
+            RUN_ALL=1
+            break
+            ;;
+        # Catch-all, kept last: shipped code no arm above claims. `*` matches
+        # slashes in a case pattern, so this covers every depth under src/.
+        src/*.php)
             RUN_ALL=1
             break
             ;;
