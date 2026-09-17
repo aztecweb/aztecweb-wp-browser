@@ -115,6 +115,7 @@ This repo runs its own test suite inside a self-contained Docker image via the
 `bin/test` wrapper, which bind-mounts the repo at `/var/www/html`.
 
 ```bash
+cp .env.example .env                         # one-time: suite parameters (gitignored)
 bin/test composer install                    # install deps (also installs the pre-push hook)
 bin/test bash resources/install.sh           # bootstrap the SQLite WordPress site (idempotent)
 bin/test codecept build                      # rebuild actor classes after method signature changes
@@ -124,7 +125,9 @@ bin/serve                                    # start WP-CLI server at http://loc
 composer check                               # validate composer.json, run PHPStan and PHPCS
 ```
 
-The port defaults to `8080` and can be overridden by setting `WP_SERVER_PORT` in a `.env` file.
+`codeception.yml` resolves its suite parameters from `.env`, which is gitignored —
+copy it from `.env.example` once or the suite refuses to start. The port defaults
+to `8080` and can be overridden by setting `WP_SERVER_PORT` there.
 
 `composer install` wires up the pre-push hook by running
 `git config core.hooksPath .githooks` (the `post-install-cmd` script). The hook
