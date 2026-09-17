@@ -90,5 +90,11 @@ if [ $RUN_ALL -eq 1 ] || [ ${#CESTS[@]} -eq 0 ]; then
     "$TEST" codecept run
 else
     echo "Running impacted tests: ${CESTS[*]} + unit"
-    "$TEST" bash -c "codecept run acceptance ${CESTS[*]} && codecept run unit"
+    # `codecept run` only accepts a single optional "test" argument, so passing
+    # multiple Cest names positionally fails once we have 2+ impacted classes.
+    # Use --filter instead: it matches against the test signature
+    # (`FQCN:testMethod` for a Cest), so the trailing `:` anchors the match to
+    # the class boundary and avoids collisions between similarly named Cests.
+    FILTER="($(IFS='|'; printf '%s' "${CESTS[*]}")):"
+    "$TEST" bash -c "codecept run acceptance --filter '$FILTER' && codecept run unit"
 fi
