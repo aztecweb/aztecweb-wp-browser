@@ -114,6 +114,21 @@ for the full design rationale.
 This repo runs its own test suite inside a self-contained Docker image via the
 `bin/test` wrapper, which bind-mounts the repo at `/var/www/html`.
 
+The image is a private package, so Docker has to be authenticated once per
+machine before the first run. Without it every `bin/test` command fails with
+`denied` from the registry, which reads like a missing image rather than a
+missing login:
+
+```bash
+gh auth token | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
+```
+
+Any personal access token carrying the `read:packages` scope works; the command
+above borrows one from the GitHub CLI. Docker stores the credential, so this is
+a one-time step. If the login succeeds and the pull is still denied, the account
+has not been granted read access to the package — ask an organization owner for
+it.
+
 ```bash
 cp .env.example .env                         # one-time: suite parameters (gitignored)
 bin/test composer install                    # install deps (also installs the pre-push hook)
@@ -146,6 +161,9 @@ version you first pulled. Refresh it from time to time:
 # php8.4 is the default; pull php8.0 instead if you set AZTEC_TEST_IMAGE to it
 docker pull ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.4
 ```
+
+This needs the registry login described above; on a machine that has never been
+authenticated the pull is denied rather than reporting the image as up to date.
 
 A stale image mostly shows up as a test that fails locally and passes in CI —
 CI runners are ephemeral and always fetch the published image, so they are the
