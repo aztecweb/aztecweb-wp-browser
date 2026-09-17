@@ -133,6 +133,22 @@ changed files, and falls back to the full acceptance suite when shared
 infrastructure changes. In an emergency you can bypass it with
 `git push --no-verify` — but CI is the authoritative gate.
 
+### Keeping the runner image current
+
+The image is rebuilt and republished weekly. `docker run` only downloads a tag it
+does not already have locally, so the copy on your machine stays at whatever
+version you first pulled. Refresh it from time to time:
+
+```bash
+# php8.4 is the default; pull php8.0 instead if you set AZTEC_TEST_IMAGE to it
+docker pull ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.4
+```
+
+A stale image mostly shows up as a test that fails locally and passes in CI —
+CI runners are ephemeral and always fetch the published image, so they are the
+reference. If a local failure looks like it comes from the browser rather than
+from your change, pull before investigating further.
+
 ### Running against PHP 8.0
 
 The default image ships PHP 8.4 and the committed `composer.lock` is resolved

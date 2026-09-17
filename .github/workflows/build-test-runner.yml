@@ -149,3 +149,45 @@ jobs:
           subject-name: ${{ env.REGISTRY }}/${{ steps.image.outputs.name }}
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
+
+  # A scheduled run has no one watching it: this workflow accumulated thirteen
+  # silent failures before anyone noticed the image was never published. Open an
+  # issue on failure so the next regression surfaces on its own. Manual runs are
+  # excluded — whoever dispatched them is already looking at the result.
+  notify:
+    needs: build
+    if: ${{ failure() && github.event_name == 'schedule' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Open or update the failure issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          TITLE: Scheduled runner image build is failing
+        run: |
+          # One issue for the whole outage, not one per week. The search is
+          # fuzzy, so the exact title comparison is what actually selects it.
+          existing="$(gh issue list --state open --search "in:title \"$TITLE\"" \
+            --json number,title \
+            --jq 'map(select(.title == env.TITLE)) | .[0].number // empty')"
+
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "Failed again: $RUN_URL"
+            exit 0
+          fi
+
+          cat > issue-body.md <<BODY
+          The weekly build of the test runner image failed. While it keeps failing the
+          published image is never refreshed, so continuous integration and every
+          developer machine stay on the last image that was published.
+
+          Failed run: $RUN_URL
+
+          Every later failure is added to this issue as a comment. Close it once a
+          build goes green.
+          BODY
+
+          gh issue create --title "$TITLE" --body-file issue-body.md
