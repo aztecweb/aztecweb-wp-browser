@@ -158,7 +158,12 @@ jobs:
     needs: build
     if: ${{ failure() && github.event_name == 'schedule' }}
     runs-on: ubuntu-latest
+    # A job-level `permissions:` block replaces the workflow-level one instead of
+    # extending it, so `contents: read` has to be restated here. Without it the
+    # job runs on `issues: write` alone, and the GraphQL query behind
+    # `gh issue list` fails at the one moment the notification matters.
     permissions:
+      contents: read
       issues: write
     steps:
       - name: Open or update the failure issue
