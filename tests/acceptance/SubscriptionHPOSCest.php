@@ -150,6 +150,20 @@ class SubscriptionHPOSCest
         ]);
     }
 
+    public function testHaveSubscriptionStatusNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'status' => 'wc-pending',
+        ]);
+
+        $I->haveSubscriptionStatus($subscriptionId, 'expired');
+
+        $I->seeInDatabase('wp_wc_orders', [
+            'id' => $subscriptionId,
+            'status' => 'wc-expired',
+        ]);
+    }
+
     public function testCancelSubscription(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase([
