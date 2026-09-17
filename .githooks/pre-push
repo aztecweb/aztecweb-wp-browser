@@ -13,7 +13,8 @@ set -e
 # user and group to the container, mounts the git common dir for worktrees and
 # persists the Composer cache. Image selection is bin/test's too, through
 # AZTEC_TEST_IMAGE (a full image reference — see README).
-TEST="$(git rev-parse --show-toplevel)/bin/test"
+ROOT="$(git rev-parse --show-toplevel)"
+TEST="$ROOT/bin/test"
 
 # Determine changed files
 # First, try to get files since tracking branch (most common case)
@@ -107,11 +108,37 @@ if [ $RUN_ALL -eq 1 ] || [ ${#CESTS[@]} -eq 0 ]; then
 else
     echo "Running impacted tests: ${CESTS[*]} + unit"
 
+    # A Cest named in the map above that no longer exists on disk means the map
+    # has drifted from the tree — as it did between the Plugin Subnamespace
+    # refactor and #71. Unlike a positional test name, which errors out, a
+    # --filter that matches nothing is reported as a pass, so the drift has to
+    # be caught here instead of being verified by an empty run.
+    for cest in "${CESTS[@]}"; do
+        if [ ! -f "$ROOT/tests/acceptance/$cest.php" ]; then
+            echo "$cest is mapped in .githooks/pre-push but tests/acceptance/$cest.php does not exist." >&2
+            echo "Update the file-to-Cest map before pushing, or bypass with --no-verify." >&2
+            exit 1
+        fi
+    done
+
     # `codecept run` only accepts a single optional "test" argument, so passing
     # multiple Cest names positionally fails once we have 2+ impacted classes.
     # Use --filter instead: it matches against the test signature
     # (`FQCN:testMethod` for a Cest), so the trailing `:` anchors the match to
     # the class boundary and avoids collisions between similarly named Cests.
     FILTER="($(IFS='|'; printf '%s' "${CESTS[*]}")):"
-    "$TEST" bash -c "codecept run acceptance --filter '$FILTER' && codecept run unit"
+
+    OUTPUT="$(mktemp)"
+    trap 'rm -f "$OUTPUT"' EXIT
+    "$TEST" bash -c "codecept run acceptance --filter '$FILTER' && codecept run unit" 2>&1 | tee "$OUTPUT"
+    STATUS=${PIPESTATUS[0]}
+    [ "$STATUS" -eq 0 ] || exit "$STATUS"
+
+    # Belt to the braces above: any other reason the selection comes out empty
+    # (a Cest renamed in the same push, a regex that stops matching) must fail
+    # the gate rather than pass it having verified nothing.
+    if grep -q 'No tests executed!' "$OUTPUT"; then
+        echo "The filter '$FILTER' selected no tests; refusing to pass the push." >&2
+        exit 1
+    fi
 fi

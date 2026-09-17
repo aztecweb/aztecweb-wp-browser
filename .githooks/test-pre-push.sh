@@ -135,6 +135,31 @@ assert_equals "RUN_ALL" "$result" "Page object changes trigger RUN_ALL"
 result=$(process_changed_files "src/WooCommerce/Method/OrderMethods.php")
 assert_equals "OrderCest OrderHPOSCest" "$result" "Order trait maps to Legacy and HPOS Cests"
 
+# Test 11: Every path the hook maps still exists in the tree
+#
+# The map silently drifted out of the tree once already, when the Plugin
+# Subnamespace refactor moved src/Method/ to src/WooCommerce/Method/: every
+# mapped path stopped matching, so no change ever resolved to a Cest. This
+# reads the paths out of the hook itself rather than the copy above, which is
+# what makes it a regression test and not a restatement.
+HOOK="$(dirname "${BASH_SOURCE[0]}")/pre-push"
+ROOT="$(dirname "${BASH_SOURCE[0]}")/.."
+missing_paths=""
+while read -r path; do
+    case "$path" in
+        *'*') [ -d "$ROOT/${path%/*}" ] || missing_paths="$missing_paths $path" ;;
+        *) [ -e "$ROOT/$path" ] || missing_paths="$missing_paths $path" ;;
+    esac
+done < <(grep -oE '(src|tests)/[A-Za-z0-9_/.*-]+' "$HOOK" | sort -u)
+assert_equals "" "$missing_paths" "Every path mapped by the hook exists in the tree"
+
+# Test 12: Every Cest the hook maps exists in tests/acceptance/
+missing_cests=""
+while read -r cest; do
+    [ -f "$ROOT/tests/acceptance/$cest.php" ] || missing_cests="$missing_cests $cest"
+done < <(grep -oE '\b[A-Za-z]+Cest\b' "$HOOK" | sort -u)
+assert_equals "" "$missing_cests" "Every Cest mapped by the hook exists in tests/acceptance/"
+
 # Print summary
 echo ""
 echo "Tests passed: $TESTS_PASSED"
