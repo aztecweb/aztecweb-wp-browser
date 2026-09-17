@@ -109,7 +109,7 @@ jobs:
         # (COMPOSER_HOME) across runs, since the container itself is removed
         # (--rm). Keyed per PHP version so parallel matrix legs don't contend
         # on one cache.
-        run: docker run --rm -v "$PWD:/var/www/html" -v "aztec-wp-browser-composer-php${{ matrix.php_version }}:/tmp/composer" -w /var/www/html test-runner:php${{ matrix.php_version }} composer update
+        run: docker run --rm -v "$PWD:/var/www/html" -v "aztec-wp-browser-composer-php${{ matrix.php_version }}:/tmp/composer" -w /var/www/html test-runner:php${{ matrix.php_version }} composer update --no-progress --prefer-dist
 
       - name: Bootstrap WordPress in test image
         run: docker run --rm -v "$PWD:/var/www/html" -w /var/www/html test-runner:php${{ matrix.php_version }} bash resources/install.sh
