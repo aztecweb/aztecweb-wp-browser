@@ -96,14 +96,28 @@ jobs:
           cache-from: ${{ steps.cache.outputs.from }}
           cache-to: ${{ steps.cache.outputs.to }}
 
+      - name: Prepare environment file
+        # codeception.yml declares `params: - .env`, and .env is gitignored, so
+        # a fresh checkout has none. Mirrors the test-suite workflow.
+        run: cp .env.example .env
+
+      - name: Install PHP dependencies in test image
+        # Must precede the bootstrap: resources/install.sh copies the SQLite
+        # drop-in from public/packages/plugins/sqlite-database-integration/ and
+        # resolves WP-CLI through `composer exec`, both of which Composer
+        # materialises. The named volume persists Composer's download cache
+        # (COMPOSER_HOME) across runs, since the container itself is removed
+        # (--rm). Keyed per PHP version so parallel matrix legs don't contend
+        # on one cache.
+        run: docker run --rm -v "$PWD:/var/www/html" -v "aztec-wp-browser-composer-php${{ matrix.php_version }}:/tmp/composer" -w /var/www/html test-runner:php${{ matrix.php_version }} composer update
+
       - name: Bootstrap WordPress in test image
         run: docker run --rm -v "$PWD:/var/www/html" -w /var/www/html test-runner:php${{ matrix.php_version }} bash resources/install.sh
 
-      - name: Install PHP dependencies in test image
-        # The named volume persists Composer's download cache (COMPOSER_HOME)
-        # across runs, since the container itself is removed (--rm). Keyed per
-        # PHP version so parallel matrix legs don't contend on one cache.
-        run: docker run --rm -v "$PWD:/var/www/html" -v "aztec-wp-browser-composer-php${{ matrix.php_version }}:/tmp/composer" -w /var/www/html test-runner:php${{ matrix.php_version }} composer update
+      - name: Build Codeception actors in test image
+        # tests/_support/_generated/ is gitignored, so the actor classes must be
+        # regenerated before the suite can run.
+        run: docker run --rm -v "$PWD:/var/www/html" -w /var/www/html test-runner:php${{ matrix.php_version }} codecept build
 
       - name: Run acceptance tests
         run: docker run --rm -v "$PWD:/var/www/html" -w /var/www/html test-runner:php${{ matrix.php_version }} codecept run acceptance
