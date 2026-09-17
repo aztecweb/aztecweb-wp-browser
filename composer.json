@@ -105,6 +105,7 @@
     ],
     "cs": "phpcs",
     "cs:fix": "phpcbf",
+    "test:hooks": "bash .githooks/test-pre-push.sh",
     "check": [
       "composer validate --strict --no-check-publish",
       "@stan",

@@ -114,7 +114,25 @@ for the full design rationale.
 This repo runs its own test suite inside a self-contained Docker image via the
 `bin/test` wrapper, which bind-mounts the repo at `/var/www/html`.
 
+The image is a private package, so Docker has to be authenticated once per
+machine before the first run. Without it every `bin/test` command fails with
+`denied` from the registry, which reads like a missing image rather than a
+missing login:
+
 ```bash
+# The GitHub CLI does not request read:packages when it first authenticates,
+# so add the scope before handing its token to Docker
+gh auth refresh -s read:packages
+gh auth token | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
+```
+
+Any personal access token carrying the `read:packages` scope works just as well.
+Docker stores the credential, so this is a one-time step. If the login succeeds
+and the pull is still denied, the account has not been granted read access to
+the package — ask an organization owner for it.
+
+```bash
+cp .env.example .env                         # one-time: suite parameters (gitignored)
 bin/test composer install                    # install deps (also installs the pre-push hook)
 bin/test bash resources/install.sh           # bootstrap the SQLite WordPress site (idempotent)
 bin/test codecept build                      # rebuild actor classes after method signature changes
@@ -124,7 +142,9 @@ bin/serve                                    # start WP-CLI server at http://loc
 composer check                               # validate composer.json, run PHPStan and PHPCS
 ```
 
-The port defaults to `8080` and can be overridden by setting `WP_SERVER_PORT` in a `.env` file.
+`codeception.yml` resolves its suite parameters from `.env`, which is gitignored —
+copy it from `.env.example` once or the suite refuses to start. The port defaults
+to `8080` and can be overridden by setting `WP_SERVER_PORT` in that file.
 
 `composer install` wires up the pre-push hook by running
 `git config core.hooksPath .githooks` (the `post-install-cmd` script). The hook
@@ -132,6 +152,23 @@ The port defaults to `8080` and can be overridden by setting `WP_SERVER_PORT` in
 changed files, and falls back to the full acceptance suite when shared
 infrastructure changes. In an emergency you can bypass it with
 `git push --no-verify` — but CI is the authoritative gate.
+
+### Keeping the runner image current
+
+The image is rebuilt and republished weekly. `docker run` only downloads a tag it
+does not already have locally, so the copy on your machine stays at whatever
+version you first pulled. Refresh it from time to time (this needs the registry
+login above):
+
+```bash
+# php8.4 is the default; pull php8.0 instead if you set AZTEC_TEST_IMAGE to it
+docker pull ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.4
+```
+
+A stale image mostly shows up as a test that fails locally and passes in CI —
+CI runners are ephemeral and always fetch the published image, so they are the
+reference. If a local failure looks like it comes from the browser rather than
+from your change, pull before investigating further.
 
 ### Running against PHP 8.0
 
