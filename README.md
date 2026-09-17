@@ -129,8 +129,7 @@ gh auth token | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
 Any personal access token carrying the `read:packages` scope works just as well.
 Docker stores the credential, so this is a one-time step. If the login succeeds
 and the pull is still denied, the account has not been granted read access to
-the package — ask an organization owner for it. The two failures are
-indistinguishable from the command output, which is why it is worth stating.
+the package — ask an organization owner for it.
 
 ```bash
 cp .env.example .env                         # one-time: suite parameters (gitignored)
@@ -145,7 +144,7 @@ composer check                               # validate composer.json, run PHPSt
 
 `codeception.yml` resolves its suite parameters from `.env`, which is gitignored —
 copy it from `.env.example` once or the suite refuses to start. The port defaults
-to `8080` and can be overridden by setting `WP_SERVER_PORT` there.
+to `8080` and can be overridden by setting `WP_SERVER_PORT` in that file.
 
 `composer install` wires up the pre-push hook by running
 `git config core.hooksPath .githooks` (the `post-install-cmd` script). The hook
@@ -158,15 +157,13 @@ infrastructure changes. In an emergency you can bypass it with
 
 The image is rebuilt and republished weekly. `docker run` only downloads a tag it
 does not already have locally, so the copy on your machine stays at whatever
-version you first pulled. Refresh it from time to time:
+version you first pulled. Refresh it from time to time (this needs the registry
+login above):
 
 ```bash
 # php8.4 is the default; pull php8.0 instead if you set AZTEC_TEST_IMAGE to it
 docker pull ghcr.io/aztecweb/aztecweb-wp-browser-runner:php8.4
 ```
-
-This needs the registry login described above; on a machine that has never been
-authenticated the pull is denied rather than reporting the image as up to date.
 
 A stale image mostly shows up as a test that fails locally and passes in CI —
 CI runners are ephemeral and always fetch the published image, so they are the

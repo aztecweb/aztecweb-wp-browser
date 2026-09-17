@@ -38,9 +38,8 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Test the pre-push hook map
-        # Nothing ran these before, which is how the map drifted out of the tree
-        # unnoticed through the Plugin Subnamespace refactor. Placed before the
-        # PHP setup because the script needs neither PHP nor the dependencies.
+        # Placed before the PHP setup: the script needs neither PHP nor the
+        # dependencies.
         run: bash .githooks/test-pre-push.sh
 
       - name: Setup PHP

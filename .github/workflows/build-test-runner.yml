@@ -103,12 +103,11 @@ jobs:
 
       - name: Install PHP dependencies in test image
         # Must precede the bootstrap: resources/install.sh copies the SQLite
-        # drop-in from public/packages/plugins/sqlite-database-integration/ and
-        # resolves WP-CLI through `composer exec`, both of which Composer
-        # materialises. The named volume persists Composer's download cache
-        # (COMPOSER_HOME) across runs, since the container itself is removed
-        # (--rm). Keyed per PHP version so parallel matrix legs don't contend
-        # on one cache.
+        # drop-in and resolves WP-CLI through `composer exec`, both of which
+        # Composer materialises. The named volume persists Composer's download
+        # cache (COMPOSER_HOME) across runs, since the container itself is
+        # removed (--rm), keyed per PHP version so parallel matrix legs don't
+        # contend on one cache.
         run: docker run --rm -v "$PWD:/var/www/html" -v "aztec-wp-browser-composer-php${{ matrix.php_version }}:/tmp/composer" -w /var/www/html test-runner:php${{ matrix.php_version }} composer update --no-progress --prefer-dist
 
       - name: Bootstrap WordPress in test image
@@ -150,18 +149,18 @@ jobs:
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
 
-  # A scheduled run has no one watching it: this workflow accumulated thirteen
-  # silent failures before anyone noticed the image was never published. Open an
-  # issue on failure so the next regression surfaces on its own. Manual runs are
-  # excluded — whoever dispatched them is already looking at the result.
+  # A scheduled run has no one watching it, so a failure can go unnoticed for
+  # weeks while the published image is never refreshed. Open an issue on failure
+  # so the next regression surfaces on its own. Manual runs are excluded —
+  # whoever dispatched them is already looking at the result.
   notify:
     needs: build
     if: ${{ failure() && github.event_name == 'schedule' }}
     runs-on: ubuntu-latest
     # A job-level `permissions:` block replaces the workflow-level one instead of
     # extending it, so `contents: read` has to be restated here. Without it the
-    # job runs on `issues: write` alone, and the GraphQL query behind
-    # `gh issue list` fails at the one moment the notification matters.
+    # GraphQL query behind `gh issue list` fails at the one moment the
+    # notification matters.
     permissions:
       contents: read
       issues: write

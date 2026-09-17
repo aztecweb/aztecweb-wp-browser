@@ -141,18 +141,17 @@ assert_equals "OrderCest OrderHPOSCest" "$result" "Order trait maps to Legacy an
 
 # Test 11: Every path the hook maps still exists in the tree
 #
-# The map silently drifted out of the tree once already, when the Plugin
-# Subnamespace refactor moved src/Method/ to src/WooCommerce/Method/: every
-# mapped path stopped matching, so no change ever resolved to a Cest. This
-# reads the paths out of the hook itself rather than the copy above, which is
-# what makes it a regression test and not a restatement.
+# A path the tree no longer has stops matching, so no change resolves to a Cest
+# and the map goes quietly dead. Reads the paths out of the hook itself rather
+# than the copy above, which is what makes it a regression test and not a
+# restatement.
 HOOK="$(dirname "${BASH_SOURCE[0]}")/pre-push"
 ROOT="$(dirname "${BASH_SOURCE[0]}")/.."
 missing_paths=""
 while read -r path; do
     case "$path" in
-        # Glob arms (`src/WooCommerce/Module/*`, `src/*.php`): the wildcard can
-        # sit anywhere, so check the directory preceding the first one.
+        # Glob arms: the wildcard can sit anywhere, so check the directory
+        # preceding the first one.
         *'*'*)
             prefix="${path%%\**}"
             [ -d "$ROOT/${prefix%/}" ] || missing_paths="$missing_paths $path"
@@ -172,8 +171,8 @@ assert_equals "" "$missing_cests" "Every Cest mapped by the hook exists in tests
 # Test 13: Shipped code with no arm of its own triggers RUN_ALL
 #
 # ActionMethods has no acceptance Cest and the sniffs are covered by the unit
-# suite, so neither can map to a Cest. They must still widen the run rather than
-# resolve to nothing, which is what the catch-all arm guarantees.
+# suite, so neither can map to a Cest. The catch-all arm is what makes them
+# widen the run rather than resolve to nothing.
 result=$(process_changed_files "src/ActionScheduler/Method/ActionMethods.php")
 assert_equals "RUN_ALL" "$result" "Unmapped trait triggers RUN_ALL"
 
@@ -183,9 +182,9 @@ assert_equals "RUN_ALL" "$result" "Sniff changes trigger RUN_ALL"
 
 # Test 15: An unmapped file alongside a mapped one still widens the run
 #
-# The case that made the fall-through comment wrong: before the catch-all, the
-# unmapped file matched no arm at all, so the selection stayed at whatever the
-# mapped file contributed and the push passed having never exercised the change.
+# Without the catch-all the unmapped file matches no arm, so the selection stays
+# at whatever the mapped file contributed and the push passes having never
+# exercised the change.
 result=$(process_changed_files "src/WooCommerce/Method/CouponMethods.php" "src/ActionScheduler/Method/ActionMethods.php")
 assert_equals "RUN_ALL" "$result" "Unmapped file alongside a mapped one triggers RUN_ALL"
 

@@ -9,10 +9,9 @@
 
 set -e
 
-# Every container invocation goes through bin/test, which forwards the calling
-# user and group to the container, mounts the git common dir for worktrees and
-# persists the Composer cache. Image selection is bin/test's too, through
-# AZTEC_TEST_IMAGE (a full image reference — see README).
+# Container commands go through bin/test, which forwards the calling user and
+# group, mounts the git common dir for worktrees, persists the Composer cache
+# and selects the image through AZTEC_TEST_IMAGE (see README).
 ROOT="$(git rev-parse --show-toplevel)"
 TEST="$ROOT/bin/test"
 
@@ -43,17 +42,14 @@ fi
 # Map changed files to Cest classes
 #
 # A Method Trait maps to every Cest that exercises it, not just the Cest of the
-# same name: the builders in ProductMethods, for example, seed the fixtures the
-# cart, checkout and subscription Cests assert on, so a change there is only
-# verified if those run too. Paths are the post-Plugin-Subnamespace layout
-# (`src/<Plugin>/...`).
+# same name: ProductMethods seeds the fixtures the cart, checkout and
+# subscription Cests assert on, so a change there is only verified if those run
+# too.
 #
-# The `src/*.php` catch-all at the end of the case is what covers the code with
-# no acceptance coverage of its own — ActionScheduler's ActionMethods, all of
-# src/CodeSniffer/, and any subnamespace added later. It has to be an explicit
-# arm, not a fall-through: a file no arm matches leaves the selection untouched,
-# so without it changing an unmapped file alongside a mapped one would narrow
-# the run to the mapped Cest and silently skip everything else.
+# The `src/*.php` catch-all covers shipped code with no acceptance Cest of its
+# own. It has to be an explicit arm, not a fall-through: a file no arm matches
+# leaves the selection untouched, so an unmapped file changed alongside a mapped
+# one would narrow the run to the mapped Cest.
 declare -a CESTS
 RUN_ALL=0
 
@@ -90,7 +86,7 @@ for file in $CHANGED_FILES; do
             break
             ;;
         # Catch-all, kept last: shipped code no arm above claims. `*` matches
-        # slashes in a case pattern, so this covers every depth under src/.
+        # slashes, so this covers every depth under src/.
         src/*.php)
             RUN_ALL=1
             break
@@ -105,9 +101,9 @@ fi
 
 # Install dependencies and bootstrap test site
 #
-# `composer install`, never `update`: the hook is a verification gate, so it must
-# run against the locked versions and leave composer.lock untouched in the
-# working tree of whoever is pushing.
+# `composer install`, never `update`: the hook is a verification gate, so it runs
+# against the locked versions and leaves composer.lock untouched in the working
+# tree of whoever is pushing.
 echo "Installing dependencies and bootstrapping test site..."
 "$TEST" bash -c "composer install && bash resources/install.sh"
 
@@ -118,11 +114,10 @@ if [ $RUN_ALL -eq 1 ] || [ ${#CESTS[@]} -eq 0 ]; then
 else
     echo "Running impacted tests: ${CESTS[*]} + unit"
 
-    # A Cest named in the map above that no longer exists on disk means the map
-    # has drifted from the tree — as it did between the Plugin Subnamespace
-    # refactor and #71. Unlike a positional test name, which errors out, a
-    # --filter that matches nothing is reported as a pass, so the drift has to
-    # be caught here instead of being verified by an empty run.
+    # A mapped Cest that no longer exists on disk means the map has drifted from
+    # the tree. Unlike a positional test name, which errors out, a --filter that
+    # matches nothing is reported as a pass, so the drift has to be caught here
+    # instead of being verified by an empty run.
     for cest in "${CESTS[@]}"; do
         if [ ! -f "$ROOT/tests/acceptance/$cest.php" ]; then
             echo "$cest is mapped in .githooks/pre-push but tests/acceptance/$cest.php does not exist." >&2
@@ -131,11 +126,11 @@ else
         fi
     done
 
-    # `codecept run` only accepts a single optional "test" argument, so passing
-    # multiple Cest names positionally fails once we have 2+ impacted classes.
-    # Use --filter instead: it matches against the test signature
-    # (`FQCN:testMethod` for a Cest), so the trailing `:` anchors the match to
-    # the class boundary and avoids collisions between similarly named Cests.
+    # `codecept run` accepts a single optional "test" argument, so 2+ impacted
+    # classes cannot be passed positionally. --filter matches against the test
+    # signature (`FQCN:testMethod` for a Cest), so the trailing `:` anchors the
+    # match to the class boundary and avoids collisions between similarly named
+    # Cests.
     FILTER="($(IFS='|'; printf '%s' "${CESTS[*]}")):"
 
     OUTPUT="$(mktemp)"
@@ -144,9 +139,9 @@ else
     STATUS=${PIPESTATUS[0]}
     [ "$STATUS" -eq 0 ] || exit "$STATUS"
 
-    # Belt to the braces above: any other reason the selection comes out empty
-    # (a Cest renamed in the same push, a regex that stops matching) must fail
-    # the gate rather than pass it having verified nothing.
+    # Any other reason the selection comes out empty (a Cest renamed in the same
+    # push, a regex that stops matching) must fail the gate rather than pass it
+    # having verified nothing.
     if grep -q 'No tests executed!' "$OUTPUT"; then
         echo "The filter '$FILTER' selected no tests; refusing to pass the push." >&2
         exit 1
