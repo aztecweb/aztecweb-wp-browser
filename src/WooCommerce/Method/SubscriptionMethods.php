@@ -25,6 +25,9 @@ trait SubscriptionMethods
      * $I->seeSubscriptionInDatabase(['id' => $subscriptionId, 'status' => 'wc-active']);
      * ```
      *
+     * Accepts a WC status with or without the `wc-` prefix (e.g. `active` or `wc-active`);
+     * it is stored with the prefix. Non-WC statuses pass through unchanged.
+     *
      * @param array<string, mixed> $overrides Subscription data overrides (status, customer_id, etc.)
      *
      * @return int The created subscription ID

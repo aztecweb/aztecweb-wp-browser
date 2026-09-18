@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\WooCommerce\SubscriptionStorage;
 
+use Aztec\WPBrowser\Normalizer\StatusNormalizer;
 use Aztec\WPBrowser\WooCommerce\Storage\AbstractHPOSStorage;
 
 class HPOSSubscriptionStorage extends AbstractHPOSStorage implements SubscriptionStorageInterface
@@ -23,6 +24,10 @@ class HPOSSubscriptionStorage extends AbstractHPOSStorage implements Subscriptio
     {
         $meta = is_array($overrides['meta'] ?? null) ? $overrides['meta'] : [];
         unset($overrides['meta']);
+
+        if (is_string($overrides['status'] ?? null)) {
+            $overrides['status'] = StatusNormalizer::normalize($overrides['status']);
+        }
 
         $subscriptionId = $this->generateId();
 

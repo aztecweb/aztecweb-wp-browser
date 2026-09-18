@@ -57,6 +57,18 @@ class OrderHPOSCest
         $I->assertSame('wc-on-hold', $status, "Order status should be 'wc-on-hold', got '$status'");
     }
 
+    public function testHaveOrderInDatabaseNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'status' => 'processing',
+        ]);
+
+        $I->seeInDatabase('wp_wc_orders', [
+            'id' => $orderId,
+            'status' => 'wc-processing',
+        ]);
+    }
+
     public function testHaveOrderStatus(AcceptanceTester $I): void
     {
         $orderId = $I->haveOrderInDatabase([

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\WooCommerce\OrderStorage;
 
+use Aztec\WPBrowser\Normalizer\StatusNormalizer;
 use Aztec\WPBrowser\WooCommerce\Storage\AbstractLegacyStorage;
 
 class LegacyOrderStorage extends AbstractLegacyStorage implements OrderStorageInterface
@@ -33,6 +34,10 @@ class LegacyOrderStorage extends AbstractLegacyStorage implements OrderStorageIn
      */
     protected function createOrderRecord(array $overrides): int
     {
+        if (is_string($overrides['post_status'] ?? null)) {
+            $overrides['post_status'] = StatusNormalizer::normalize($overrides['post_status']);
+        }
+
         return $this->wpDb->havePostInDatabase(array_merge([
             'post_type' => 'shop_order',
             'post_status' => 'wc-pending',
