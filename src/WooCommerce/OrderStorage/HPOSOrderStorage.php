@@ -41,7 +41,6 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
         $orderId = $this->generateId();
 
         $orderData = array_merge([
-            'id' => $orderId,
             'status' => 'wc-pending',
             'currency' => 'USD',
             'type' => 'shop_order',

@@ -27,10 +27,8 @@ class HPOSSubscriptionStorage extends AbstractHPOSStorage implements Subscriptio
         $subscriptionId = $this->generateId();
 
         $subscriptionData = array_merge([
-            'id' => $subscriptionId,
             'status' => 'wc-active',
             'currency' => 'USD',
-            'type' => 'shop_subscription',
             'tax_amount' => '0.00',
             'total_amount' => '0.00',
             'customer_id' => 0,
