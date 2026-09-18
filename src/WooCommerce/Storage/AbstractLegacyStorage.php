@@ -37,7 +37,12 @@ abstract class AbstractLegacyStorage extends AbstractStorage
             }
         }
 
-        return $mapped;
+        return $this->normalizeStatusInCriteria($mapped);
+    }
+
+    protected function getStatusColumnName(): string
+    {
+        return 'post_status';
     }
 
     protected function grabEntityStatus(int $entityId): string

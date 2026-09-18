@@ -122,17 +122,11 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
      */
     public function mapCriteria(array $criteria): array
     {
-        $mapped = [];
+        $prepped = [];
         foreach ($criteria as $key => $value) {
-            if ($key === 'post_status') {
-                $mapped['status'] = $value;
-            } elseif ($key === 'post_title') {
-                $mapped['title'] = $value;
-            } else {
-                $mapped[$key] = $value;
-            }
+            $prepped[$key === 'post_title' ? 'title' : $key] = $value;
         }
-        return $mapped;
+        return parent::mapCriteria($prepped);
     }
 
     /**
