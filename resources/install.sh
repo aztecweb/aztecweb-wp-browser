@@ -48,6 +48,11 @@ wp rewrite structure '/%postname%/' --hard
 wp wc payment_gateway update cod --user=admin --enabled=true
 wp wc hpos sync
 
+# WooCommerce ships a fresh install in "coming soon" mode, which serves the
+# placeholder page instead of the cart and checkout blocks to logged-out
+# visitors. Acceptance tests browse logged out, so leave the store public.
+wp option update woocommerce_coming_soon no
+
 mkdir -p tests/_data
 # Keep DELETE journal mode (SQLite's default). WPDb resets the database between
 # tests by copying a snapshot file directly over the live SQLite file; WAL's
