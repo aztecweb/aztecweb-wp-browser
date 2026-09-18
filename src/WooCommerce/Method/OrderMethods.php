@@ -263,6 +263,9 @@ trait OrderMethods
      * $I->assertSame($orderId, $found);
      * ```
      *
+     * Accepts a `status` criterion with or without the `wc-` prefix (e.g. `processing` or
+     * `wc-processing`); it is normalized before matching against the stored value.
+     *
      * @param array<string, mixed> $criteria Database query criteria (e.g., ['status' => 'pending', 'id' => 123]). Supports storage-agnostic keys like 'id', 'status'
      *
      * @return int|false Order ID if found, false otherwise
@@ -320,6 +323,9 @@ trait OrderMethods
      * $orderId = $I->haveOrderInDatabase(['status' => 'completed']);
      * $I->seeOrderInDatabase(['id' => $orderId, 'status' => 'completed']);
      * ```
+     *
+     * Accepts a `status` criterion with or without the `wc-` prefix (e.g. `completed` or
+     * `wc-completed`); it is normalized before matching against the stored value.
      *
      * @param array<string, mixed> $criteria Database query criteria (e.g., ['id' => 123, 'status' => 'pending']). Supports storage-agnostic keys like 'id', 'status'
      *
