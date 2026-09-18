@@ -346,6 +346,30 @@ trait OrderMethods
     }
 
     /**
+     * Verify that no order exists in the database with the given criteria.
+     *
+     * @example
+     * ```php
+     * $orderId = $I->haveOrderInDatabase(['status' => 'active']);
+     * $I->dontSeeOrderInDatabase(['id' => $orderId, 'status' => 'cancelled']);
+     * $I->dontSeeOrderInDatabase(['id' => 999999]);
+     * ```
+     *
+     * Accepts a `status` criterion with or without the `wc-` prefix (e.g. `cancelled` or
+     * `wc-cancelled`); it is normalized before matching against the stored value.
+     *
+     * @param array<string, mixed> $criteria Database query criteria (e.g., ['id' => 123, 'status' => 'cancelled']). Supports storage-agnostic keys like 'id', 'status'
+     *
+     * @return void
+     */
+    public function dontSeeOrderInDatabase(array $criteria): void
+    {
+        $tableName = $this->orderStorage()->getTableName();
+        $mappedCriteria = $this->orderStorage()->mapCriteria($criteria);
+        $this->wpDb()->dontSeeInDatabase($tableName, $mappedCriteria);
+    }
+
+    /**
      * Verify that order meta exists in the database with the given criteria.
      *
      * @example
