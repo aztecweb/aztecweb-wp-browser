@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Aztec\WPBrowser\Tests\Acceptance;
 
 use Aztec\WPBrowser\Tests\Support\AcceptanceTester;
+use PHPUnit\Framework\AssertionFailedError;
 
 class OrderHPOSCest
 {
@@ -352,6 +353,35 @@ class OrderHPOSCest
             'id' => $orderId,
             'status' => 'active',
         ]);
+    }
+
+    public function testDontSeeOrderInDatabaseNormalizesUnprefixedStatusCriterion(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'status' => 'wc-active',
+        ]);
+
+        $I->dontSeeOrderInDatabase([
+            'id' => $orderId,
+            'status' => 'cancelled',
+        ]);
+
+        // If the unprefixed 'active' criterion were not normalized to 'wc-active', it would
+        // never match the stored row and dontSeeOrderInDatabase would (incorrectly) pass.
+        $I->expectThrowable(
+            AssertionFailedError::class,
+            function () use ($I, $orderId): void {
+                $I->dontSeeOrderInDatabase([
+                    'id' => $orderId,
+                    'status' => 'active',
+                ]);
+            },
+        );
+    }
+
+    public function testDontSeeOrderInDatabaseWithNonStatusCriteria(AcceptanceTester $I): void
+    {
+        $I->dontSeeOrderInDatabase(['id' => 999999]);
     }
 
     public function testSeeOrderMetaInDatabase(AcceptanceTester $I): void
