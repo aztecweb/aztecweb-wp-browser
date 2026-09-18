@@ -282,6 +282,15 @@ class SubscriptionHPOSCest
         $I->seeSubscriptionStatus($subscriptionId, 'wc-active');
     }
 
+    public function testSeeSubscriptionStatusNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'status' => 'wc-active',
+        ]);
+
+        $I->seeSubscriptionStatus($subscriptionId, 'active');
+    }
+
     public function testDontSeeSubscriptionInDatabase(AcceptanceTester $I): void
     {
         $I->dontSeeSubscriptionInDatabase([

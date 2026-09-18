@@ -128,12 +128,15 @@ trait OrderMethods
      * ```php
      * $orderId = $I->haveOrderInDatabase(['status' => 'pending']);
      * $status = $I->grabOrderStatus($orderId);
-     * $I->assertSame('pending', $status);
+     * $I->assertSame('wc-pending', $status);
      * ```
+     *
+     * Returns the raw DB value (still `wc-`-prefixed, e.g. `'wc-pending'`); unlike
+     * {@see seeOrderStatus()}, this does not go through criteria normalization.
      *
      * @param int $orderId  Order ID
      *
-     * @return string Order status (e.g., 'pending', 'processing', 'completed', 'cancelled')
+     * @return string Order status (e.g., 'wc-pending', 'wc-processing', 'wc-completed', 'wc-cancelled')
      */
     public function grabOrderStatus(int $orderId): string
     {
@@ -148,6 +151,10 @@ trait OrderMethods
      * $orderId = $I->haveOrderInDatabase(['status' => 'processing']);
      * $I->seeOrderStatus($orderId, 'processing');
      * ```
+     *
+     * Accepts a status with or without the `wc-` prefix (e.g. `processing` or `wc-processing`);
+     * it is normalized before matching against the stored value. Non-WC statuses pass through
+     * unchanged.
      *
      * @param int    $orderId  Order ID to verify
      * @param string $status   Expected order status

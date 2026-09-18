@@ -201,6 +201,9 @@ trait SubscriptionMethods
      * $I->assertSame('wc-active', $status);
      * ```
      *
+     * Returns the raw DB value (still `wc-`-prefixed); unlike {@see seeSubscriptionStatus()},
+     * this does not go through criteria normalization.
+     *
      * @param int $subscriptionId  Subscription ID
      *
      * @return string Subscription status (e.g., 'wc-active', 'wc-on-hold', 'wc-cancelled', 'wc-expired')
@@ -341,6 +344,10 @@ trait SubscriptionMethods
      * $subscriptionId = $I->haveSubscriptionInDatabase(['status' => 'wc-active']);
      * $I->seeSubscriptionStatus($subscriptionId, 'wc-active');
      * ```
+     *
+     * Accepts a status with or without the `wc-` prefix (e.g. `active` or `wc-active`); it is
+     * normalized before matching against the stored value. Non-WC statuses pass through
+     * unchanged.
      *
      * @param int    $subscriptionId  Subscription ID to verify
      * @param string $status          Expected subscription status
