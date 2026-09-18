@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\WooCommerce\OrderStorage;
 
-use Aztec\WPBrowser\Normalizer\StatusNormalizer;
 use Aztec\WPBrowser\WooCommerce\Storage\AbstractHPOSStorage;
 
 class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterface
@@ -41,10 +40,6 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
     {
         $orderId = $this->generateId();
 
-        if (is_string($overrides['status'] ?? null)) {
-            $overrides['status'] = StatusNormalizer::normalize($overrides['status']);
-        }
-
         $orderData = array_merge([
             'id' => $orderId,
             'status' => 'wc-pending',
@@ -66,6 +61,7 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
         ], $overrides);
 
         $orderData['id'] = $orderId;
+        $orderData['status'] = $this->normalizeStatusValue($orderData['status']);
 
         $this->wpDb->haveInDatabase($this->grabWcOrdersTableName(), $orderData);
 

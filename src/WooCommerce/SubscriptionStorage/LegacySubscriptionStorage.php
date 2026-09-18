@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\WooCommerce\SubscriptionStorage;
 
-use Aztec\WPBrowser\Normalizer\StatusNormalizer;
 use Aztec\WPBrowser\WooCommerce\Storage\AbstractLegacyStorage;
 
 class LegacySubscriptionStorage extends AbstractLegacyStorage implements SubscriptionStorageInterface
@@ -25,15 +24,15 @@ class LegacySubscriptionStorage extends AbstractLegacyStorage implements Subscri
         $meta = is_array($overrides['meta'] ?? null) ? $overrides['meta'] : [];
         unset($overrides['meta']);
 
-        if (is_string($overrides['post_status'] ?? null)) {
-            $overrides['post_status'] = StatusNormalizer::normalize($overrides['post_status']);
-        }
-
-        $subscriptionId = $this->wpDb->havePostInDatabase(array_merge([
+        $subscriptionData = array_merge([
             'post_type' => 'shop_subscription',
             'post_status' => 'wc-active',
             'post_title' => 'Subscription',
-        ], $overrides));
+        ], $overrides);
+
+        $subscriptionData['post_status'] = $this->normalizeStatusValue($subscriptionData['post_status']);
+
+        $subscriptionId = $this->wpDb->havePostInDatabase($subscriptionData);
 
         $finalMeta = array_merge([
             '_billing_period' => 'month',
