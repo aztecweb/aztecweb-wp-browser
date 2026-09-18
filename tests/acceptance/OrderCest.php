@@ -49,6 +49,18 @@ class OrderCest
         ]);
     }
 
+    public function testHaveOrderInDatabaseNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'post_status' => 'processing',
+        ]);
+
+        $I->seeOrderInDatabase([
+            'ID' => $orderId,
+            'post_status' => 'wc-processing',
+        ]);
+    }
+
     public function testGrabOrderStatus(AcceptanceTester $I): void
     {
         $orderId = $I->haveOrderInDatabase([

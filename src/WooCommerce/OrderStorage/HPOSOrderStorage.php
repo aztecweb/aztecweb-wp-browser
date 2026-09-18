@@ -41,7 +41,6 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
         $orderId = $this->generateId();
 
         $orderData = array_merge([
-            'id' => $orderId,
             'status' => 'wc-pending',
             'currency' => 'USD',
             'type' => 'shop_order',
@@ -61,6 +60,7 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
         ], $overrides);
 
         $orderData['id'] = $orderId;
+        $orderData['status'] = $this->normalizeStatusValue($orderData['status']);
 
         $this->wpDb->haveInDatabase($this->grabWcOrdersTableName(), $orderData);
 
