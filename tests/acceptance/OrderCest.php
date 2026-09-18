@@ -130,6 +130,16 @@ class OrderCest
         ]);
 
         $I->seeOrderStatus($orderId, 'active');
+        $I->seeOrderStatus($orderId, 'wc-active');
+    }
+
+    public function testSeeOrderStatusPassesThroughNonWcStatus(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'post_status' => 'trash',
+        ]);
+
+        $I->seeOrderStatus($orderId, 'trash');
     }
 
     public function testHaveOrderMeta(AcceptanceTester $I): void

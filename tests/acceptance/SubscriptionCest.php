@@ -269,6 +269,15 @@ class SubscriptionCest
         $I->seeSubscriptionStatus($subscriptionId, 'active');
     }
 
+    public function testSeeSubscriptionStatusPassesThroughNonWcStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'trash',
+        ]);
+
+        $I->seeSubscriptionStatus($subscriptionId, 'trash');
+    }
+
     public function testDontSeeSubscriptionInDatabase(AcceptanceTester $I): void
     {
         $I->dontSeeSubscriptionInDatabase([

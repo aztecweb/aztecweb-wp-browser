@@ -126,7 +126,7 @@ trait OrderMethods
      *
      * @example
      * ```php
-     * $orderId = $I->haveOrderInDatabase(['status' => 'pending']);
+     * $orderId = $I->haveOrderInDatabase(['post_status' => 'wc-pending']);
      * $status = $I->grabOrderStatus($orderId);
      * $I->assertSame('wc-pending', $status);
      * ```

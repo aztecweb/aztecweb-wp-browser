@@ -196,7 +196,7 @@ trait SubscriptionMethods
      *
      * @example
      * ```php
-     * $subscriptionId = $I->haveSubscriptionInDatabase(['status' => 'wc-active']);
+     * $subscriptionId = $I->haveSubscriptionInDatabase(['post_status' => 'wc-active']);
      * $status = $I->grabSubscriptionStatus($subscriptionId);
      * $I->assertSame('wc-active', $status);
      * ```
