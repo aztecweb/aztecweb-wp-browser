@@ -350,7 +350,7 @@ trait OrderMethods
      *
      * @example
      * ```php
-     * $orderId = $I->haveOrderInDatabase(['status' => 'active']);
+     * $orderId = $I->haveOrderInDatabase(['status' => 'completed']);
      * $I->dontSeeOrderInDatabase(['id' => $orderId, 'status' => 'cancelled']);
      * $I->dontSeeOrderInDatabase(['id' => 999999]);
      * ```
