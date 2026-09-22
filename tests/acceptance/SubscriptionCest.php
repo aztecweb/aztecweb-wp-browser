@@ -50,6 +50,27 @@ class SubscriptionCest
         ]);
     }
 
+    public function testHaveSubscriptionWithCustomer(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->haveSubscriptionMetaInDatabase($subscriptionId, '_customer_user', '1');
+        $I->haveSubscriptionMetaInDatabase($subscriptionId, '_billing_email', 'customer@example.com');
+
+        $I->seeSubscriptionInDatabase([
+            'ID' => $subscriptionId,
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->seeSubscriptionMetaInDatabase([
+            'subscription_id' => $subscriptionId,
+            'meta_key' => '_customer_user',
+            'meta_value' => '1',
+        ]);
+    }
+
     public function testHaveSubscriptionWithMeta(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase([
