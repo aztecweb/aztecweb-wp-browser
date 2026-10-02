@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `CartMethods::addProductToCart()` no longer waits for the "product added to cart" notice: it issues the add-to-cart request and returns. The notice is a one-shot session notice — cleared on print, and lost whenever anything rewrites the WooCommerce session between the add-to-cart request and the render (async loopbacks, a persistent object cache, a plugin touching the session) — so the wait timed out on runs where the product had in fact been added. There was nothing left to synchronize: `amOnPage()` returns only once the add-to-cart request has been served, and no other element is guaranteed to exist on every landing page a store can choose. Tests that assert on cart contents must navigate first, with `amOnCartPage()` or `amOnCheckoutPage()`; the method itself stays agnostic to the store's "Add to cart behaviour" setting and to the `woocommerce_add_to_cart_redirect` filter ([#66](https://github.com/aztecweb/aztecweb-wp-browser/issues/66)).
 
+### Fixed
+
+- `$I->loginAsAdmin()` and `$I->loginAs()` no longer return while the post-login redirect is still in flight. `WooCommerceWebDriver` intercepts the step in `_afterStep()` and waits for the landing document to be complete and the login form to be gone, so the next navigation is not overwritten by the pending redirect. The actor API is unchanged — the step remains wp-browser's ([ADR-0010](docs/adr/0010-login-settle-after-step.md), [#81](https://github.com/aztecweb/aztecweb-wp-browser/issues/81)).
+- The test site now blocks outgoing HTTP (`WP_HTTP_BLOCK_EXTERNAL` in `resources/mu-plugins/00-test-quiesce.php`). wp-admin update checks stalled every login for tens of seconds, which both slowed the suite and hid the post-login navigation race behind a slow redirect ([#81](https://github.com/aztecweb/aztecweb-wp-browser/issues/81)).
+
 ### Removed
 
 - `CartPageObject::PRODUCT_ADDED_TO_CART_MESSAGE_SELECTOR` — the notice it targeted is no longer waited on by any method in the package. Projects that overrode it to point at cart state can drop the override ([#66](https://github.com/aztecweb/aztecweb-wp-browser/issues/66)).

@@ -11,6 +11,8 @@ use Aztec\WPBrowser\WooCommerce\Method\OrderBrowserMethods;
 use Aztec\WPBrowser\WooCommerce\PageObject\PageObjectProvider;
 use Codeception\Exception\ModuleException;
 use Codeception\Module;
+use Codeception\Step;
+use Facebook\WebDriver\Exception\WebDriverException;
 use lucatume\WPBrowser\Module\WPWebDriver;
 
 class WooCommerceWebDriver extends Module
@@ -19,6 +21,23 @@ class WooCommerceWebDriver extends Module
     use CheckoutMethods;
     use CustomerBrowserMethods;
     use OrderBrowserMethods;
+
+    /**
+     * The log-in actor steps whose post-login redirect the module waits to settle.
+     *
+     * @var list<string>
+     */
+    private const LOGIN_ACTIONS = ['loginAs', 'loginAsAdmin'];
+
+    /**
+     * Max seconds to wait for the post-login redirect to settle.
+     */
+    private const LOGIN_SETTLE_TIMEOUT = 10;
+
+    /**
+     * Poll interval, in microseconds, while waiting for the post-login redirect to settle.
+     */
+    private const LOGIN_SETTLE_POLL_INTERVAL = 100_000;
 
     /** @var array<string, mixed> */
     protected array $config = [
@@ -43,6 +62,54 @@ class WooCommerceWebDriver extends Module
                 'WooCommerceWebDriver requires the WPWebDriver module to be enabled in the same suite.',
             );
         }
+    }
+
+    /**
+     * Waits for the redirect triggered by a log-in step before the test continues.
+     *
+     * wp-browser's `loginAs`/`loginAsAdmin` return once the auth cookies are
+     * readable, which can be before the browser commits the post-login redirect:
+     * the next navigation then races the pending one and can be overwritten. A
+     * Plugin Module cannot override those methods (ADR-0002), so the module
+     * intercepts the step and settles the navigation here. See ADR-0010.
+     */
+    public function _afterStep(Step $step): void
+    {
+        if ($step->hasFailed() || !in_array($step->getAction(), self::LOGIN_ACTIONS, true)) {
+            return;
+        }
+
+        $webDriver = $this->wpWebDriver()->webDriver;
+
+        if ($webDriver === null) {
+            return;
+        }
+
+        $this->waitForLoginToSettle();
+    }
+
+    private function waitForLoginToSettle(): void
+    {
+        $deadline = microtime(true) + self::LOGIN_SETTLE_TIMEOUT;
+        $script = 'return document.readyState === "complete" '
+            . '&& document.getElementById("loginform") === null;';
+
+        while (microtime(true) < $deadline) {
+            try {
+                if ($this->wpWebDriver()->executeJS($script) === true) {
+                    return;
+                }
+            } catch (WebDriverException) {
+                // The pending redirect is replacing the execution context; poll again.
+            }
+
+            usleep(self::LOGIN_SETTLE_POLL_INTERVAL);
+        }
+
+        throw new ModuleException(
+            $this,
+            sprintf('The login page did not settle within %d seconds.', self::LOGIN_SETTLE_TIMEOUT),
+        );
     }
 
     protected function wpWebDriver(): WPWebDriver
