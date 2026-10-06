@@ -7,6 +7,7 @@ namespace Aztec\WPBrowser\WooCommerce\Module;
 use Aztec\WPBrowser\WooCommerce\Method\CartMethods;
 use Aztec\WPBrowser\WooCommerce\Method\CheckoutMethods;
 use Aztec\WPBrowser\WooCommerce\Method\CustomerBrowserMethods;
+use Aztec\WPBrowser\WooCommerce\Method\FastLoginMethods;
 use Aztec\WPBrowser\WooCommerce\Method\OrderBrowserMethods;
 use Aztec\WPBrowser\WooCommerce\PageObject\PageObjectProvider;
 use Codeception\Exception\ModuleException;
@@ -20,6 +21,7 @@ class WooCommerceWebDriver extends Module
     use CartMethods;
     use CheckoutMethods;
     use CustomerBrowserMethods;
+    use FastLoginMethods;
     use OrderBrowserMethods;
 
     /**
