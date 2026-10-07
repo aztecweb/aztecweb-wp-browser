@@ -337,6 +337,18 @@ class OrderCest
         ]);
     }
 
+    public function testSeeOrderInDatabaseNormalizesUnprefixedStatusCriterion(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->seeOrderInDatabase([
+            'ID' => $orderId,
+            'post_status' => 'active',
+        ]);
+    }
+
     public function testSeeOrderMetaInDatabase(AcceptanceTester $I): void
     {
         $orderId = $I->haveOrderInDatabase();

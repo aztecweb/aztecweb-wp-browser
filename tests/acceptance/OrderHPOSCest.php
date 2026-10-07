@@ -251,6 +251,19 @@ class OrderHPOSCest
         $I->assertFalse($notFound);
     }
 
+    public function testGrabOrderIdFromDatabaseNormalizesUnprefixedStatusCriterion(AcceptanceTester $I): void
+    {
+        $uniqueCustomerId = 9998;
+
+        $orderId = $I->haveOrderInDatabase([
+            'status' => 'wc-active',
+            'customer_id' => $uniqueCustomerId,
+        ]);
+
+        $grabbedId = $I->grabOrderIdFromDatabase(['status' => 'active', 'customer_id' => $uniqueCustomerId]);
+        $I->assertSame($orderId, $grabbedId);
+    }
+
     public function testGrabOrderItemFromDatabase(AcceptanceTester $I): void
     {
         $orderId = $I->haveOrderInDatabase();
@@ -307,6 +320,18 @@ class OrderHPOSCest
         $I->seeOrderInDatabase([
             'id' => $orderId,
             'status' => 'wc-processing',
+        ]);
+    }
+
+    public function testSeeOrderInDatabaseNormalizesUnprefixedStatusCriterion(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'status' => 'wc-active',
+        ]);
+
+        $I->seeOrderInDatabase([
+            'id' => $orderId,
+            'status' => 'active',
         ]);
     }
 

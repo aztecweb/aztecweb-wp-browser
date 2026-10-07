@@ -15,6 +15,8 @@ abstract class AbstractStorage implements WooCommerceStorageInterface
 
     abstract protected function getEntityIdKey(): string;
 
+    abstract protected function getStatusColumnName(): string;
+
     /**
      * Normalize a status value, with an unprefixed WC status accepted.
      *
@@ -23,6 +25,22 @@ abstract class AbstractStorage implements WooCommerceStorageInterface
     protected function normalizeStatusValue(mixed $status): mixed
     {
         return is_string($status) ? StatusNormalizer::normalize($status) : $status;
+    }
+
+    /**
+     * Normalize the status criterion, when present, with an unprefixed WC status accepted.
+     *
+     * @param array<string, mixed> $criteria Database query criteria, already mapped to storage keys.
+     * @return array<string, mixed> Criteria with the status column normalized.
+     */
+    protected function normalizeStatusInCriteria(array $criteria): array
+    {
+        $statusKey = $this->getStatusColumnName();
+        if (isset($criteria[$statusKey])) {
+            $criteria[$statusKey] = $this->normalizeStatusValue($criteria[$statusKey]);
+        }
+
+        return $criteria;
     }
 
     public function getMetaTableName(): string

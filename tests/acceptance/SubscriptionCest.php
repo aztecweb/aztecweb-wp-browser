@@ -216,6 +216,15 @@ class SubscriptionCest
         $I->seeSubscriptionInDatabase(['ID' => $subscriptionId, 'post_status' => 'wc-active']);
     }
 
+    public function testSeeSubscriptionInDatabaseNormalizesUnprefixedStatusCriterion(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->seeSubscriptionInDatabase(['ID' => $subscriptionId, 'post_status' => 'active']);
+    }
+
     public function testSeeSubscriptionMetaWithSubscriptionId(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase();

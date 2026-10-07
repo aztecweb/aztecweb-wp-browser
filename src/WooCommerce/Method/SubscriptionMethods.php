@@ -125,6 +125,9 @@ trait SubscriptionMethods
      * $I->assertSame($subscriptionId, $found);
      * ```
      *
+     * Accepts a `status` criterion with or without the `wc-` prefix (e.g. `active` or
+     * `wc-active`); it is normalized before matching against the stored value.
+     *
      * @param array<string, mixed> $criteria Database query criteria (e.g., ['status' => 'wc-active', 'id' => 123])
      *
      * @return int|false Subscription ID if found, false otherwise
@@ -295,6 +298,9 @@ trait SubscriptionMethods
      * $I->seeSubscriptionInDatabase(['id' => $subscriptionId, 'status' => 'wc-active']);
      * ```
      *
+     * Accepts a `status` criterion with or without the `wc-` prefix (e.g. `active` or
+     * `wc-active`); it is normalized before matching against the stored value.
+     *
      * @param array<string, mixed> $criteria Database query criteria (e.g., ['id' => 123, 'status' => 'wc-active'])
      *
      * @return void
@@ -353,6 +359,9 @@ trait SubscriptionMethods
      * ```php
      * $I->dontSeeSubscriptionInDatabase(['id' => 999]);
      * ```
+     *
+     * Accepts a `status` criterion with or without the `wc-` prefix (e.g. `cancelled` or
+     * `wc-cancelled`); it is normalized before matching against the stored value.
      *
      * @param array<string, mixed> $criteria Database query criteria (e.g., ['status' => 'wc-deleted'])
      *
