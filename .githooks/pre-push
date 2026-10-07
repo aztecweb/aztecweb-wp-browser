@@ -9,7 +9,11 @@
 
 set -e
 
-AZTEC_TEST_IMAGE=${AZTEC_TEST_IMAGE:-php8.4}
+# Container commands go through bin/test, which forwards the calling user and
+# group, mounts the git common dir for worktrees, persists the Composer cache
+# and selects the image through AZTEC_TEST_IMAGE (see README).
+ROOT="$(git rev-parse --show-toplevel)"
+TEST="$ROOT/bin/test"
 
 # Determine changed files
 # First, try to get files since tracking branch (most common case)
@@ -36,31 +40,54 @@ if [ -z "$PHP_CHANGED" ]; then
 fi
 
 # Map changed files to Cest classes
+#
+# A Method Trait maps to every Cest that exercises it, not just the Cest of the
+# same name: ProductMethods seeds the fixtures the cart, checkout and
+# subscription Cests assert on, so a change there is only verified if those run
+# too.
+#
+# The `src/*.php` catch-all covers shipped code with no acceptance Cest of its
+# own. It has to be an explicit arm, not a fall-through: a file no arm matches
+# leaves the selection untouched, so an unmapped file changed alongside a mapped
+# one would narrow the run to the mapped Cest.
 declare -a CESTS
 RUN_ALL=0
 
 for file in $CHANGED_FILES; do
     case "$file" in
-        src/Method/CartMethods.php)
-            CESTS+=("CartCest")
+        src/WooCommerce/Method/CartMethods.php)
+            CESTS+=(CartCest CheckoutCest PageSlugCest)
             ;;
-        src/Method/CheckoutMethods.php)
-            CESTS+=("CheckoutCest")
+        src/WooCommerce/Method/CheckoutMethods.php)
+            CESTS+=(CheckoutCest)
             ;;
-        src/Method/CouponMethods.php)
-            CESTS+=("CouponCest")
+        src/WooCommerce/Method/CouponMethods.php)
+            CESTS+=(CouponCest)
             ;;
-        src/Method/CustomerMethods.php)
-            CESTS+=("CustomerCest")
+        src/WooCommerce/Method/CustomerMethods.php)
+            CESTS+=(CustomerCest)
             ;;
-        src/Method/OrderMethods.php)
-            CESTS+=("OrderCest")
+        src/WooCommerce/Method/CustomerBrowserMethods.php)
+            CESTS+=(CustomerCest PageSlugCest)
             ;;
-        src/Method/ProductMethods.php)
-            CESTS+=("ProductCest")
+        # Both order Cests: the same methods run against Legacy and HPOS storage.
+        src/WooCommerce/Method/OrderMethods.php|src/WooCommerce/Method/OrderBrowserMethods.php)
+            CESTS+=(OrderCest OrderHPOSCest)
+            ;;
+        src/WooCommerce/Method/ProductMethods.php)
+            CESTS+=(ProductCest CartCest CheckoutCest SubscriptionCest SubscriptionHPOSCest)
+            ;;
+        src/WooCommerce/Method/SubscriptionMethods.php)
+            CESTS+=(SubscriptionCest SubscriptionHPOSCest)
             ;;
         # Shared infrastructure: triggers full suite
-        src/aliases.php|src/AztecWPBrowser.php|src/Config/*|src/Page/*|src/OrderStorage/*|src/Storage/*|src/SubscriptionStorage/*|composer.json|composer.lock|phpstan.neon.dist|phpcs.xml.dist|tests/_support/*|tests/acceptance/*)
+        src/aliases.php|src/WooCommerce/Module/*|src/WooCommerce/Browser/*|src/WooCommerce/PageObject/*|src/WooCommerce/OrderStorage/*|src/WooCommerce/Storage/*|src/WooCommerce/SubscriptionStorage/*|composer.json|composer.lock|phpstan.neon.dist|phpcs.xml.dist|tests/_support/*|tests/acceptance/*)
+            RUN_ALL=1
+            break
+            ;;
+        # Catch-all, kept last: shipped code no arm above claims. `*` matches
+        # slashes, so this covers every depth under src/.
+        src/*.php)
             RUN_ALL=1
             break
             ;;
@@ -73,29 +100,50 @@ if [ $RUN_ALL -eq 0 ] && [ ${#CESTS[@]} -gt 0 ]; then
 fi
 
 # Install dependencies and bootstrap test site
+#
+# `composer install`, never `update`: the hook is a verification gate, so it runs
+# against the locked versions and leaves composer.lock untouched in the working
+# tree of whoever is pushing.
 echo "Installing dependencies and bootstrapping test site..."
-docker run \
-    --rm \
-    -v "$PWD:/var/www/html" \
-    -w /var/www/html \
-    ghcr.io/aztecweb/aztecweb-wp-browser-runner:$AZTEC_TEST_IMAGE \
-    bash -c "composer update && bash resources/install.sh"
+"$TEST" bash -c "composer install && bash resources/install.sh"
 
 # Run tests
 if [ $RUN_ALL -eq 1 ] || [ ${#CESTS[@]} -eq 0 ]; then
     echo "Running full test suite..."
-    docker run \
-        --rm \
-        -v "$PWD:/var/www/html" \
-        -w /var/www/html \
-        ghcr.io/aztecweb/aztecweb-wp-browser-runner:$AZTEC_TEST_IMAGE \
-        vendor/bin/codecept run
+    "$TEST" codecept run
 else
     echo "Running impacted tests: ${CESTS[*]} + unit"
-    docker run \
-        --rm \
-        -v "$PWD:/var/www/html" \
-        -w /var/www/html \
-        ghcr.io/aztecweb/aztecweb-wp-browser-runner:$AZTEC_TEST_IMAGE \
-        bash -c "vendor/bin/codecept run acceptance ${CESTS[*]} && vendor/bin/codecept run unit"
+
+    # A mapped Cest that no longer exists on disk means the map has drifted from
+    # the tree. Unlike a positional test name, which errors out, a --filter that
+    # matches nothing is reported as a pass, so the drift has to be caught here
+    # instead of being verified by an empty run.
+    for cest in "${CESTS[@]}"; do
+        if [ ! -f "$ROOT/tests/acceptance/$cest.php" ]; then
+            echo "$cest is mapped in .githooks/pre-push but tests/acceptance/$cest.php does not exist." >&2
+            echo "Update the file-to-Cest map before pushing, or bypass with --no-verify." >&2
+            exit 1
+        fi
+    done
+
+    # `codecept run` accepts a single optional "test" argument, so 2+ impacted
+    # classes cannot be passed positionally. --filter matches against the test
+    # signature (`FQCN:testMethod` for a Cest), so the trailing `:` anchors the
+    # match to the class boundary and avoids collisions between similarly named
+    # Cests.
+    FILTER="($(IFS='|'; printf '%s' "${CESTS[*]}")):"
+
+    OUTPUT="$(mktemp)"
+    trap 'rm -f "$OUTPUT"' EXIT
+    "$TEST" bash -c "codecept run acceptance --filter '$FILTER' && codecept run unit" 2>&1 | tee "$OUTPUT"
+    STATUS=${PIPESTATUS[0]}
+    [ "$STATUS" -eq 0 ] || exit "$STATUS"
+
+    # Any other reason the selection comes out empty (a Cest renamed in the same
+    # push, a regex that stops matching) must fail the gate rather than pass it
+    # having verified nothing.
+    if grep -q 'No tests executed!' "$OUTPUT"; then
+        echo "The filter '$FILTER' selected no tests; refusing to pass the push." >&2
+        exit 1
+    fi
 fi
