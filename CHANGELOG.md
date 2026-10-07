@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `$I->fastLoginAs($username, $password)` and `$I->fastLoginAsAdmin()` sign a user in over the HTTP layer: they POST the credentials to `wp-login.php` with Guzzle (no redirect following), then copy the returned auth cookies into the browser. The log-in flow costs ~0.25 s instead of the ~2–3 s of the browser-driven form, needs no `WPDb` and no wp-config salts, and still lets WordPress do the authenticating ([ADR-0011](docs/adr/0011-fast-login-over-http.md)).
+- `$I->fastLoginAs($username, $password)` and `$I->fastLoginAsAdmin()` sign a user in over the HTTP layer: they POST the credentials to `wp-login.php` with Guzzle in a single request (no redirect following), then copy the returned auth cookies into the browser, HTTPS (`wordpress_sec_*`) included. The log-in flow costs ~0.25 s instead of the ~2–3 s of the browser-driven form, needs no `WPDb` and no wp-config salts, and still lets WordPress do the authenticating ([ADR-0011](docs/adr/0011-fast-login-over-http.md)).
 - `@phpstan-type` shape aliases (unsealed, with enum literals for status/stock/discount values) for the high-arity `overrides`/`criteria` params on `ProductMethods::haveProductInDatabase`/`haveManyProductsInDatabase`, `CouponMethods::haveCouponInDatabase` and its percentage/fixed-cart/fixed-product/free-shipping wrappers, and `OrderMethods::haveOrderInDatabase`/`haveManyOrdersInDatabase`/`haveOrderAddressInDatabase`/`seeOrderAddressInDatabase`/`haveOrderItemInDatabase` — so PHPStan (already at level max over `src` and `tests`) flags hallucinated keys/values in any Cest ([#37](https://github.com/aztecweb/aztecweb-wp-browser/issues/37)).
 
 ## [0.1.0] - 2026-06-09

@@ -6,7 +6,6 @@ namespace Aztec\WPBrowser\WooCommerce\Method;
 
 use Codeception\Exception\ModuleException;
 use GuzzleHttp\Client;
-use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\GuzzleException;
 use lucatume\WPBrowser\Module\WPWebDriver;
 
@@ -14,9 +13,9 @@ use lucatume\WPBrowser\Module\WPWebDriver;
  * Signs users in over the HTTP layer instead of driving the wp-login.php form
  * in the browser.
  *
- * `fastLoginAs()` GETs `wp-login.php` (to obtain the `wordpress_test_cookie`),
- * POSTs the credentials with redirect following disabled, and copies the auth
- * cookies from the 302 response into the browser. WordPress itself authenticates
+ * `fastLoginAs()` POSTs the credentials to `wp-login.php` with redirect
+ * following disabled and copies the auth cookies from the 302 response into the
+ * browser. WordPress itself authenticates
  * the credentials and registers the session, so the browser layer needs no
  * database access (ADR-0008) and the module needs no wp-config salts. See
  * ADR-0011.
@@ -74,9 +73,11 @@ trait FastLoginMethods
      * bypassing the wp-login.php form submission in the browser.
      *
      * The credentials are POSTed directly to `wp-login.php`; the redirect is not
-     * followed, so the slow post-login wp-admin load never happens. Both auth
-     * cookies from the response are then attached to the browser, which must be
-     * on the target domain for the cookies to stick.
+     * followed, so the slow post-login wp-admin load never happens. The
+     * `testcookie` field is omitted, so WordPress skips its cookie-support check
+     * and no preliminary GET is needed. The auth cookies from the response are
+     * then attached to the browser, which must be on the target domain for the
+     * cookies to stick.
      *
      * @example
      * ```php
@@ -96,22 +97,19 @@ trait FastLoginMethods
     public function fastLoginAs(string $username, string $password): void
     {
         $webDriver = $this->wpWebDriver();
-        $loginUrl = $this->fastLoginUrl();
+        $loginUrl = $this->fastLoginSiteUrl('wp-login.php');
 
         $client = new Client([
-            'cookies' => new CookieJar(),
             'allow_redirects' => false,
             'http_errors' => false,
             'timeout' => self::$fastLoginTimeout,
         ]);
 
         try {
-            $client->get($loginUrl);
             $response = $client->post($loginUrl, [
                 'form_params' => [
                     'log' => $username,
                     'pwd' => $password,
-                    'testcookie' => '1',
                     'redirect_to' => '',
                 ],
             ]);
@@ -135,16 +133,32 @@ trait FastLoginMethods
             );
         }
 
-        // Cookies are only accepted while the browser is on the target domain;
-        // `/` is that domain's home page.
-        $webDriver->amOnPage('/');
+        // Cookies are only accepted while the browser is on the target domain.
+        // A static core image puts it there without bootstrapping WordPress.
+        $webDriver->amOnUrl($this->fastLoginSiteUrl('wp-includes/images/blank.gif'));
 
-        foreach ($cookies as $name => $value) {
-            $webDriver->setCookie($name, $value, ['path' => '/', 'httpOnly' => true]);
+        foreach ($cookies as $name => $cookie) {
+            $webDriver->setCookie($name, $cookie['value'], [
+                'path' => '/',
+                'httpOnly' => true,
+                'secure' => $cookie['secure'],
+            ]);
         }
     }
 
-    private function fastLoginUrl(): string
+    /**
+     * Build the absolute URL of a path that sits next to `wp-admin`.
+     *
+     * Derived from the `WPWebDriver` `adminPath`, so it follows WordPress
+     * installed in a subdirectory (e.g. Bedrock's `/wp/wp-admin`).
+     *
+     * @param string $path Path relative to the WordPress core directory.
+     *
+     * @return string
+     *
+     * @throws ModuleException If `url` or `adminPath` is not configured.
+     */
+    private function fastLoginSiteUrl(string $path): string
     {
         $webDriver = $this->wpWebDriver();
         $url = $webDriver->_getConfig('url');
@@ -157,7 +171,7 @@ trait FastLoginMethods
             );
         }
 
-        return rtrim($url, '/') . str_replace('wp-admin', 'wp-login.php', $adminPath);
+        return rtrim($url, '/') . str_replace('wp-admin', $path, $adminPath);
     }
 
     /**
@@ -166,23 +180,30 @@ trait FastLoginMethods
      *
      * The cookie hash is not computed: it is read from whatever WordPress
      * emitted, which keeps the method correct regardless of the site URL and
-     * scheme. Only the two auth cookies are matched, so unrelated cookies (the
-     * test cookie, plugins' cookies) are ignored.
+     * scheme. Only the auth cookies are matched — `wordpress_{hash}` over HTTP,
+     * `wordpress_sec_{hash}` over HTTPS, and `wordpress_logged_in_{hash}` — so
+     * unrelated cookies (plugins' cookies) are ignored. The `Secure` attribute
+     * is kept so HTTPS cookies stay HTTPS-only in the browser.
      *
      * @param string[] $setCookieHeaders One entry per `Set-Cookie` header.
      *
-     * @return array<string, string> Cookie name => value.
+     * @return array<string, array{value: string, secure: bool}> Cookie name => value and Secure flag.
      */
     private static function extractAuthCookies(array $setCookieHeaders): array
     {
         $cookies = [];
 
         foreach ($setCookieHeaders as $header) {
-            if (preg_match('/^(wordpress(?:_logged_in)?_[a-f0-9]{32})=([^;]*)/', trim($header), $matches) !== 1) {
+            $header = trim($header);
+
+            if (preg_match('/^(wordpress(?:_sec|_logged_in)?_[a-f0-9]{32})=([^;]*)/', $header, $matches) !== 1) {
                 continue;
             }
 
-            $cookies[$matches[1]] = $matches[2];
+            $cookies[$matches[1]] = [
+                'value' => $matches[2],
+                'secure' => preg_match('/;\s*secure\s*(?:;|$)/i', $header) === 1,
+            ];
         }
 
         return $cookies;
