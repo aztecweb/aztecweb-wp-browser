@@ -135,6 +135,17 @@ class SubscriptionHPOSCest
         $I->assertSame($subscriptionId, $grabbedId);
     }
 
+    public function testGrabSubscriptionFieldFromDatabase(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'billing_email' => 'hpos-field@example.com',
+        ]);
+
+        $email = $I->grabSubscriptionFieldFromDatabase($subscriptionId, 'billing_email');
+
+        $I->assertSame('hpos-field@example.com', $email);
+    }
+
     public function testGrabSubscriptionIdNotFound(AcceptanceTester $I): void
     {
         $result = $I->grabSubscriptionIdFromDatabase([
@@ -419,6 +430,35 @@ class SubscriptionHPOSCest
             'product_id' => $productId,
             'meta_key' => '_subscription_price',
             'meta_value' => '49.99',
+        ]);
+    }
+
+    public function testHaveSubscriptionProductWithCustomMeta(AcceptanceTester $I): void
+    {
+        $productId = $I->haveSubscriptionProductInDatabase([
+            'post_title' => 'Premium Monthly Subscription',
+            'meta' => [
+                '_subscription_price' => '29.99',
+                '_subscription_period' => 'month',
+                '_subscription_sign_up_fee' => '5.00',
+            ],
+        ]);
+
+        $I->seeProductInDatabase([
+            'ID' => $productId,
+            'post_title' => 'Premium Monthly Subscription',
+        ]);
+
+        $I->seeProductMetaInDatabase([
+            'product_id' => $productId,
+            'meta_key' => '_subscription_price',
+            'meta_value' => '29.99',
+        ]);
+
+        $I->seeProductMetaInDatabase([
+            'product_id' => $productId,
+            'meta_key' => '_subscription_sign_up_fee',
+            'meta_value' => '5.00',
         ]);
     }
 }

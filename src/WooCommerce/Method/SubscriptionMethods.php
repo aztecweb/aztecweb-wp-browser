@@ -152,6 +152,10 @@ trait SubscriptionMethods
     /**
      * Extract a field value from a subscription record in the database.
      *
+     * The field name is storage-specific: under Legacy storage the subscription is a
+     * `wp_posts` row (e.g. `post_title`, `post_status`); under HPOS storage it is a
+     * `wc_orders` row (e.g. `billing_email`, `status`).
+     *
      * @example
      * ```php
      * $subscriptionId = $I->haveSubscriptionInDatabase(['post_title' => 'My Subscription']);
@@ -160,13 +164,17 @@ trait SubscriptionMethods
      * ```
      *
      * @param int    $id     Subscription ID
-     * @param string $field  Database field name to retrieve (e.g., 'post_title', 'post_status')
+     * @param string $field  Database field name to retrieve
      *
      * @return mixed Field value from the subscription record
      */
     public function grabSubscriptionFieldFromDatabase(int $id, string $field): mixed
     {
-        return $this->wpDb()->grabPostFieldFromDatabase($id, $field);
+        return $this->wpDb()->grabFromDatabase(
+            $this->subscriptionStorage()->getTableName(),
+            $field,
+            [$this->subscriptionStorage()->getIdColumnName() => $id],
+        );
     }
 
     /**
