@@ -473,6 +473,55 @@ class OrderCest
         }
     }
 
+    public function testSeeOrderMetaIsScopedToTheGivenOrder(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase();
+        $otherOrderId = $I->haveOrderInDatabase();
+
+        $I->haveOrderMetaInDatabase($orderId, '_scoped_meta', 'scoped_value');
+
+        $I->seeOrderMetaInDatabase([
+            'order_id' => $orderId,
+            'meta_key' => '_scoped_meta',
+        ]);
+
+        $I->dontSeeOrderMetaInDatabase([
+            'order_id' => $otherOrderId,
+            'meta_key' => '_scoped_meta',
+        ]);
+    }
+
+    public function testSeeOrderMetaWithPostId(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase();
+
+        $I->haveOrderMetaInDatabase($orderId, '_legacy_meta_post_id', 'value_post_id');
+
+        $I->seeOrderMetaInDatabase([
+            'post_id' => $orderId,
+            'meta_key' => '_legacy_meta_post_id',
+            'meta_value' => 'value_post_id',
+        ]);
+    }
+
+    public function testHaveOrderMetaTargetsPostmetaTable(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase();
+
+        $I->haveOrderMetaInDatabase($orderId, '_legacy_meta_location', 'legacy_value');
+
+        $I->seeInDatabase('wp_postmeta', [
+            'post_id' => $orderId,
+            'meta_key' => '_legacy_meta_location',
+            'meta_value' => 'legacy_value',
+        ]);
+
+        $I->dontSeeInDatabase('wp_wc_orders_meta', [
+            'order_id' => $orderId,
+            'meta_key' => '_legacy_meta_location',
+        ]);
+    }
+
     public function testSeeOrderItemMetaWithOrderId(AcceptanceTester $I): void
     {
         $orderId = $I->haveOrderInDatabase();
