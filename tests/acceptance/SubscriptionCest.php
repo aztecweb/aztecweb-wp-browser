@@ -37,6 +37,18 @@ class SubscriptionCest
         ]);
     }
 
+    public function testHaveSubscriptionInDatabaseNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'active',
+        ]);
+
+        $I->seeSubscriptionInDatabase([
+            'ID' => $subscriptionId,
+            'post_status' => 'wc-active',
+        ]);
+    }
+
     public function testHaveSubscriptionWithMeta(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase([
@@ -144,6 +156,20 @@ class SubscriptionCest
         $I->seeSubscriptionInDatabase([
             'ID' => $subscriptionId,
             'post_status' => 'wc-active',
+        ]);
+    }
+
+    public function testHaveSubscriptionStatusNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'wc-pending',
+        ]);
+
+        $I->haveSubscriptionStatus($subscriptionId, 'expired');
+
+        $I->seeSubscriptionInDatabase([
+            'ID' => $subscriptionId,
+            'post_status' => 'wc-expired',
         ]);
     }
 

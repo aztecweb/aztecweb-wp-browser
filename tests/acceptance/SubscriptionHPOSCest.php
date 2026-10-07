@@ -39,6 +39,19 @@ class SubscriptionHPOSCest
         ]);
     }
 
+    public function testHaveSubscriptionInDatabaseNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'status' => 'active',
+        ]);
+
+        $I->seeInDatabase('wp_wc_orders', [
+            'id' => $subscriptionId,
+            'type' => 'shop_subscription',
+            'status' => 'wc-active',
+        ]);
+    }
+
     public function testHaveSubscriptionWithCustomer(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase([
@@ -147,6 +160,20 @@ class SubscriptionHPOSCest
         $I->seeInDatabase('wp_wc_orders', [
             'id' => $subscriptionId,
             'status' => 'wc-active',
+        ]);
+    }
+
+    public function testHaveSubscriptionStatusNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'status' => 'wc-pending',
+        ]);
+
+        $I->haveSubscriptionStatus($subscriptionId, 'expired');
+
+        $I->seeInDatabase('wp_wc_orders', [
+            'id' => $subscriptionId,
+            'status' => 'wc-expired',
         ]);
     }
 

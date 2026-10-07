@@ -63,8 +63,11 @@ trait OrderMethods
      * $orderId = $I->haveOrderInDatabase([
      *     'status' => 'processing',
      * ]);
-     * $I->seeOrderInDatabase(['id' => $orderId, 'status' => 'processing']);
+     * $I->seeOrderInDatabase(['id' => $orderId, 'status' => 'wc-processing']);
      * ```
+     *
+     * Accepts a WC status with or without the `wc-` prefix (e.g. `processing` or `wc-processing`);
+     * it is stored with the prefix. Non-WC statuses pass through unchanged.
      *
      * @param OrderOverrides $overrides Order data overrides (status, customer_id, etc.). Behavior depends on storage mode (HPOS or Legacy)
      *
@@ -165,6 +168,8 @@ trait OrderMethods
      * $I->haveOrderStatus($orderId, 'completed');
      * $I->seeOrderStatus($orderId, 'completed');
      * ```
+     *
+     * Accepts WC statuses with or without the `wc-` prefix. Non-WC statuses pass through unchanged.
      *
      * @param int    $orderId    Order ID to modify
      * @param string $newStatus  New order status to set
