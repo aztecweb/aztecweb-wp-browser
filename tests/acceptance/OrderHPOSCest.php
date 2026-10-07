@@ -106,6 +106,25 @@ class OrderHPOSCest
         $I->seeOrderStatus($orderId, 'wc-completed');
     }
 
+    public function testSeeOrderStatusNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'status' => 'wc-active',
+        ]);
+
+        $I->seeOrderStatus($orderId, 'active');
+        $I->seeOrderStatus($orderId, 'wc-active');
+    }
+
+    public function testSeeOrderStatusPassesThroughNonWcStatus(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'status' => 'trash',
+        ]);
+
+        $I->seeOrderStatus($orderId, 'trash');
+    }
+
     public function testHaveOrderMeta(AcceptanceTester $I): void
     {
         $orderId = $I->haveOrderInDatabase();
