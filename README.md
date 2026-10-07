@@ -74,6 +74,184 @@ public function customerCheckoutWithCoupon(AcceptanceTester $I): void
 }
 ```
 
+## Speeding up the suite
+
+A slow WordPress acceptance suite is rarely slow because of what it tests. Most
+of the time is waiting: on the network, on background requests, on the
+database restore. One consumer suite went from 47 to 8 minutes, with the same
+tests and assertions, by applying the guidelines below. They are ordered by
+how much they usually save; none of them needs anything outside a stock
+WordPress, Docker and Chrome setup.
+
+### 1. Measure before changing anything
+
+Time one slow test step by step (`codecept run --debug`) and log slow PHP
+requests on the server side. With PHP-FPM:
+
+```ini
+; php-fpm pool override, test environment only
+slowlog = /proc/self/fd/2
+request_slowlog_timeout = 2s
+```
+
+A request that keeps showing up in the slowlog points at the guideline to apply.
+
+### 2. Log in over HTTP
+
+Use `fastLoginAs($username, $password)` and `fastLoginAsAdmin()` instead of
+`loginAs()`/`loginAsAdmin()`. They send one POST to `wp-login.php`, copy the
+auth cookies into the browser, and skip the form and the post-login redirect
+(~0.25 s instead of ~2–3 s, and much more when the redirect lands on a slow
+wp-admin page). Keep `loginAs()` for tests whose subject is the login screen
+itself. See [ADR-0011](docs/adr/0011-fast-login-over-http.md).
+
+### 3. Keep wp-admin off the internet
+
+Every wp-admin load checks for core, plugin, theme and translation updates.
+Test suites usually clear the object cache before each test, so those checks
+run again on every test; in the suite above, the post-login redirect alone took
+35 s per test. Answer the checks locally with a mu-plugin loaded **only** by
+the test environment:
+
+```php
+<?php
+// mu-plugins/test-no-update-checks.php — test environment only.
+$no_updates = static fn (): object => (object) [
+    'last_checked'    => time(),
+    'version_checked' => get_bloginfo('version'),
+    'updates'         => [],
+    'translations'    => [],
+    'response'        => [],
+    'no_update'       => [],
+    'checked'         => [],
+];
+
+foreach (['update_core', 'update_plugins', 'update_themes'] as $transient) {
+    add_filter("pre_site_transient_{$transient}", $no_updates);
+}
+
+add_filter('automatic_updater_disabled', '__return_true');
+```
+
+To also stop any other outgoing call, turn on `WP_HTTP_BLOCK_EXTERNAL` and
+allow only the hosts the tests need (mocks, mail trap, payment sandboxes). Read
+both from the environment so production and development stay untouched:
+
+```php
+// wp-config.php (or Config::define() in Bedrock's config/application.php)
+define('WP_HTTP_BLOCK_EXTERNAL', filter_var(getenv('WP_HTTP_BLOCK_EXTERNAL'), FILTER_VALIDATE_BOOLEAN));
+define('WP_ACCESSIBLE_HOSTS', getenv('WP_ACCESSIBLE_HOSTS') ?: '');
+```
+
+```yaml
+# test compose service for PHP-FPM and WP-CLI
+environment:
+  WP_HTTP_BLOCK_EXTERNAL: "true"
+  WP_ACCESSIBLE_HOSTS: "mock-api,mailpit,localhost"
+```
+
+This library does not ship either: blocking outgoing HTTP is a per-environment
+decision, and a forced block would break suites that call real sandboxes.
+
+### 4. Turn off background requests
+
+Background requests compete with the browser for PHP workers and, worse, keep
+writing after the test ends — on top of the database the next test just
+restored. Turn them off in the test mu-plugin, and run scheduled work
+explicitly in the tests that depend on it:
+
+```php
+// WordPress cron on every request: set DISABLE_WP_CRON=true in the test environment instead.
+add_filter('action_scheduler_allow_async_request_runner', '__return_false'); // Action Scheduler loopback
+add_filter('site_status_tests', '__return_empty_array');                    // Site Health loopbacks
+add_action('wp_dashboard_setup', static function (): void {
+    remove_meta_box('dashboard_site_health', 'dashboard', 'normal');
+}, 99);
+```
+
+### 5. Do not wait for every asset in the browser
+
+WebDriver returns a navigation only after the `load` event, which waits for
+every asset — including the external ones WordPress and plugins reference
+(`s.w.org`, Gravatar, web fonts, analytics). Without internet access in the
+browser container each page waits for those requests to time out. Return on
+`DOMContentLoaded` instead, and rely on `waitForElement()` for what the test
+needs:
+
+```yaml
+# Acceptance.suite.yml
+modules:
+  enabled:
+    - WPWebDriver:
+        capabilities:
+          pageLoadStrategy: eager
+```
+
+### 6. Make the database restore cheap
+
+`WPDb` with `cleanup: true` restores the whole dump before every test, and the
+cost is mostly DDL. Keep the test database in RAM and drop durability
+guarantees that a throwaway database does not need (7.2 s → 1.1 s per restore
+in the suite above):
+
+```yaml
+# test compose service for MySQL/MariaDB
+volumes:
+  - type: tmpfs
+    target: /var/lib/mysql
+    tmpfs:
+      size: 2g
+  - ./my-test.cnf:/etc/mysql/conf.d/zz-test.cnf
+```
+
+```ini
+# my-test.cnf
+[mysqld]
+skip-log-bin
+innodb_flush_log_at_trx_commit = 0
+innodb_doublewrite             = OFF
+innodb_flush_method            = O_DIRECT_NO_FSYNC
+innodb_buffer_pool_size        = 512M
+performance_schema             = OFF
+```
+
+Then trim the dump: drop the rows (keep the structure) of log and history
+tables no test reads — WooCommerce logs, Action Scheduler logs, sessions,
+abandoned carts, form submissions, import history. They are often half of the
+file, and they tend to hold real customers' personal data.
+
+### 7. Size the PHP side for the browser
+
+- **Xdebug off by default.** With `xdebug.mode=debug` and
+  `start_with_request=yes`, every PHP process and WP-CLI call waits for the IDE
+  connection to time out. Switch it on per run (for example through an
+  environment variable) only when debugging.
+- **Enough PHP-FPM workers.** A single checkout page fires several PHP requests
+  in parallel (`admin-ajax`, `wc-ajax`, REST); with the image default of 5
+  workers they queue behind each other. A static pool of 10–12 is a good start.
+
+### 8. Expect races once the suite is fast
+
+Slowness hides timing bugs; removing it surfaces them as intermittent failures.
+Two are common in WooCommerce suites:
+
+- **The login redirect races the next navigation.** `WooCommerceWebDriver`
+  already waits for `loginAs()`/`loginAsAdmin()` to settle
+  ([ADR-0010](docs/adr/0010-login-settle-after-step.md)); the `fastLoginAs*()`
+  methods follow no redirect, so they have nothing to settle.
+- **The cart leaks between tests.** WooCommerce saves the session and the
+  persistent cart on `shutdown`, after the response is sent, so a late write
+  can survive the dump restore. When tests share a customer, empty the cart in
+  `_before`, after the restore:
+
+  ```php
+  $I->dontHaveInDatabase($I->grabPrefixedTableNameFor('woocommerce_sessions'), []);
+  $I->dontHaveUserMetaInDatabase([
+      'user_id'  => $customerId,
+      'meta_key' => '_woocommerce_persistent_cart_1', // suffix is the blog ID
+  ]);
+  ```
+
 ## Writing tests with an AI coding agent
 
 This library is **agent-ready**: it declares an installable **skill** that orients a
