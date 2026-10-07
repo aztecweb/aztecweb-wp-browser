@@ -39,6 +39,19 @@ class SubscriptionHPOSCest
         ]);
     }
 
+    public function testHaveSubscriptionInDatabaseNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'status' => 'active',
+        ]);
+
+        $I->seeInDatabase('wp_wc_orders', [
+            'id' => $subscriptionId,
+            'type' => 'shop_subscription',
+            'status' => 'wc-active',
+        ]);
+    }
+
     public function testHaveSubscriptionWithCustomer(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase([

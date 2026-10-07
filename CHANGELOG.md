@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `OrderMethods::haveOrderInDatabase()` and `SubscriptionMethods::haveSubscriptionInDatabase()` now normalize a bare WC status (e.g. `processing`, `active`) to its `wc-`-prefixed form via `StatusNormalizer` before merging with defaults, the same normalization already applied to `haveOrderStatus()`/`haveSubscriptionStatus()`. Already-prefixed and non-WC statuses pass through unchanged; omitting the status key still falls back to the `wc-`-prefixed default.
 - `CartMethods::addProductToCart()` no longer waits for the "product added to cart" notice: it issues the add-to-cart request and returns. The notice is a one-shot session notice — cleared on print, and lost whenever anything rewrites the WooCommerce session between the add-to-cart request and the render (async loopbacks, a persistent object cache, a plugin touching the session) — so the wait timed out on runs where the product had in fact been added. There was nothing left to synchronize: `amOnPage()` returns only once the add-to-cart request has been served, and no other element is guaranteed to exist on every landing page a store can choose. Tests that assert on cart contents must navigate first, with `amOnCartPage()` or `amOnCheckoutPage()`; the method itself stays agnostic to the store's "Add to cart behaviour" setting and to the `woocommerce_add_to_cart_redirect` filter ([#66](https://github.com/aztecweb/aztecweb-wp-browser/issues/66)).
 
 ### Removed

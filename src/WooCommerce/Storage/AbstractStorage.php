@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\WooCommerce\Storage;
 
+use Aztec\WPBrowser\Normalizer\StatusNormalizer;
 use lucatume\WPBrowser\Module\WPDb;
 
 abstract class AbstractStorage implements WooCommerceStorageInterface
@@ -13,6 +14,16 @@ abstract class AbstractStorage implements WooCommerceStorageInterface
     }
 
     abstract protected function getEntityIdKey(): string;
+
+    /**
+     * Normalize a status value, with an unprefixed WC status accepted.
+     *
+     * Non-string values pass through unchanged, so callers can hand over a raw override value.
+     */
+    protected function normalizeStatusValue(mixed $status): mixed
+    {
+        return is_string($status) ? StatusNormalizer::normalize($status) : $status;
+    }
 
     public function getMetaTableName(): string
     {
