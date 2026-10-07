@@ -154,11 +154,6 @@ class LegacyOrderStorage extends AbstractLegacyStorage implements OrderStorageIn
         }
     }
 
-    public function getMetaIdColumnName(): string
-    {
-        return 'post_id';
-    }
-
     public function getOrderAddressTableName(): string
     {
         return $this->getMetaTableName();
