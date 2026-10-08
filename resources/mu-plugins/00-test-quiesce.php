@@ -27,3 +27,10 @@ add_action( 'admin_init', static function () {
 add_action( 'init', static function () {
     wp_deregister_script( 'heartbeat' );
 }, 1 );
+
+// --- Outgoing HTTP: block all external requests. wp-admin update checks
+// otherwise stall every login for tens of seconds, and the slow post-login
+// redirect hides the navigation races these tests are meant to expose.
+if ( ! defined( 'WP_HTTP_BLOCK_EXTERNAL' ) ) {
+    define( 'WP_HTTP_BLOCK_EXTERNAL', true );
+}

@@ -28,11 +28,10 @@ fi
 
 # Install the test-only mu-plugin that quiesces background admin traffic
 # (Action Scheduler async runner, heartbeat, etc.) which otherwise deadlocks the
-# single-worker PHP server.
-if [ ! -f public/packages/mu-plugins/00-test-quiesce.php ]; then
-    mkdir -p public/packages/mu-plugins
-    cp resources/mu-plugins/00-test-quiesce.php public/packages/mu-plugins/00-test-quiesce.php
-fi
+# single-worker PHP server. Always overwrite: the repo's copy is authoritative
+# and updates must reach existing checkouts.
+mkdir -p public/packages/mu-plugins
+cp resources/mu-plugins/00-test-quiesce.php public/packages/mu-plugins/00-test-quiesce.php
 
 wp core is-installed --quiet || wp core install \
     --url="${WP_HOME}" \
