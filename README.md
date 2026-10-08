@@ -187,6 +187,12 @@ modules:
           pageLoadStrategy: eager
 ```
 
+The gain depends on slow external assets. This library's own suite, which has
+none, did not get faster (1 min 14 s either way) and one test started to fail:
+the WooCommerce cart page renders its blocks in the browser, and the test read
+the page before they mounted. Measure before adopting it, and use
+`waitForElement()` before asserting on content rendered in the browser.
+
 ### 6. Make the database restore cheap
 
 `WPDb` with `cleanup: true` restores the whole dump before every test, and the
