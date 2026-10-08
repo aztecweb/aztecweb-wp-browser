@@ -6,11 +6,11 @@ three elements, fills the form, clicks submit, and returns as soon as the auth
 cookies are readable — with the post-login redirect still in flight (the race
 ADR-0010 settles). The site's own speed is a separate problem: every wp-admin
 load targets update checks against api.wordpress.org, which stall the login for
-tens of seconds when the environment does not block outgoing HTTP. That stall is
-the **consumer's** to fix (a per-environment network policy), not the library's:
-a versioned mu-plugin that forced `WP_HTTP_BLOCK_EXTERNAL` would break consumer
-suites that legitimately talk to external services (payment sandboxes, mail
-traps).
+tens of seconds when outgoing HTTP is not blocked. The library's own test site
+blocks it through its test mu-plugin (`resources/mu-plugins/00-test-quiesce.php`),
+which is excluded from the Composer dist and never reaches consumers. Consumers
+own that network policy for their sites (see the README), because their suites may
+legitimately talk to external services (payment sandboxes, mail traps).
 
 To remove the log-in flow cost, `fastLoginAs(string $username, string $password)`
 and `fastLoginAsAdmin()` authenticate over the **HTTP layer** and hand the
