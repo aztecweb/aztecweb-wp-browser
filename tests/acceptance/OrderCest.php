@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Aztec\WPBrowser\Tests\Acceptance;
 
 use Aztec\WPBrowser\Tests\Support\AcceptanceTester;
+use PHPUnit\Framework\AssertionFailedError;
 
 class OrderCest
 {
@@ -49,6 +50,18 @@ class OrderCest
         ]);
     }
 
+    public function testHaveOrderInDatabaseNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'post_status' => 'processing',
+        ]);
+
+        $I->seeOrderInDatabase([
+            'ID' => $orderId,
+            'post_status' => 'wc-processing',
+        ]);
+    }
+
     public function testGrabOrderStatus(AcceptanceTester $I): void
     {
         $orderId = $I->haveOrderInDatabase([
@@ -74,6 +87,34 @@ class OrderCest
         ]);
     }
 
+    public function testHaveOrderStatusNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'post_status' => 'wc-pending',
+        ]);
+
+        $I->haveOrderStatus($orderId, 'active');
+
+        $I->seeOrderInDatabase([
+            'ID' => $orderId,
+            'post_status' => 'wc-active',
+        ]);
+    }
+
+    public function testHaveOrderStatusPassesThroughNonWcStatus(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'post_status' => 'wc-pending',
+        ]);
+
+        $I->haveOrderStatus($orderId, 'trash');
+
+        $I->seeOrderInDatabase([
+            'ID' => $orderId,
+            'post_status' => 'trash',
+        ]);
+    }
+
     public function testSeeOrderStatus(AcceptanceTester $I): void
     {
         $orderId = $I->haveOrderInDatabase([
@@ -81,6 +122,25 @@ class OrderCest
         ]);
 
         $I->seeOrderStatus($orderId, 'wc-completed');
+    }
+
+    public function testSeeOrderStatusNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->seeOrderStatus($orderId, 'active');
+        $I->seeOrderStatus($orderId, 'wc-active');
+    }
+
+    public function testSeeOrderStatusPassesThroughNonWcStatus(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'post_status' => 'trash',
+        ]);
+
+        $I->seeOrderStatus($orderId, 'trash');
     }
 
     public function testHaveOrderMeta(AcceptanceTester $I): void
@@ -297,6 +357,47 @@ class OrderCest
         ]);
     }
 
+    public function testSeeOrderInDatabaseNormalizesUnprefixedStatusCriterion(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->seeOrderInDatabase([
+            'ID' => $orderId,
+            'post_status' => 'active',
+        ]);
+    }
+
+    public function testDontSeeOrderInDatabaseNormalizesUnprefixedStatusCriterion(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->dontSeeOrderInDatabase([
+            'id' => $orderId,
+            'status' => 'cancelled',
+        ]);
+
+        // If the unprefixed 'active' criterion were not normalized to 'wc-active', it would
+        // never match the stored row and dontSeeOrderInDatabase would (incorrectly) pass.
+        $I->expectThrowable(
+            AssertionFailedError::class,
+            function () use ($I, $orderId): void {
+                $I->dontSeeOrderInDatabase([
+                    'id' => $orderId,
+                    'status' => 'active',
+                ]);
+            },
+        );
+    }
+
+    public function testDontSeeOrderInDatabaseWithNonStatusCriteria(AcceptanceTester $I): void
+    {
+        $I->dontSeeOrderInDatabase(['id' => 999999]);
+    }
+
     public function testSeeOrderMetaInDatabase(AcceptanceTester $I): void
     {
         $orderId = $I->haveOrderInDatabase();
@@ -471,6 +572,55 @@ class OrderCest
                 'ID' => $orderId,
             ]);
         }
+    }
+
+    public function testSeeOrderMetaIsScopedToTheGivenOrder(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase();
+        $otherOrderId = $I->haveOrderInDatabase();
+
+        $I->haveOrderMetaInDatabase($orderId, '_scoped_meta', 'scoped_value');
+
+        $I->seeOrderMetaInDatabase([
+            'order_id' => $orderId,
+            'meta_key' => '_scoped_meta',
+        ]);
+
+        $I->dontSeeOrderMetaInDatabase([
+            'order_id' => $otherOrderId,
+            'meta_key' => '_scoped_meta',
+        ]);
+    }
+
+    public function testSeeOrderMetaWithPostId(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase();
+
+        $I->haveOrderMetaInDatabase($orderId, '_legacy_meta_post_id', 'value_post_id');
+
+        $I->seeOrderMetaInDatabase([
+            'post_id' => $orderId,
+            'meta_key' => '_legacy_meta_post_id',
+            'meta_value' => 'value_post_id',
+        ]);
+    }
+
+    public function testHaveOrderMetaTargetsPostmetaTable(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase();
+
+        $I->haveOrderMetaInDatabase($orderId, '_legacy_meta_location', 'legacy_value');
+
+        $I->seeInDatabase('wp_postmeta', [
+            'post_id' => $orderId,
+            'meta_key' => '_legacy_meta_location',
+            'meta_value' => 'legacy_value',
+        ]);
+
+        $I->dontSeeInDatabase('wp_wc_orders_meta', [
+            'order_id' => $orderId,
+            'meta_key' => '_legacy_meta_location',
+        ]);
     }
 
     public function testSeeOrderItemMetaWithOrderId(AcceptanceTester $I): void

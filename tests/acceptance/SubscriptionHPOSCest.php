@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Aztec\WPBrowser\Tests\Acceptance;
 
 use Aztec\WPBrowser\Tests\Support\AcceptanceTester;
+use PHPUnit\Framework\AssertionFailedError;
 
 class SubscriptionHPOSCest
 {
@@ -36,6 +37,19 @@ class SubscriptionHPOSCest
             'id' => $subscriptionId,
             'type' => 'shop_subscription',
             'status' => 'wc-on-hold',
+        ]);
+    }
+
+    public function testHaveSubscriptionInDatabaseNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'status' => 'active',
+        ]);
+
+        $I->seeInDatabase('wp_wc_orders', [
+            'id' => $subscriptionId,
+            'type' => 'shop_subscription',
+            'status' => 'wc-active',
         ]);
     }
 
@@ -104,6 +118,34 @@ class SubscriptionHPOSCest
         $I->assertSame($subscriptionId, $grabbedId);
     }
 
+    public function testGrabSubscriptionIdFromDatabaseNormalizesUnprefixedStatusCriterion(AcceptanceTester $I): void
+    {
+        $uniqueCustomerId = 8887;
+
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'status' => 'wc-active',
+            'customer_id' => $uniqueCustomerId,
+        ]);
+
+        $grabbedId = $I->grabSubscriptionIdFromDatabase([
+            'status' => 'active',
+            'customer_id' => $uniqueCustomerId,
+        ]);
+
+        $I->assertSame($subscriptionId, $grabbedId);
+    }
+
+    public function testGrabSubscriptionFieldFromDatabase(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'billing_email' => 'hpos-field@example.com',
+        ]);
+
+        $email = $I->grabSubscriptionFieldFromDatabase($subscriptionId, 'billing_email');
+
+        $I->assertSame('hpos-field@example.com', $email);
+    }
+
     public function testGrabSubscriptionIdNotFound(AcceptanceTester $I): void
     {
         $result = $I->grabSubscriptionIdFromDatabase([
@@ -150,6 +192,20 @@ class SubscriptionHPOSCest
         ]);
     }
 
+    public function testHaveSubscriptionStatusNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'status' => 'wc-pending',
+        ]);
+
+        $I->haveSubscriptionStatus($subscriptionId, 'expired');
+
+        $I->seeInDatabase('wp_wc_orders', [
+            'id' => $subscriptionId,
+            'status' => 'wc-expired',
+        ]);
+    }
+
     public function testCancelSubscription(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase([
@@ -193,6 +249,15 @@ class SubscriptionHPOSCest
         $I->seeSubscriptionInDatabase(['id' => $subscriptionId, 'status' => 'wc-active']);
     }
 
+    public function testSeeSubscriptionInDatabaseNormalizesUnprefixedStatusCriterion(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'status' => 'wc-active',
+        ]);
+
+        $I->seeSubscriptionInDatabase(['id' => $subscriptionId, 'status' => 'active']);
+    }
+
     public function testSeeSubscriptionMetaWithSubscriptionId(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase();
@@ -210,12 +275,30 @@ class SubscriptionHPOSCest
     {
         $subscriptionId = $I->haveSubscriptionInDatabase();
 
-        $I->haveSubscriptionMetaInDatabase($subscriptionId, '_hpos_meta2', 'value2');
+        $I->haveSubscriptionMetaInDatabase($subscriptionId, '_hpos_meta_post_id', 'value_post_id');
 
         $I->seeSubscriptionMetaInDatabase([
             'post_id' => $subscriptionId,
+            'meta_key' => '_hpos_meta_post_id',
+            'meta_value' => 'value_post_id',
+        ]);
+    }
+
+    public function testHaveSubscriptionMetaTargetsWcOrdersMetaTable(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase();
+
+        $I->haveSubscriptionMetaInDatabase($subscriptionId, '_hpos_meta2', 'value2');
+
+        $I->seeInDatabase('wp_wc_orders_meta', [
+            'order_id' => $subscriptionId,
             'meta_key' => '_hpos_meta2',
             'meta_value' => 'value2',
+        ]);
+
+        $I->dontSeeInDatabase('wp_postmeta', [
+            'post_id' => $subscriptionId,
+            'meta_key' => '_hpos_meta2',
         ]);
     }
 
@@ -228,11 +311,54 @@ class SubscriptionHPOSCest
         $I->seeSubscriptionStatus($subscriptionId, 'wc-active');
     }
 
+    public function testSeeSubscriptionStatusNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'status' => 'wc-active',
+        ]);
+
+        $I->seeSubscriptionStatus($subscriptionId, 'active');
+    }
+
+    public function testSeeSubscriptionStatusPassesThroughNonWcStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'status' => 'trash',
+        ]);
+
+        $I->seeSubscriptionStatus($subscriptionId, 'trash');
+    }
+
     public function testDontSeeSubscriptionInDatabase(AcceptanceTester $I): void
     {
         $I->dontSeeSubscriptionInDatabase([
             'customer_id' => 999999,
         ]);
+    }
+
+    public function testDontSeeSubscriptionInDatabaseNormalizesUnprefixedStatusCriterion(
+        AcceptanceTester $I,
+    ): void {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'status' => 'wc-active',
+        ]);
+
+        $I->dontSeeSubscriptionInDatabase([
+            'id' => $subscriptionId,
+            'status' => 'cancelled',
+        ]);
+
+        // If the unprefixed 'active' criterion were not normalized to 'wc-active', it would
+        // never match the stored row and dontSeeSubscriptionInDatabase would (incorrectly) pass.
+        $I->expectThrowable(
+            AssertionFailedError::class,
+            function () use ($I, $subscriptionId): void {
+                $I->dontSeeSubscriptionInDatabase([
+                    'id' => $subscriptionId,
+                    'status' => 'active',
+                ]);
+            },
+        );
     }
 
     public function testDontSeeSubscriptionMetaInDatabase(AcceptanceTester $I): void
@@ -303,6 +429,31 @@ class SubscriptionHPOSCest
         ]);
     }
 
+    public function testSubscriptionDefaultMetaTargetsWcOrdersMetaTable(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase();
+
+        $defaultKeys = [
+            '_billing_period',
+            '_billing_interval',
+            '_subscription_start_date',
+            '_subscription_expiry_date',
+            '_subscription_end_date',
+        ];
+
+        foreach ($defaultKeys as $metaKey) {
+            $I->seeInDatabase('wp_wc_orders_meta', [
+                'order_id' => $subscriptionId,
+                'meta_key' => $metaKey,
+            ]);
+
+            $I->dontSeeInDatabase('wp_postmeta', [
+                'post_id' => $subscriptionId,
+                'meta_key' => $metaKey,
+            ]);
+        }
+    }
+
     public function testHaveSubscriptionProductInDatabase(AcceptanceTester $I): void
     {
         $productId = $I->haveSubscriptionProductInDatabase([
@@ -322,6 +473,35 @@ class SubscriptionHPOSCest
             'product_id' => $productId,
             'meta_key' => '_subscription_price',
             'meta_value' => '49.99',
+        ]);
+    }
+
+    public function testHaveSubscriptionProductWithCustomMeta(AcceptanceTester $I): void
+    {
+        $productId = $I->haveSubscriptionProductInDatabase([
+            'post_title' => 'Premium Monthly Subscription',
+            'meta' => [
+                '_subscription_price' => '29.99',
+                '_subscription_period' => 'month',
+                '_subscription_sign_up_fee' => '5.00',
+            ],
+        ]);
+
+        $I->seeProductInDatabase([
+            'ID' => $productId,
+            'post_title' => 'Premium Monthly Subscription',
+        ]);
+
+        $I->seeProductMetaInDatabase([
+            'product_id' => $productId,
+            'meta_key' => '_subscription_price',
+            'meta_value' => '29.99',
+        ]);
+
+        $I->seeProductMetaInDatabase([
+            'product_id' => $productId,
+            'meta_key' => '_subscription_sign_up_fee',
+            'meta_value' => '5.00',
         ]);
     }
 }

@@ -27,10 +27,8 @@ class HPOSSubscriptionStorage extends AbstractHPOSStorage implements Subscriptio
         $subscriptionId = $this->generateId();
 
         $subscriptionData = array_merge([
-            'id' => $subscriptionId,
             'status' => 'wc-active',
             'currency' => 'USD',
-            'type' => 'shop_subscription',
             'tax_amount' => '0.00',
             'total_amount' => '0.00',
             'customer_id' => 0,
@@ -48,6 +46,7 @@ class HPOSSubscriptionStorage extends AbstractHPOSStorage implements Subscriptio
 
         $subscriptionData['id'] = $subscriptionId;
         $subscriptionData['type'] = 'shop_subscription';
+        $subscriptionData['status'] = $this->normalizeStatusValue($subscriptionData['status']);
 
         $this->wpDb->haveInDatabase($this->grabWcOrdersTableName(), $subscriptionData);
 
@@ -88,16 +87,11 @@ class HPOSSubscriptionStorage extends AbstractHPOSStorage implements Subscriptio
 
     public function mapCriteria(array $criteria): array
     {
-        $mapped = [];
+        $prepped = [];
         foreach ($criteria as $key => $value) {
-            if ($key === 'post_status') {
-                $mapped['status'] = $value;
-            } elseif ($key === 'ID') {
-                $mapped['id'] = $value;
-            } else {
-                $mapped[$key] = $value;
-            }
+            $prepped[$key === 'ID' ? 'id' : $key] = $value;
         }
+        $mapped = parent::mapCriteria($prepped);
         $mapped['type'] = 'shop_subscription';
         return $mapped;
     }

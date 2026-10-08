@@ -63,8 +63,11 @@ trait OrderMethods
      * $orderId = $I->haveOrderInDatabase([
      *     'status' => 'processing',
      * ]);
-     * $I->seeOrderInDatabase(['id' => $orderId, 'status' => 'processing']);
+     * $I->seeOrderInDatabase(['id' => $orderId, 'status' => 'wc-processing']);
      * ```
+     *
+     * Accepts a WC status with or without the `wc-` prefix (e.g. `processing` or `wc-processing`);
+     * it is stored with the prefix. Non-WC statuses pass through unchanged.
      *
      * @param OrderOverrides $overrides Order data overrides (status, customer_id, etc.). Behavior depends on storage mode (HPOS or Legacy)
      *
@@ -123,14 +126,17 @@ trait OrderMethods
      *
      * @example
      * ```php
-     * $orderId = $I->haveOrderInDatabase(['status' => 'pending']);
+     * $orderId = $I->haveOrderInDatabase(['post_status' => 'wc-pending']);
      * $status = $I->grabOrderStatus($orderId);
-     * $I->assertSame('pending', $status);
+     * $I->assertSame('wc-pending', $status);
      * ```
+     *
+     * Returns the raw DB value (still `wc-`-prefixed, e.g. `'wc-pending'`); unlike
+     * {@see seeOrderStatus()}, this does not go through criteria normalization.
      *
      * @param int $orderId  Order ID
      *
-     * @return string Order status (e.g., 'pending', 'processing', 'completed', 'cancelled')
+     * @return string Order status (e.g., 'wc-pending', 'wc-processing', 'wc-completed', 'wc-cancelled')
      */
     public function grabOrderStatus(int $orderId): string
     {
@@ -145,6 +151,10 @@ trait OrderMethods
      * $orderId = $I->haveOrderInDatabase(['status' => 'processing']);
      * $I->seeOrderStatus($orderId, 'processing');
      * ```
+     *
+     * Accepts a status with or without the `wc-` prefix (e.g. `processing` or `wc-processing`);
+     * it is normalized before matching against the stored value. Non-WC statuses pass through
+     * unchanged.
      *
      * @param int    $orderId  Order ID to verify
      * @param string $status   Expected order status
@@ -165,6 +175,8 @@ trait OrderMethods
      * $I->haveOrderStatus($orderId, 'completed');
      * $I->seeOrderStatus($orderId, 'completed');
      * ```
+     *
+     * Accepts WC statuses with or without the `wc-` prefix. Non-WC statuses pass through unchanged.
      *
      * @param int    $orderId    Order ID to modify
      * @param string $newStatus  New order status to set
@@ -258,6 +270,9 @@ trait OrderMethods
      * $I->assertSame($orderId, $found);
      * ```
      *
+     * Accepts a `status` criterion with or without the `wc-` prefix (e.g. `processing` or
+     * `wc-processing`); it is normalized before matching against the stored value.
+     *
      * @param array<string, mixed> $criteria Database query criteria (e.g., ['status' => 'pending', 'id' => 123]). Supports storage-agnostic keys like 'id', 'status'
      *
      * @return int|false Order ID if found, false otherwise
@@ -316,6 +331,9 @@ trait OrderMethods
      * $I->seeOrderInDatabase(['id' => $orderId, 'status' => 'completed']);
      * ```
      *
+     * Accepts a `status` criterion with or without the `wc-` prefix (e.g. `completed` or
+     * `wc-completed`); it is normalized before matching against the stored value.
+     *
      * @param array<string, mixed> $criteria Database query criteria (e.g., ['id' => 123, 'status' => 'pending']). Supports storage-agnostic keys like 'id', 'status'
      *
      * @return void
@@ -325,6 +343,30 @@ trait OrderMethods
         $tableName = $this->orderStorage()->getTableName();
         $mappedCriteria = $this->orderStorage()->mapCriteria($criteria);
         $this->wpDb()->seeInDatabase($tableName, $mappedCriteria);
+    }
+
+    /**
+     * Verify that no order exists in the database with the given criteria.
+     *
+     * @example
+     * ```php
+     * $orderId = $I->haveOrderInDatabase(['status' => 'completed']);
+     * $I->dontSeeOrderInDatabase(['id' => $orderId, 'status' => 'cancelled']);
+     * $I->dontSeeOrderInDatabase(['id' => 999999]);
+     * ```
+     *
+     * Accepts a `status` criterion with or without the `wc-` prefix (e.g. `cancelled` or
+     * `wc-cancelled`); it is normalized before matching against the stored value.
+     *
+     * @param array<string, mixed> $criteria Database query criteria (e.g., ['id' => 123, 'status' => 'cancelled']). Supports storage-agnostic keys like 'id', 'status'
+     *
+     * @return void
+     */
+    public function dontSeeOrderInDatabase(array $criteria): void
+    {
+        $tableName = $this->orderStorage()->getTableName();
+        $mappedCriteria = $this->orderStorage()->mapCriteria($criteria);
+        $this->wpDb()->dontSeeInDatabase($tableName, $mappedCriteria);
     }
 
     /**
@@ -346,6 +388,26 @@ trait OrderMethods
         $tableName = $this->orderStorage()->getMetaTableName();
         $mappedCriteria = $this->orderStorage()->mapMetaCriteria($criteria);
         $this->wpDb()->seeInDatabase($tableName, $mappedCriteria);
+    }
+
+    /**
+     * Verify that order meta does not exist in the database with the given criteria.
+     *
+     * @example
+     * ```php
+     * $orderId = $I->haveOrderInDatabase();
+     * $I->dontSeeOrderMetaInDatabase(['order_id' => $orderId, 'meta_key' => '_deleted']);
+     * ```
+     *
+     * @param array<string, mixed> $criteria Database query criteria (e.g., ['order_id' => 123, 'meta_key' => '_deleted']). Supports storage-agnostic keys
+     *
+     * @return void
+     */
+    public function dontSeeOrderMetaInDatabase(array $criteria): void
+    {
+        $tableName = $this->orderStorage()->getMetaTableName();
+        $mappedCriteria = $this->orderStorage()->mapMetaCriteria($criteria);
+        $this->wpDb()->dontSeeInDatabase($tableName, $mappedCriteria);
     }
 
     /**

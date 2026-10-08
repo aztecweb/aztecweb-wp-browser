@@ -28,11 +28,10 @@ fi
 
 # Install the test-only mu-plugin that quiesces background admin traffic
 # (Action Scheduler async runner, heartbeat, etc.) which otherwise deadlocks the
-# single-worker PHP server.
-if [ ! -f public/packages/mu-plugins/00-test-quiesce.php ]; then
-    mkdir -p public/packages/mu-plugins
-    cp resources/mu-plugins/00-test-quiesce.php public/packages/mu-plugins/00-test-quiesce.php
-fi
+# single-worker PHP server. Always overwrite: the repo's copy is authoritative
+# and updates must reach existing checkouts.
+mkdir -p public/packages/mu-plugins
+cp resources/mu-plugins/00-test-quiesce.php public/packages/mu-plugins/00-test-quiesce.php
 
 wp core is-installed --quiet || wp core install \
     --url="${WP_HOME}" \
@@ -47,6 +46,11 @@ wp theme activate storefront
 wp rewrite structure '/%postname%/' --hard
 wp wc payment_gateway update cod --user=admin --enabled=true
 wp wc hpos sync
+
+# WooCommerce ships a fresh install in "coming soon" mode, which serves the
+# placeholder page instead of the cart and checkout blocks to logged-out
+# visitors. Acceptance tests browse logged out, so leave the store public.
+wp option update woocommerce_coming_soon no
 
 mkdir -p tests/_data
 # Keep DELETE journal mode (SQLite's default). WPDb resets the database between

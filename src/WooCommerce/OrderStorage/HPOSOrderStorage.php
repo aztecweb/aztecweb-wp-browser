@@ -41,7 +41,6 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
         $orderId = $this->generateId();
 
         $orderData = array_merge([
-            'id' => $orderId,
             'status' => 'wc-pending',
             'currency' => 'USD',
             'type' => 'shop_order',
@@ -61,6 +60,7 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
         ], $overrides);
 
         $orderData['id'] = $orderId;
+        $orderData['status'] = $this->normalizeStatusValue($orderData['status']);
 
         $this->wpDb->haveInDatabase($this->grabWcOrdersTableName(), $orderData);
 
@@ -122,17 +122,11 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
      */
     public function mapCriteria(array $criteria): array
     {
-        $mapped = [];
+        $prepped = [];
         foreach ($criteria as $key => $value) {
-            if ($key === 'post_status') {
-                $mapped['status'] = $value;
-            } elseif ($key === 'post_title') {
-                $mapped['title'] = $value;
-            } else {
-                $mapped[$key] = $value;
-            }
+            $prepped[$key === 'post_title' ? 'title' : $key] = $value;
         }
-        return $mapped;
+        return parent::mapCriteria($prepped);
     }
 
     /**
@@ -161,11 +155,6 @@ class HPOSOrderStorage extends AbstractHPOSStorage implements OrderStorageInterf
             $this->grabOrderAddressesTableName(),
             $this->mapAddressCriteria($addressType, $criteria),
         );
-    }
-
-    public function getMetaIdColumnName(): string
-    {
-        return 'order_id';
     }
 
     public function getOrderAddressTableName(): string

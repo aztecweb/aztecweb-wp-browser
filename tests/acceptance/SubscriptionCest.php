@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Aztec\WPBrowser\Tests\Acceptance;
 
 use Aztec\WPBrowser\Tests\Support\AcceptanceTester;
+use PHPUnit\Framework\AssertionFailedError;
 
 class SubscriptionCest
 {
@@ -34,6 +35,39 @@ class SubscriptionCest
         $I->seeSubscriptionInDatabase([
             'ID' => $subscriptionId,
             'post_status' => 'wc-on-hold',
+        ]);
+    }
+
+    public function testHaveSubscriptionInDatabaseNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'active',
+        ]);
+
+        $I->seeSubscriptionInDatabase([
+            'ID' => $subscriptionId,
+            'post_status' => 'wc-active',
+        ]);
+    }
+
+    public function testHaveSubscriptionWithCustomer(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->haveSubscriptionMetaInDatabase($subscriptionId, '_customer_user', '1');
+        $I->haveSubscriptionMetaInDatabase($subscriptionId, '_billing_email', 'customer@example.com');
+
+        $I->seeSubscriptionInDatabase([
+            'ID' => $subscriptionId,
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->seeSubscriptionMetaInDatabase([
+            'subscription_id' => $subscriptionId,
+            'meta_key' => '_customer_user',
+            'meta_value' => '1',
         ]);
     }
 
@@ -147,6 +181,20 @@ class SubscriptionCest
         ]);
     }
 
+    public function testHaveSubscriptionStatusNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'wc-pending',
+        ]);
+
+        $I->haveSubscriptionStatus($subscriptionId, 'expired');
+
+        $I->seeSubscriptionInDatabase([
+            'ID' => $subscriptionId,
+            'post_status' => 'wc-expired',
+        ]);
+    }
+
     public function testCancelSubscription(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase([
@@ -190,6 +238,15 @@ class SubscriptionCest
         $I->seeSubscriptionInDatabase(['ID' => $subscriptionId, 'post_status' => 'wc-active']);
     }
 
+    public function testSeeSubscriptionInDatabaseNormalizesUnprefixedStatusCriterion(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->seeSubscriptionInDatabase(['ID' => $subscriptionId, 'post_status' => 'active']);
+    }
+
     public function testSeeSubscriptionMetaWithSubscriptionId(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase();
@@ -216,6 +273,24 @@ class SubscriptionCest
         ]);
     }
 
+    public function testHaveSubscriptionMetaTargetsPostmetaTable(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase();
+
+        $I->haveSubscriptionMetaInDatabase($subscriptionId, '_legacy_meta_location', 'legacy_value');
+
+        $I->seeInDatabase('wp_postmeta', [
+            'post_id' => $subscriptionId,
+            'meta_key' => '_legacy_meta_location',
+            'meta_value' => 'legacy_value',
+        ]);
+
+        $I->dontSeeInDatabase('wp_wc_orders_meta', [
+            'order_id' => $subscriptionId,
+            'meta_key' => '_legacy_meta_location',
+        ]);
+    }
+
     public function testSeeSubscriptionStatus(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase([
@@ -225,11 +300,53 @@ class SubscriptionCest
         $I->seeSubscriptionStatus($subscriptionId, 'wc-active');
     }
 
+    public function testSeeSubscriptionStatusNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->seeSubscriptionStatus($subscriptionId, 'active');
+    }
+
+    public function testSeeSubscriptionStatusPassesThroughNonWcStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'trash',
+        ]);
+
+        $I->seeSubscriptionStatus($subscriptionId, 'trash');
+    }
+
     public function testDontSeeSubscriptionInDatabase(AcceptanceTester $I): void
     {
         $I->dontSeeSubscriptionInDatabase([
             'post_name' => 'nonexistent-subscription-xyz-123',
         ]);
+    }
+
+    public function testDontSeeSubscriptionInDatabaseNormalizesUnprefixedStatusCriterion(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->dontSeeSubscriptionInDatabase([
+            'id' => $subscriptionId,
+            'status' => 'cancelled',
+        ]);
+
+        // If the unprefixed 'active' criterion were not normalized to 'wc-active', it would
+        // never match the stored row and dontSeeSubscriptionInDatabase would (incorrectly) pass.
+        $I->expectThrowable(
+            AssertionFailedError::class,
+            function () use ($I, $subscriptionId): void {
+                $I->dontSeeSubscriptionInDatabase([
+                    'id' => $subscriptionId,
+                    'status' => 'active',
+                ]);
+            },
+        );
     }
 
     public function testDontSeeSubscriptionMetaInDatabase(AcceptanceTester $I): void
@@ -355,5 +472,30 @@ class SubscriptionCest
             'meta_key' => '_subscription_expiry_date',
             'meta_value' => '0',
         ]);
+    }
+
+    public function testSubscriptionDefaultMetaTargetsPostmetaTable(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase();
+
+        $defaultKeys = [
+            '_billing_period',
+            '_billing_interval',
+            '_subscription_start_date',
+            '_subscription_expiry_date',
+            '_subscription_end_date',
+        ];
+
+        foreach ($defaultKeys as $metaKey) {
+            $I->seeInDatabase('wp_postmeta', [
+                'post_id' => $subscriptionId,
+                'meta_key' => $metaKey,
+            ]);
+
+            $I->dontSeeInDatabase('wp_wc_orders_meta', [
+                'order_id' => $subscriptionId,
+                'meta_key' => $metaKey,
+            ]);
+        }
     }
 }
