@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Aztec\WPBrowser\Tests\Support\Helper;
 
 use Codeception\Module;
+use Codeception\TestInterface;
 use lucatume\WPBrowser\ManagedProcess\PhpBuiltInServer;
 use lucatume\WPBrowser\Module\WPWebDriver;
 use lucatume\WPBrowser\Utils\Ports;
@@ -14,6 +15,35 @@ use lucatume\WPBrowser\Utils\Ports;
  */
 class Acceptance extends Module
 {
+    /**
+     * Stop the browser from talking to WordPress before the next test reloads the database.
+     *
+     * WPDb reloads the SQLite file in place before each test, while the page
+     * left by a browser test can keep firing wc-admin REST requests. A request
+     * that opens the file mid-reload sees missing tables or a missing admin
+     * user. This module is listed last, so its `_after` runs before the other
+     * modules' hooks and before the next test's database reload.
+     *
+     * Cookies are cleared here, while the site page is still open: WPWebDriver
+     * clears them in its own `_after`, which runs later on the blank page and
+     * can no longer reach the site's cookies.
+     */
+    public function _after(TestInterface $test): void
+    {
+        /** @var WPWebDriver $webDriver */
+        $webDriver = $this->getModule('WPWebDriver');
+
+        if ($webDriver->webDriver === null) {
+            return;
+        }
+
+        if ($webDriver->_getConfig('clear_cookies')) {
+            $webDriver->webDriver->manage()->deleteAllCookies();
+        }
+
+        $this->quiesceBrowser($webDriver);
+    }
+
     /**
      * Declare the store-wide order-storage mode for the browser layer.
      *
@@ -47,16 +77,9 @@ class Acceptance extends Module
         $webDriver = $this->getModule('WPWebDriver');
 
         // Quiesce the browser first so the live page cannot re-fire AJAX
-        // requests against the restarted server. window.stop() halts in-flight
-        // requests; replacing the document with a blank one tears down the React
-        // app and its timers. (amOnUrl('about:blank') is unreliable here, so we
-        // drive it from page JS directly.)
+        // requests against the restarted server.
         if ($webDriver->webDriver !== null) {
-            try {
-                $webDriver->executeJS('window.stop(); window.location.replace("about:blank");');
-            } catch (\Throwable $e) {
-                // No live document; the server restart below still quiesces it.
-            }
+            $this->quiesceBrowser($webDriver);
         }
 
         $pidFile = PhpBuiltInServer::getPidFile();
@@ -85,5 +108,21 @@ class Acceptance extends Module
         // start() rewrites the PID file so suite teardown still finds it. A
         // failure surfaces deliberately — a dead server must fail loudly.
         (new PhpBuiltInServer($docRoot, $port, ['PHP_CLI_SERVER_WORKERS' => $workers]))->start();
+    }
+
+    /**
+     * Replace the live page with a blank one, stopping its requests and timers.
+     *
+     * window.stop() halts in-flight requests; replacing the document tears down
+     * the React app and its timers. (amOnUrl('about:blank') is unreliable here,
+     * so we drive it from page JS directly.)
+     */
+    private function quiesceBrowser(WPWebDriver $webDriver): void
+    {
+        try {
+            $webDriver->executeJS('window.stop(); window.location.replace("about:blank");');
+        } catch (\Throwable $e) {
+            // No live document; nothing to quiesce.
+        }
     }
 }
