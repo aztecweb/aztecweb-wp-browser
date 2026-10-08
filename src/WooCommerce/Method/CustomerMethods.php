@@ -125,6 +125,28 @@ trait CustomerMethods
     }
 
     /**
+     * Remove every WooCommerce session from the database, guests included.
+     *
+     * {@see dontHaveCartInDatabase()} only removes the session of one logged-in customer.
+     * Guest sessions are keyed by a cookie hash, so use this when tests also shop as guests
+     * or when any session written on `shutdown` after the database restore could leak.
+     *
+     * @example
+     * ```php
+     * $I->dontHaveSessionsInDatabase();
+     * ```
+     *
+     * @return void
+     */
+    public function dontHaveSessionsInDatabase(): void
+    {
+        $this->wpDb()->dontHaveInDatabase(
+            $this->wpDb()->grabPrefixedTableNameFor('woocommerce_sessions'),
+            [],
+        );
+    }
+
+    /**
      * Extract a field value from a customer (user) record in the database.
      *
      * @example

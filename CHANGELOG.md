@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `CustomerMethods::dontHaveCartInDatabase()` removes a customer's WooCommerce session and persistent cart from the database, so a cart written on `shutdown` after the database restore no longer returns at login ([#81](https://github.com/aztecweb/aztecweb-wp-browser/issues/81)).
+- `CustomerMethods::dontHaveSessionsInDatabase()` removes every WooCommerce session, guests included ([#81](https://github.com/aztecweb/aztecweb-wp-browser/issues/81)).
 
 ### Fixed
 
