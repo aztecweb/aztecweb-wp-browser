@@ -241,6 +241,12 @@ encapsulated: no public actor method exposes the state (there is no
 | Admin URL     | `post.php?post={id}&action=edit`    | `admin.php?page=wc-orders&action=edit&id={id}`    |
 | ID generation | Auto-increment (via `havePostInDatabase`) | Manual (must check max ID across both tables) |
 
+Either way the status column holds a `wc-`-prefixed value. Per
+[ADR-0009](docs/adr/0009-wc-status-normalization-on-input.md), the library
+normalizes a **WC status** to that prefixed form at every input call site, so
+tests may pass `processing` or `wc-processing` interchangeably; unknown statuses
+pass through verbatim and `grab*Status` returns the raw stored value.
+
 ## Page Objects
 
 Page Objects hold **CSS selectors and page-specific logic** — selector constants

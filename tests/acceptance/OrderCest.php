@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Aztec\WPBrowser\Tests\Acceptance;
 
 use Aztec\WPBrowser\Tests\Support\AcceptanceTester;
+use PHPUnit\Framework\AssertionFailedError;
 
 class OrderCest
 {
@@ -121,6 +122,25 @@ class OrderCest
         ]);
 
         $I->seeOrderStatus($orderId, 'wc-completed');
+    }
+
+    public function testSeeOrderStatusNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->seeOrderStatus($orderId, 'active');
+        $I->seeOrderStatus($orderId, 'wc-active');
+    }
+
+    public function testSeeOrderStatusPassesThroughNonWcStatus(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'post_status' => 'trash',
+        ]);
+
+        $I->seeOrderStatus($orderId, 'trash');
     }
 
     public function testHaveOrderMeta(AcceptanceTester $I): void
@@ -335,6 +355,47 @@ class OrderCest
             'ID' => $orderId,
             'post_status' => 'wc-processing',
         ]);
+    }
+
+    public function testSeeOrderInDatabaseNormalizesUnprefixedStatusCriterion(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->seeOrderInDatabase([
+            'ID' => $orderId,
+            'post_status' => 'active',
+        ]);
+    }
+
+    public function testDontSeeOrderInDatabaseNormalizesUnprefixedStatusCriterion(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->dontSeeOrderInDatabase([
+            'id' => $orderId,
+            'status' => 'cancelled',
+        ]);
+
+        // If the unprefixed 'active' criterion were not normalized to 'wc-active', it would
+        // never match the stored row and dontSeeOrderInDatabase would (incorrectly) pass.
+        $I->expectThrowable(
+            AssertionFailedError::class,
+            function () use ($I, $orderId): void {
+                $I->dontSeeOrderInDatabase([
+                    'id' => $orderId,
+                    'status' => 'active',
+                ]);
+            },
+        );
+    }
+
+    public function testDontSeeOrderInDatabaseWithNonStatusCriteria(AcceptanceTester $I): void
+    {
+        $I->dontSeeOrderInDatabase(['id' => 999999]);
     }
 
     public function testSeeOrderMetaInDatabase(AcceptanceTester $I): void

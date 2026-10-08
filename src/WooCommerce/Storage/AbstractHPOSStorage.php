@@ -44,7 +44,12 @@ abstract class AbstractHPOSStorage extends AbstractStorage
             $mapped[$key === 'post_status' ? 'status' : $key] = $value;
         }
 
-        return $mapped;
+        return $this->normalizeStatusInCriteria($mapped);
+    }
+
+    protected function getStatusColumnName(): string
+    {
+        return 'status';
     }
 
     protected function grabEntityMeta(int $entityId, string $key, bool $single = false): mixed

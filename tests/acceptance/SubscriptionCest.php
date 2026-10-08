@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Aztec\WPBrowser\Tests\Acceptance;
 
 use Aztec\WPBrowser\Tests\Support\AcceptanceTester;
+use PHPUnit\Framework\AssertionFailedError;
 
 class SubscriptionCest
 {
@@ -46,6 +47,27 @@ class SubscriptionCest
         $I->seeSubscriptionInDatabase([
             'ID' => $subscriptionId,
             'post_status' => 'wc-active',
+        ]);
+    }
+
+    public function testHaveSubscriptionWithCustomer(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->haveSubscriptionMetaInDatabase($subscriptionId, '_customer_user', '1');
+        $I->haveSubscriptionMetaInDatabase($subscriptionId, '_billing_email', 'customer@example.com');
+
+        $I->seeSubscriptionInDatabase([
+            'ID' => $subscriptionId,
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->seeSubscriptionMetaInDatabase([
+            'subscription_id' => $subscriptionId,
+            'meta_key' => '_customer_user',
+            'meta_value' => '1',
         ]);
     }
 
@@ -216,6 +238,15 @@ class SubscriptionCest
         $I->seeSubscriptionInDatabase(['ID' => $subscriptionId, 'post_status' => 'wc-active']);
     }
 
+    public function testSeeSubscriptionInDatabaseNormalizesUnprefixedStatusCriterion(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->seeSubscriptionInDatabase(['ID' => $subscriptionId, 'post_status' => 'active']);
+    }
+
     public function testSeeSubscriptionMetaWithSubscriptionId(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase();
@@ -269,11 +300,53 @@ class SubscriptionCest
         $I->seeSubscriptionStatus($subscriptionId, 'wc-active');
     }
 
+    public function testSeeSubscriptionStatusNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->seeSubscriptionStatus($subscriptionId, 'active');
+    }
+
+    public function testSeeSubscriptionStatusPassesThroughNonWcStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'trash',
+        ]);
+
+        $I->seeSubscriptionStatus($subscriptionId, 'trash');
+    }
+
     public function testDontSeeSubscriptionInDatabase(AcceptanceTester $I): void
     {
         $I->dontSeeSubscriptionInDatabase([
             'post_name' => 'nonexistent-subscription-xyz-123',
         ]);
+    }
+
+    public function testDontSeeSubscriptionInDatabaseNormalizesUnprefixedStatusCriterion(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'wc-active',
+        ]);
+
+        $I->dontSeeSubscriptionInDatabase([
+            'id' => $subscriptionId,
+            'status' => 'cancelled',
+        ]);
+
+        // If the unprefixed 'active' criterion were not normalized to 'wc-active', it would
+        // never match the stored row and dontSeeSubscriptionInDatabase would (incorrectly) pass.
+        $I->expectThrowable(
+            AssertionFailedError::class,
+            function () use ($I, $subscriptionId): void {
+                $I->dontSeeSubscriptionInDatabase([
+                    'id' => $subscriptionId,
+                    'status' => 'active',
+                ]);
+            },
+        );
     }
 
     public function testDontSeeSubscriptionMetaInDatabase(AcceptanceTester $I): void

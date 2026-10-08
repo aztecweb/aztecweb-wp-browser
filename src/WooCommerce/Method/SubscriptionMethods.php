@@ -125,6 +125,9 @@ trait SubscriptionMethods
      * $I->assertSame($subscriptionId, $found);
      * ```
      *
+     * Accepts a `status` criterion with or without the `wc-` prefix (e.g. `active` or
+     * `wc-active`); it is normalized before matching against the stored value.
+     *
      * @param array<string, mixed> $criteria Database query criteria (e.g., ['status' => 'wc-active', 'id' => 123])
      *
      * @return int|false Subscription ID if found, false otherwise
@@ -149,6 +152,10 @@ trait SubscriptionMethods
     /**
      * Extract a field value from a subscription record in the database.
      *
+     * The field name is storage-specific: under Legacy storage the subscription is a
+     * `wp_posts` row (e.g. `post_title`, `post_status`); under HPOS storage it is a
+     * `wc_orders` row (e.g. `billing_email`, `status`).
+     *
      * @example
      * ```php
      * $subscriptionId = $I->haveSubscriptionInDatabase(['post_title' => 'My Subscription']);
@@ -157,13 +164,17 @@ trait SubscriptionMethods
      * ```
      *
      * @param int    $id     Subscription ID
-     * @param string $field  Database field name to retrieve (e.g., 'post_title', 'post_status')
+     * @param string $field  Database field name to retrieve
      *
      * @return mixed Field value from the subscription record
      */
     public function grabSubscriptionFieldFromDatabase(int $id, string $field): mixed
     {
-        return $this->wpDb()->grabPostFieldFromDatabase($id, $field);
+        return $this->wpDb()->grabFromDatabase(
+            $this->subscriptionStorage()->getTableName(),
+            $field,
+            [$this->subscriptionStorage()->getIdColumnName() => $id],
+        );
     }
 
     /**
@@ -193,10 +204,13 @@ trait SubscriptionMethods
      *
      * @example
      * ```php
-     * $subscriptionId = $I->haveSubscriptionInDatabase(['status' => 'wc-active']);
+     * $subscriptionId = $I->haveSubscriptionInDatabase(['post_status' => 'wc-active']);
      * $status = $I->grabSubscriptionStatus($subscriptionId);
      * $I->assertSame('wc-active', $status);
      * ```
+     *
+     * Returns the raw DB value (still `wc-`-prefixed); unlike {@see seeSubscriptionStatus()},
+     * this does not go through criteria normalization.
      *
      * @param int $subscriptionId  Subscription ID
      *
@@ -295,6 +309,9 @@ trait SubscriptionMethods
      * $I->seeSubscriptionInDatabase(['id' => $subscriptionId, 'status' => 'wc-active']);
      * ```
      *
+     * Accepts a `status` criterion with or without the `wc-` prefix (e.g. `active` or
+     * `wc-active`); it is normalized before matching against the stored value.
+     *
      * @param array<string, mixed> $criteria Database query criteria (e.g., ['id' => 123, 'status' => 'wc-active'])
      *
      * @return void
@@ -336,6 +353,10 @@ trait SubscriptionMethods
      * $I->seeSubscriptionStatus($subscriptionId, 'wc-active');
      * ```
      *
+     * Accepts a status with or without the `wc-` prefix (e.g. `active` or `wc-active`); it is
+     * normalized before matching against the stored value. Non-WC statuses pass through
+     * unchanged.
+     *
      * @param int    $subscriptionId  Subscription ID to verify
      * @param string $status          Expected subscription status
      *
@@ -353,6 +374,9 @@ trait SubscriptionMethods
      * ```php
      * $I->dontSeeSubscriptionInDatabase(['id' => 999]);
      * ```
+     *
+     * Accepts a `status` criterion with or without the `wc-` prefix (e.g. `cancelled` or
+     * `wc-cancelled`); it is normalized before matching against the stored value.
      *
      * @param array<string, mixed> $criteria Database query criteria (e.g., ['status' => 'wc-deleted'])
      *

@@ -35,6 +35,10 @@ _Avoid_: Tester (reserved for the concrete class name `AcceptanceTester`).
 WooCommerce's High-Performance Order Storage feature — orders persisted in custom tables (`wp_wc_orders` family) rather than `wp_posts`/`wp_postmeta`. Handled per layer: `WooCommerceDb` **detects it from the database**; `WooCommerceWebDriver` must never query the database, so it is **told the order-storage mode via a single config flag** (`legacyOrderStorage`, default `false`) that governs every HPOS-dependent browser behavior. Never exposed as a public actor method.
 _Avoid_: Custom orders table, COT, HPOS mode.
 
+**WC status**:
+A status registered with WooCommerce via `wc_register_order_status()` (or the Subscriptions equivalent) and carried by an order or a subscription; always stored in the database with a `wc-` prefix (`wc-pending`, `wc-active`), but named without it in the admin UI, the WC PHP API and this library's actor methods. Inputs are normalized to the prefixed form by `StatusNormalizer` at every write and criteria call site; statuses outside the known allowlist pass through verbatim, and `grab*Status` returns the raw stored value. Not the same thing as a WordPress post status — coupons carry `publish`/`draft` and are never normalized.
+_Avoid_: Order status (excludes subscriptions), post status (a different thing), status slug.
+
 **First-class library**:
 The project's stated quality target — equipped with level-max static analysis, semver-disciplined releases, polished README, and CI gates from day one, even though external adoption is deferred.
 _Avoid_: Production-ready (vague), enterprise-grade (marketing).
@@ -45,6 +49,7 @@ _Avoid_: Production-ready (vague), enterprise-grade (marketing).
 - A **Plugin Module** is composed of one or more **Method Traits** via `use` statements.
 - A **Plugin Module** declares **Sibling Module** requirements in `_initialize()` and accesses them via `getModule()`.
 - The **Class Alias Trick** maps `\Codeception\Module\X` to a **Plugin Module**'s real class so consumers reference it by short name.
+- A **WC status** is normalized on the way in — by every actor method that writes one or matches on one — and never on the way out; only the DB-facing form (`wc-`-prefixed) is ever read back.
 - **HPOS** handling is split by layer: `WooCommerceDb` **detects** it from the database, while `WooCommerceWebDriver` is **declared** the order-storage mode through one config flag (`legacyOrderStorage`) and never queries the DB. A single flag — not per-screen flags — so an impossible mixed state (one screen HPOS, another legacy) cannot be expressed. Neither layer exposes HPOS on the public actor API.
 
 ## Example dialogue
@@ -65,4 +70,5 @@ _Avoid_: Production-ready (vague), enterprise-grade (marketing).
 
 - "Module" (generic Codeception term) vs. **Plugin Module** (this library's plugin-flavored modules) — when ambiguous, default to **Plugin Module**.
 - "Trait" (generic PHP construct) vs. **Method Trait** (this library's actor-method-providing traits in `src/{Plugin}/Method/`) — default to the qualified term.
+- "Status" — a **WC status** (orders, subscriptions; `wc-`-prefixed in the DB, normalized on input) vs. a WordPress post status (coupons, products; `publish`/`draft`, never normalized). Qualify it; the two are not interchangeable and the library treats them differently.
 - "HPOS detection" — implementation detail; never expose as part of the actor or any module's public API.
