@@ -37,11 +37,15 @@ modules:
             adminPath: /wp/wp-admin
             capabilities:
                 goog:chromeOptions:
+                    # NetworkServiceInProcess: Chromium 102 (PHP 8.0 image) crashes its
+                    # out-of-process network service at startup in ~5% of sessions, and
+                    # session creation then hangs until chromedriver's 600s timeout.
                     args:
                         - '--headless=new'
                         - '--disable-gpu'
                         - '--no-sandbox'
                         - '--disable-dev-shm-usage'
+                        - '--enable-features=NetworkServiceInProcess'
         AztecWPBrowser:
             pageObjects: []
 step_decorators:
