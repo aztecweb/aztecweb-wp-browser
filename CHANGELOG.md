@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `CustomerMethods::dontHaveCartInDatabase()` removes a customer's WooCommerce session and persistent cart from the database, so a cart written on `shutdown` after the database restore no longer returns at login ([#81](https://github.com/aztecweb/aztecweb-wp-browser/issues/81)).
+
 ### Fixed
 
 - `$I->loginAsAdmin()` and `$I->loginAs()` no longer return while the post-login redirect is still in flight. `WooCommerceWebDriver` intercepts the step in `_afterStep()` and waits for the landing document to be complete and the login form to be gone, so the next navigation is not overwritten by the pending redirect. The actor API is unchanged — the step remains wp-browser's ([ADR-0010](docs/adr/0010-login-settle-after-step.md), [#81](https://github.com/aztecweb/aztecweb-wp-browser/issues/81)).

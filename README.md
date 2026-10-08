@@ -251,11 +251,7 @@ Two are common in WooCommerce suites:
   `_before`, after the restore:
 
   ```php
-  $I->dontHaveInDatabase($I->grabPrefixedTableNameFor('woocommerce_sessions'), []);
-  $I->dontHaveUserMetaInDatabase([
-      'user_id'  => $customerId,
-      'meta_key' => '_woocommerce_persistent_cart_1', // suffix is the blog ID
-  ]);
+  $I->dontHaveCartInDatabase($customerId);
   ```
 
 ## Writing tests with an AI coding agent

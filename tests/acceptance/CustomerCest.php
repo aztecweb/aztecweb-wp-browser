@@ -608,4 +608,24 @@ class CustomerCest
             'meta_key' => 'nonexistent_key',
         ]);
     }
+
+    public function testDontHaveCartInDatabase(AcceptanceTester $I): void
+    {
+        $customerId = $I->haveCustomerInDatabase(['user_login' => 'cartless']);
+        $I->haveCustomerMetaInDatabase($customerId, '_woocommerce_persistent_cart_1', 'a:0:{}');
+        $sessions = $I->grabPrefixedTableNameFor('woocommerce_sessions');
+        $I->haveInDatabase($sessions, [
+            'session_key'    => (string)$customerId,
+            'session_value'  => 'a:0:{}',
+            'session_expiry' => time() + 3600,
+        ]);
+
+        $I->dontHaveCartInDatabase($customerId);
+
+        $I->dontSeeCustomerMetaInDatabase([
+            'user_id'  => $customerId,
+            'meta_key' => '_woocommerce_persistent_cart_1',
+        ]);
+        $I->dontSeeInDatabase($sessions, ['session_key' => (string)$customerId]);
+    }
 }

@@ -92,6 +92,39 @@ trait CustomerMethods
     }
 
     /**
+     * Remove a customer's cart from the database: the WooCommerce session and the persistent cart.
+     *
+     * WooCommerce writes both on `shutdown`, after the response is sent, so a late write can
+     * survive the database restore between tests and bring the previous cart back at login.
+     * Call it in `_before`, after the restore, when tests share a customer.
+     *
+     * @example
+     * ```php
+     * $customerId = $I->haveCustomerInDatabase(['user_login' => 'customer', 'user_pass' => 'pw']);
+     * $I->dontHaveCartInDatabase($customerId);
+     * $I->loginAs('customer', 'pw');
+     * $I->amOnCartPage();
+     * $I->dontSeeElement('.cart_item');
+     * ```
+     *
+     * @param int $customerId  Customer (user) ID. Logged-in sessions are keyed by it
+     * @param int $blogId      Blog ID the persistent cart meta key is suffixed with (default: 1)
+     *
+     * @return void
+     */
+    public function dontHaveCartInDatabase(int $customerId, int $blogId = 1): void
+    {
+        $this->wpDb()->dontHaveInDatabase(
+            $this->wpDb()->grabPrefixedTableNameFor('woocommerce_sessions'),
+            ['session_key' => (string)$customerId],
+        );
+        $this->wpDb()->dontHaveUserMetaInDatabase([
+            'user_id'  => $customerId,
+            'meta_key' => '_woocommerce_persistent_cart_' . $blogId,
+        ]);
+    }
+
+    /**
      * Extract a field value from a customer (user) record in the database.
      *
      * @example
