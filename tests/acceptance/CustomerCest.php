@@ -628,4 +628,21 @@ class CustomerCest
         ]);
         $I->dontSeeInDatabase($sessions, ['session_key' => (string)$customerId]);
     }
+
+    public function testDontHaveSessionsInDatabase(AcceptanceTester $I): void
+    {
+        $sessions = $I->grabPrefixedTableNameFor('woocommerce_sessions');
+        foreach (['guest-hash', '42'] as $key) {
+            $I->haveInDatabase($sessions, [
+                'session_key'    => $key,
+                'session_value'  => 'a:0:{}',
+                'session_expiry' => time() + 3600,
+            ]);
+        }
+
+        $I->dontHaveSessionsInDatabase();
+
+        $I->dontSeeInDatabase($sessions, ['session_key' => 'guest-hash']);
+        $I->dontSeeInDatabase($sessions, ['session_key' => '42']);
+    }
 }

@@ -254,6 +254,9 @@ Two are common in WooCommerce suites:
   $I->dontHaveCartInDatabase($customerId);
   ```
 
+  Guest sessions are keyed by a cookie hash; `$I->dontHaveSessionsInDatabase()`
+  removes every session, guests included.
+
 ## Writing tests with an AI coding agent
 
 This library is **agent-ready**: it declares an installable **skill** that orients a
