@@ -81,7 +81,6 @@ trait ActionMethods
             'attempts' => 0,
             'last_attempt_gmt' => null,
             'claim_id' => 0,
-            'extended_claim_id' => '',
         ], $overrides);
 
         return $this->wpDb()->haveInDatabase($this->actionsTableName(), $actionData);
@@ -171,27 +170,8 @@ trait ActionMethods
      */
     public function grabActionsFromDatabase(array $criteria = []): array
     {
-        $actionIds = $this->wpDb()->grabColumnFromDatabase(
-            $this->actionsTableName(),
-            'action_id',
-            $criteria,
-        );
-
         /** @var array<int, array<string, mixed>> $actions */
-        $actions = [];
-        foreach ($actionIds as $actionId) {
-            $row = $this->wpDb()->grabFromDatabase(
-                $this->actionsTableName(),
-                '*',
-                ['action_id' => $actionId],
-            );
-            if ($row === false || !is_array($row)) {
-                continue;
-            }
-
-            /** @var array<string, mixed> $row */
-            $actions[] = $row;
-        }
+        $actions = $this->wpDb()->grabEntriesFromDatabase($this->actionsTableName(), $criteria);
 
         return $actions;
     }
