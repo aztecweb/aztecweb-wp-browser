@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `ActionMethods::grabActionsFromDatabase()` always returned an empty array, so negative assertions such as `assertCount(0, ...)` passed whether or not the action existed. It now returns the matching rows through `grabEntriesFromDatabase()`, in a single query ([#68](https://github.com/aztecweb/aztecweb-wp-browser/issues/68)).
+- `ActionMethods::haveActionInDatabase()` no longer inserts the `extended_claim_id` column, which Action Scheduler does not define and made every call fail with `Unknown column` ([#68](https://github.com/aztecweb/aztecweb-wp-browser/issues/68)).
+
 ### Changed
 
 - `CartMethods::addProductToCart()` no longer waits for the "product added to cart" notice: it issues the add-to-cart request and returns. The notice is a one-shot session notice — cleared on print, and lost whenever anything rewrites the WooCommerce session between the add-to-cart request and the render (async loopbacks, a persistent object cache, a plugin touching the session) — so the wait timed out on runs where the product had in fact been added. There was nothing left to synchronize: `amOnPage()` returns only once the add-to-cart request has been served, and no other element is guaranteed to exist on every landing page a store can choose. Tests that assert on cart contents must navigate first, with `amOnCartPage()` or `amOnCheckoutPage()`; the method itself stays agnostic to the store's "Add to cart behaviour" setting and to the `woocommerce_add_to_cart_redirect` filter ([#66](https://github.com/aztecweb/aztecweb-wp-browser/issues/66)).
