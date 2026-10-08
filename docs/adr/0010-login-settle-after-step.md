@@ -19,7 +19,10 @@ the race.
 Instead the module intercepts the step after it runs: `_afterStep()` sees the
 just-executed action (still `loginAs`/`loginAsAdmin` for `tryTo`/`retry`
 variants) and calls a private `waitForLoginToSettle()`, which polls the browser
-until the login form is gone and the document is complete. The step stays
+until the login form is gone, the document is complete and two consecutive
+polls see the same document (a marker on `window` is wiped by any navigation,
+so a chained redirect such as `profile.php` to the account page restarts the
+count). The step stays
 wp-browser's; the module only waits behind it.
 
 ## Considered options
@@ -48,7 +51,7 @@ wp-browser's; the module only waits behind it.
 - A failed log-in step is skipped (`Step::hasFailed()`): the hook runs in
   Scenario's `finally`, so without the guard a timeout would mask the real error.
 - The wait is implicit, so the module emits no step of its own; it is bounded by
-  `LOGIN_SETTLE_TIMEOUT` (10 s) and ends as soon as the landing document is
-  complete and the login form is gone.
+  `LOGIN_SETTLE_TIMEOUT` (10 s) and ends once the landing document is
+  complete, the login form is gone and the page stayed put between two polls.
 - When wp-browser settles the redirect itself, this hook and ADR should be
   removed.

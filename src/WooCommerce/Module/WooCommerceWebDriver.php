@@ -93,8 +93,15 @@ class WooCommerceWebDriver extends Module
     private function waitForLoginToSettle(): void
     {
         $deadline = microtime(true) + self::LOGIN_SETTLE_TIMEOUT;
-        $script = 'return document.readyState === "complete" '
-            . '&& document.getElementById("loginform") === null;';
+        // The document must be complete, past the login form, and unchanged since the
+        // previous poll. The marker lives on `window`, so any navigation between two
+        // polls (a chained redirect such as profile.php -> my account) wipes it and
+        // restarts the count.
+        $script = 'if (document.readyState !== "complete" '
+            . '|| document.getElementById("loginform") !== null) { return false; } '
+            . 'if (window.__aztecLoginSettleHref === location.href) { return true; } '
+            . 'window.__aztecLoginSettleHref = location.href; '
+            . 'return false;';
 
         while (microtime(true) < $deadline) {
             try {
