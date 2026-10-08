@@ -72,8 +72,11 @@ unworkable, and the measurement that settled it is below.
   environment in `config/application.php`).
 - Custom login forms (2FA/SSO/reCAPTCHA) are out of scope, exactly as they are
   for `loginAs` — not a regression.
-- Cookies are re-attached with `path=/`, `httpOnly` and their original
-  `Secure` flag; the narrower WordPress paths (`/wp-admin`, `/wp-content/plugins`)
-  and any `COOKIE_DOMAIN` are not reproduced. Acceptable for a test origin.
+- Cookies are re-attached with `httpOnly`, their original `Secure` flag and the
+  `path` WordPress sent (the auth cookie is scoped to `wp-admin`). Keeping the path
+  matters: a cookie of the same name and path replaces the one a previous session
+  left in the browser, while one forced to `path=/` would lose to the older, more
+  specific cookie and WordPress would ask to log in again. Any `COOKIE_DOMAIN` is
+  not reproduced. Acceptable for a test origin.
 - The first log-in of a run pays a cold-bootstrap cost (~1 s); steady-state is
   ~0.25 s.

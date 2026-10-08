@@ -137,9 +137,12 @@ trait FastLoginMethods
         // A static core image puts it there without bootstrapping WordPress.
         $webDriver->amOnUrl($this->fastLoginSiteUrl('wp-includes/images/blank.gif'));
 
-        foreach ($cookies as $name => $cookie) {
-            $webDriver->setCookie($name, $cookie['value'], [
-                'path' => '/',
+        // Each cookie keeps the path WordPress gave it (the auth cookie is scoped
+        // to `wp-admin`). A cookie of the same name and path replaces the one a
+        // previous session left in the browser, which a path of `/` would not.
+        foreach ($cookies as $cookie) {
+            $webDriver->setCookie($cookie['name'], $cookie['value'], [
+                'path' => $cookie['path'],
                 'httpOnly' => true,
                 'secure' => $cookie['secure'],
             ]);
@@ -187,7 +190,7 @@ trait FastLoginMethods
      *
      * @param string[] $setCookieHeaders One entry per `Set-Cookie` header.
      *
-     * @return array<string, array{value: string, secure: bool}> Cookie name => value and Secure flag.
+     * @return list<array{name: string, value: string, path: string, secure: bool}> Name, value, path and Secure flag.
      */
     private static function extractAuthCookies(array $setCookieHeaders): array
     {
@@ -200,8 +203,10 @@ trait FastLoginMethods
                 continue;
             }
 
-            $cookies[$matches[1]] = [
+            $cookies[] = [
+                'name' => $matches[1],
                 'value' => $matches[2],
+                'path' => preg_match('/;\s*path=([^;]*)/i', $header, $path) === 1 ? $path[1] : '/',
                 'secure' => preg_match('/;\s*secure\s*(?:;|$)/i', $header) === 1,
             ];
         }
