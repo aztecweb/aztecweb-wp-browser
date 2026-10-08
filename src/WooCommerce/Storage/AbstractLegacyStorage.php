@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\WooCommerce\Storage;
 
+use Aztec\WPBrowser\Normalizer\StatusNormalizer;
+
 abstract class AbstractLegacyStorage extends AbstractStorage
 {
     public function getTableName(): string
@@ -52,7 +54,7 @@ abstract class AbstractLegacyStorage extends AbstractStorage
     {
         $this->wpDb->updateInDatabase(
             $this->wpDb->grabPostsTableName(),
-            ['post_status' => $status],
+            ['post_status' => StatusNormalizer::normalize($status)],
             ['ID' => $entityId],
         );
     }

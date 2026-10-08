@@ -37,6 +37,18 @@ class SubscriptionCest
         ]);
     }
 
+    public function testHaveSubscriptionInDatabaseNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'active',
+        ]);
+
+        $I->seeSubscriptionInDatabase([
+            'ID' => $subscriptionId,
+            'post_status' => 'wc-active',
+        ]);
+    }
+
     public function testHaveSubscriptionWithMeta(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase([
@@ -147,6 +159,20 @@ class SubscriptionCest
         ]);
     }
 
+    public function testHaveSubscriptionStatusNormalizesUnprefixedStatus(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'wc-pending',
+        ]);
+
+        $I->haveSubscriptionStatus($subscriptionId, 'expired');
+
+        $I->seeSubscriptionInDatabase([
+            'ID' => $subscriptionId,
+            'post_status' => 'wc-expired',
+        ]);
+    }
+
     public function testCancelSubscription(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase([
@@ -213,6 +239,24 @@ class SubscriptionCest
             'post_id' => $subscriptionId,
             'meta_key' => '_another_meta',
             'meta_value' => 'another_value',
+        ]);
+    }
+
+    public function testHaveSubscriptionMetaTargetsPostmetaTable(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase();
+
+        $I->haveSubscriptionMetaInDatabase($subscriptionId, '_legacy_meta_location', 'legacy_value');
+
+        $I->seeInDatabase('wp_postmeta', [
+            'post_id' => $subscriptionId,
+            'meta_key' => '_legacy_meta_location',
+            'meta_value' => 'legacy_value',
+        ]);
+
+        $I->dontSeeInDatabase('wp_wc_orders_meta', [
+            'order_id' => $subscriptionId,
+            'meta_key' => '_legacy_meta_location',
         ]);
     }
 
@@ -355,5 +399,30 @@ class SubscriptionCest
             'meta_key' => '_subscription_expiry_date',
             'meta_value' => '0',
         ]);
+    }
+
+    public function testSubscriptionDefaultMetaTargetsPostmetaTable(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase();
+
+        $defaultKeys = [
+            '_billing_period',
+            '_billing_interval',
+            '_subscription_start_date',
+            '_subscription_expiry_date',
+            '_subscription_end_date',
+        ];
+
+        foreach ($defaultKeys as $metaKey) {
+            $I->seeInDatabase('wp_postmeta', [
+                'post_id' => $subscriptionId,
+                'meta_key' => $metaKey,
+            ]);
+
+            $I->dontSeeInDatabase('wp_wc_orders_meta', [
+                'order_id' => $subscriptionId,
+                'meta_key' => $metaKey,
+            ]);
+        }
     }
 }

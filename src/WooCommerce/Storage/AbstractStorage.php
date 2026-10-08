@@ -4,33 +4,63 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\WooCommerce\Storage;
 
+use Aztec\WPBrowser\Normalizer\StatusNormalizer;
 use lucatume\WPBrowser\Module\WPDb;
 
 abstract class AbstractStorage implements WooCommerceStorageInterface
 {
+    /**
+     * Meta ID columns used across the storages, accepted as aliases in meta criteria.
+     */
+    private const META_ID_COLUMNS = ['post_id', 'order_id'];
+
     public function __construct(protected WPDb $wpDb)
     {
     }
 
     abstract protected function getEntityIdKey(): string;
 
+    /**
+     * Normalize a status value, with an unprefixed WC status accepted.
+     *
+     * Non-string values pass through unchanged, so callers can hand over a raw override value.
+     */
+    protected function normalizeStatusValue(mixed $status): mixed
+    {
+        return is_string($status) ? StatusNormalizer::normalize($status) : $status;
+    }
+
     public function getMetaTableName(): string
     {
         return $this->wpDb->grabPostMetaTableName();
     }
 
+    public function getMetaIdColumnName(): string
+    {
+        return 'post_id';
+    }
+
     /**
      * Map meta query criteria to storage format.
+     *
+     * Entity-specific keys ('order_id', 'subscription_id') and the meta ID columns
+     * of the other storages are all normalized to this storage's meta ID column,
+     * so criteria stay storage-agnostic.
      *
      * @param array<string, mixed> $criteria Database query criteria.
      * @return array<string, mixed> Mapped criteria.
      */
     public function mapMetaCriteria(array $criteria): array
     {
-        $entityKey = $this->getEntityIdKey();
-        if (isset($criteria[$entityKey])) {
-            $criteria['post_id'] = $criteria[$entityKey];
-            unset($criteria[$entityKey]);
+        $metaIdColumn = $this->getMetaIdColumnName();
+
+        foreach ([$this->getEntityIdKey(), ...self::META_ID_COLUMNS] as $alias) {
+            if ($alias === $metaIdColumn || !isset($criteria[$alias])) {
+                continue;
+            }
+
+            $criteria[$metaIdColumn] = $criteria[$alias];
+            unset($criteria[$alias]);
         }
 
         return $criteria;
