@@ -10,6 +10,7 @@ on:
       - 'composer.lock'
       - '.env.example'
       - 'resources/**'
+      - '.githooks/**'
       - '.github/workflows/test-suite.yml'
   pull_request:
     paths:
@@ -19,6 +20,7 @@ on:
       - 'composer.lock'
       - '.env.example'
       - 'resources/**'
+      - '.githooks/**'
       - '.github/workflows/test-suite.yml'
 
 permissions:
