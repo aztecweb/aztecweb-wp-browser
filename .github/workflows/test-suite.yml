@@ -63,3 +63,7 @@ jobs:
 
       - name: Run test suite
         run: vendor/bin/codecept run
+
+      - name: Print request log
+        if: failure()
+        run: grep -n "" tests/_output/requests.log | grep -v "\.css\|\.js" | tail -400

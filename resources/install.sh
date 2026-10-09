@@ -32,6 +32,7 @@ fi
 # and updates must reach existing checkouts.
 mkdir -p public/packages/mu-plugins
 cp resources/mu-plugins/00-test-quiesce.php public/packages/mu-plugins/00-test-quiesce.php
+cp resources/mu-plugins/99-request-log.php public/packages/mu-plugins/99-request-log.php
 
 wp core is-installed --quiet || wp core install \
     --url="${WP_HOME}" \
