@@ -96,13 +96,16 @@ class WooCommerceWebDriver extends Module
         $script = 'return document.readyState === "complete" '
             . '&& document.getElementById("loginform") === null;';
 
+        $lastError = null;
+
         while (microtime(true) < $deadline) {
             try {
                 if ($this->wpWebDriver()->executeJS($script) === true) {
                     return;
                 }
-            } catch (WebDriverException) {
+            } catch (WebDriverException $e) {
                 // The pending redirect is replacing the execution context; poll again.
+                $lastError = $e;
             }
 
             usleep(self::LOGIN_SETTLE_POLL_INTERVAL);
@@ -113,7 +116,7 @@ class WooCommerceWebDriver extends Module
             sprintf(
                 'The login page did not settle within %d seconds. %s',
                 self::LOGIN_SETTLE_TIMEOUT,
-                $this->describeUnsettledLogin(),
+                $this->describeUnsettledLogin($lastError),
             ),
         );
     }
@@ -121,25 +124,27 @@ class WooCommerceWebDriver extends Module
     /**
      * Describe where the browser stopped, so a login that never settled can be told apart from a rejected one.
      */
-    private function describeUnsettledLogin(): string
+    private function describeUnsettledLogin(?WebDriverException $lastError): string
     {
+        $webDriver = $this->wpWebDriver()->webDriver;
+        $description = [];
+
         try {
-            $state = $this->wpWebDriver()->executeJS(
+            $description[] = sprintf('Browser at "%s".', $webDriver?->getCurrentURL() ?? '');
+            $error = $webDriver?->executeScript(
                 'var error = document.getElementById("login_error");'
-                . 'return {url: location.href, error: error ? error.innerText.trim() : ""};',
+                . 'return error ? error.innerText.trim() : "";',
             );
-        } catch (WebDriverException) {
-            return 'The browser state could not be read.';
+            $description[] = sprintf('Login error: "%s".', is_string($error) && $error !== '' ? $error : 'none');
+        } catch (WebDriverException $e) {
+            $description[] = sprintf('The browser did not answer: %s', $e->getMessage());
         }
 
-        if (!is_array($state)) {
-            return 'The browser state could not be read.';
+        if ($lastError !== null) {
+            $description[] = sprintf('Last polling error: %s', $lastError->getMessage());
         }
 
-        $url = is_string($state['url'] ?? null) ? $state['url'] : '';
-        $error = is_string($state['error'] ?? null) ? $state['error'] : '';
-
-        return sprintf('Browser at "%s"; login error: "%s".', $url, $error === '' ? 'none' : $error);
+        return implode(' ', $description);
     }
 
     protected function wpWebDriver(): WPWebDriver
