@@ -11,6 +11,8 @@ class CartPageObject
     public const EMPTY_CART_SELECTOR = '.wp-block-woocommerce-empty-cart-block';
     public const CART_ITEM_SELECTOR = '.wc-block-cart-item__wrap';
     public const REMOVE_ITEM_SELECTOR = 'button.wc-block-cart-item__remove-link';
+    // The Cart block carries `is-loading` until the browser has rendered the cart.
+    public const LOADING_CART_SELECTOR = '.wp-block-woocommerce-cart.is-loading';
 
     public function cartItemQuantitySelector(string $cartItemXpath): string
     {

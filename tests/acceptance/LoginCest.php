@@ -15,6 +15,19 @@ class LoginCest
         $I->dontSeeInCurrentUrl('/wp-admin/');
     }
 
+    public function testLoginSettleLeavesAnIdleLoginFormWhenAlreadyLoggedIn(AcceptanceTester $I): void
+    {
+        // The state wp-browser's loginAs() retry can leave: logged in, back on the form, nothing pending.
+        $I->fastLoginAsAdmin();
+        $I->amOnPage('/wp/wp-login.php');
+        $I->seeElement('#loginform');
+
+        $I->settleLoginStep();
+
+        $I->seeInCurrentUrl('/wp-admin/');
+        $I->dontSeeElement('#loginform');
+    }
+
     public function testFastLoginAsAdminLandsOnTheDashboard(AcceptanceTester $I): void
     {
         $I->fastLoginAsAdmin();

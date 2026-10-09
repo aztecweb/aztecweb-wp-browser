@@ -13,6 +13,17 @@ class CartCest
         $I->restartBuiltInServer();
     }
 
+    public function testAmOnCartPageWaitsForTheCartBlockToRender(AcceptanceTester $I): void
+    {
+        $productId = $I->haveProductInDatabase(['post_title' => 'Rendered Product']);
+
+        $I->addProductToCart($productId);
+        $I->amOnCartPage();
+
+        $I->dontSeeElement('.wp-block-woocommerce-cart.is-loading');
+        $I->seeElement('.wc-block-components-product-name');
+    }
+
     public function testSeeProductInCart(AcceptanceTester $I): void
     {
         $productName = 'Cart Product';

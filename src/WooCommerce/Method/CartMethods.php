@@ -20,7 +20,10 @@ trait CartMethods
     abstract protected function selector(mixed $value): string;
 
     /**
-     * Navigate to the WooCommerce cart page.
+     * Navigate to the WooCommerce cart page and wait for the Cart block to render.
+     *
+     * The Cart block is rendered in the browser after the page loads; until then
+     * its items are not in the page. A cart without the block returns at once.
      *
      * @example
      * ```php
@@ -32,7 +35,11 @@ trait CartMethods
      */
     public function amOnCartPage(): void
     {
+        /** @var CartPageObject $cartPage */
+        $cartPage = $this->pageObjectProvider()->cartPage();
+
         $this->wpWebDriver()->amOnPage($this->cartPageSlug());
+        $this->wpWebDriver()->waitForElementNotVisible($this->selector($cartPage::LOADING_CART_SELECTOR));
     }
 
     /**

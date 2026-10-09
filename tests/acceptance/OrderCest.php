@@ -189,7 +189,7 @@ class OrderCest
         // confirms we landed on the order page.
         $attempts = 0;
         do {
-            $I->loginAsAdmin();
+            $I->fastLoginAsAdmin();
             $I->amOnAdminOrderPage($orderId);
             $currentUrl = $I->grabFromCurrentUrl();
             $urlStr = is_string($currentUrl) ? $currentUrl : '';
