@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Aztec\WPBrowser\Tests\Support\Helper;
 
+use Codeception\Exception\ModuleException;
 use Codeception\Module;
 use Codeception\TestInterface;
 use Facebook\WebDriver\Chrome\ChromeDevToolsDriver;
@@ -20,18 +21,21 @@ class Acceptance extends Module
      * Stop the browser from talking to WordPress before the next test reloads the database.
      *
      * WPDb reloads the SQLite file in place before each test, while the page
-     * left by a browser test can keep firing wc-admin REST requests. A request
-     * that opens the file mid-reload sees missing tables or a missing admin
-     * user. This module is listed last, so its `_after` runs before the other
-     * modules' hooks and before the next test's database reload.
+     * left by a browser test can keep firing requests, such as WooCommerce's
+     * cart fragments. A request that touches the file mid-reload leaves the
+     * next test without tables ("no such table: wp_options"). This module is
+     * listed last, so its `_after` runs before the other modules' hooks and
+     * before the next test's database reload.
      *
-     * Cookies are cleared here through the DevTools protocol: WPWebDriver
-     * clears them in its own `_after`, which runs later on the blank page and
-     * can no longer reach the site's cookies, and WebDriver itself only deletes
-     * the cookies visible to the current page. A log-in cookie scoped to the
-     * `/wp/` path survived into the next test, where wp-browser's `loginAs()`
-     * took it as proof the log-in had worked and skipped its retry of a lost
-     * click on the submit button.
+     * Replacing the page only stops the browser: a request the server already
+     * received keeps running. The single-worker built-in server answers one
+     * request at a time, so a request for a static file returns only once the
+     * requests ahead of it are done.
+     *
+     * Cookies are cleared through the DevTools protocol: WPWebDriver clears
+     * them in its own `_after`, on the blank page, where the site's cookies are
+     * out of reach, and WebDriver only deletes the cookies the current page can
+     * see, so a log-in cookie scoped to the `/wp/` path reached the next test.
      */
     public function _after(TestInterface $test): void
     {
@@ -47,6 +51,7 @@ class Acceptance extends Module
         }
 
         $this->quiesceBrowser($webDriver);
+        $this->waitForServerToFinishRequests($webDriver);
     }
 
     /**
@@ -128,6 +133,19 @@ class Acceptance extends Module
             $webDriver->executeJS('window.stop(); window.location.replace("about:blank");');
         } catch (\Throwable $e) {
             // No live document; nothing to quiesce.
+        }
+    }
+
+    /**
+     * Return once the built-in server has answered every request sent before this one.
+     */
+    private function waitForServerToFinishRequests(WPWebDriver $webDriver): void
+    {
+        $url = rtrim((string) $webDriver->_getConfig('url'), '/') . '/wp/wp-includes/images/blank.gif';
+        $context = stream_context_create(['http' => ['timeout' => 60]]);
+
+        if (@file_get_contents($url, false, $context) === false) {
+            throw new ModuleException($this, "The built-in server did not answer {$url}.");
         }
     }
 }
