@@ -41,6 +41,11 @@ class WooCommerceWebDriver extends Module
      */
     private const LOGIN_SETTLE_POLL_INTERVAL = 100_000;
 
+    /**
+     * Seconds the browser may sit idle on the log-in form, already logged in, before the module leaves it.
+     */
+    private const LOGIN_FORM_IDLE_TIMEOUT = 3;
+
     /** @var array<string, mixed> */
     protected array $config = [
         'pageObjects' => [],
@@ -90,22 +95,51 @@ class WooCommerceWebDriver extends Module
         $this->waitForLoginToSettle();
     }
 
+    /**
+     * Wait until the browser has left the log-in form for a complete page.
+     *
+     * wp-browser's `loginAs()` retries when it finds no auth cookie right after
+     * clicking the submit button, which happens while the first attempt's
+     * request is still in flight. That attempt then logs the user in, the retry
+     * reopens the form, and its submit can be lost: the browser stays on the
+     * form, already logged in, with nothing pending. When the form sits idle
+     * like that, the module opens the admin, where the post-login redirect
+     * would have landed.
+     */
     private function waitForLoginToSettle(): void
     {
         $deadline = microtime(true) + self::LOGIN_SETTLE_TIMEOUT;
-        $script = 'return document.readyState === "complete" '
-            . '&& document.getElementById("loginform") === null;';
+        $script = 'if (document.readyState !== "complete") { return "loading"; }'
+            . 'if (document.getElementById("loginform") === null) { return "settled"; }'
+            . 'return document.getElementById("login_error") === null ? "form" : "rejected";';
 
         $lastError = null;
+        $formSince = null;
+        $leftIdleForm = false;
 
         while (microtime(true) < $deadline) {
             try {
-                if ($this->wpWebDriver()->executeJS($script) === true) {
-                    return;
-                }
+                $state = $this->wpWebDriver()->executeJS($script);
             } catch (WebDriverException $e) {
                 // The pending redirect is replacing the execution context; poll again.
                 $lastError = $e;
+                $state = null;
+            }
+
+            if ($state === 'settled') {
+                return;
+            }
+
+            $formSince = $state === 'form' ? ($formSince ?? microtime(true)) : null;
+
+            if (
+                !$leftIdleForm
+                && $formSince !== null
+                && microtime(true) - $formSince >= self::LOGIN_FORM_IDLE_TIMEOUT
+                && $this->wpWebDriver()->grabCookiesWithPattern('/^wordpress_logged_in_[a-z0-9]{32}$/') !== null
+            ) {
+                $leftIdleForm = true;
+                $this->wpWebDriver()->amOnAdminPage('/');
             }
 
             usleep(self::LOGIN_SETTLE_POLL_INTERVAL);

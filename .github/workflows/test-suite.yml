@@ -62,10 +62,4 @@ jobs:
         run: vendor/bin/codecept build
 
       - name: Run test suite
-        run: |
-          echo "auto_prepend_file=$PWD/resources/diag/request-log.php" > resources/diag/request-log.ini
-          PHP_INI_SCAN_DIR=":$PWD/resources/diag" vendor/bin/codecept run
-
-      - name: Print request log
-        if: failure()
-        run: cat tests/_output/requests.log
+        run: vendor/bin/codecept run

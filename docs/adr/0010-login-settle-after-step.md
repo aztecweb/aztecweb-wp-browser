@@ -50,5 +50,12 @@ wp-browser's; the module only waits behind it.
 - The wait is implicit, so the module emits no step of its own; it is bounded by
   `LOGIN_SETTLE_TIMEOUT` (10 s) and ends as soon as the landing document is
   complete and the login form is gone.
+- wp-browser's `loginAs()` retries when it finds no auth cookie right after
+  clicking the submit button, which happens while the first attempt's request
+  is still in flight. That attempt logs the user in, the retry reopens the form,
+  and its submit can be lost, leaving the browser idle on the form, already
+  logged in. When the form has been idle for `LOGIN_FORM_IDLE_TIMEOUT` (3 s)
+  with a log-in cookie set and no log-in error, the hook opens the admin, where
+  the post-login redirect would have landed.
 - When wp-browser settles the redirect itself, this hook and ADR should be
   removed.

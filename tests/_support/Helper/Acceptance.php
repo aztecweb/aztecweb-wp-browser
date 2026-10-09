@@ -6,6 +6,7 @@ namespace Aztec\WPBrowser\Tests\Support\Helper;
 
 use Codeception\Exception\ModuleException;
 use Codeception\Module;
+use Codeception\Step\Action;
 use Codeception\TestInterface;
 use Facebook\WebDriver\Chrome\ChromeDevToolsDriver;
 use lucatume\WPBrowser\ManagedProcess\PhpBuiltInServer;
@@ -52,6 +53,17 @@ class Acceptance extends Module
 
         $this->quiesceBrowser($webDriver);
         $this->waitForServerToFinishRequests($webDriver);
+    }
+
+    /**
+     * Run the WooCommerceWebDriver hook that follows a `loginAsAdmin` step, without running the step.
+     *
+     * Lets a test put the browser in the state a log-in step can leave behind
+     * and check how the hook settles it.
+     */
+    public function settleLoginStep(): void
+    {
+        $this->getModule('WooCommerceWebDriver')->_afterStep(new Action('loginAsAdmin', []));
     }
 
     /**
