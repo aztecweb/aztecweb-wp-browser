@@ -63,10 +63,3 @@ jobs:
 
       - name: Run test suite
         run: vendor/bin/codecept run
-
-      - name: Upload failure artifacts
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: failure-php${{ matrix.php_version }}-attempt${{ github.run_attempt }}
-          path: tests/_output/*.fail.*
