@@ -110,8 +110,36 @@ class WooCommerceWebDriver extends Module
 
         throw new ModuleException(
             $this,
-            sprintf('The login page did not settle within %d seconds.', self::LOGIN_SETTLE_TIMEOUT),
+            sprintf(
+                'The login page did not settle within %d seconds. %s',
+                self::LOGIN_SETTLE_TIMEOUT,
+                $this->describeUnsettledLogin(),
+            ),
         );
+    }
+
+    /**
+     * Describe where the browser stopped, so a login that never settled can be told apart from a rejected one.
+     */
+    private function describeUnsettledLogin(): string
+    {
+        try {
+            $state = $this->wpWebDriver()->executeJS(
+                'var error = document.getElementById("login_error");'
+                . 'return {url: location.href, error: error ? error.innerText.trim() : ""};',
+            );
+        } catch (WebDriverException) {
+            return 'The browser state could not be read.';
+        }
+
+        if (!is_array($state)) {
+            return 'The browser state could not be read.';
+        }
+
+        $url = is_string($state['url'] ?? null) ? $state['url'] : '';
+        $error = is_string($state['error'] ?? null) ? $state['error'] : '';
+
+        return sprintf('Browser at "%s"; login error: "%s".', $url, $error === '' ? 'none' : $error);
     }
 
     protected function wpWebDriver(): WPWebDriver
