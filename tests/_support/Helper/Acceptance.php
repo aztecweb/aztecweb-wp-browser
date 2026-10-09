@@ -99,9 +99,12 @@ class Acceptance extends Module
         $webDriver = $this->getModule('WPWebDriver');
 
         // Quiesce the browser first so the live page cannot re-fire AJAX
-        // requests against the restarted server.
+        // requests against the restarted server, then let the server finish
+        // the requests it already received: killing it mid-write leaves a
+        // SQLite journal that is rolled back onto the next test's database.
         if ($webDriver->webDriver !== null) {
             $this->quiesceBrowser($webDriver);
+            $this->waitForServerToFinishRequests($webDriver);
         }
 
         $pidFile = PhpBuiltInServer::getPidFile();
