@@ -6,6 +6,7 @@ namespace Aztec\WPBrowser\Tests\Support\Helper;
 
 use Codeception\Module;
 use Codeception\TestInterface;
+use Facebook\WebDriver\Chrome\ChromeDevToolsDriver;
 use lucatume\WPBrowser\ManagedProcess\PhpBuiltInServer;
 use lucatume\WPBrowser\Module\WPWebDriver;
 use lucatume\WPBrowser\Utils\Ports;
@@ -24,9 +25,13 @@ class Acceptance extends Module
      * user. This module is listed last, so its `_after` runs before the other
      * modules' hooks and before the next test's database reload.
      *
-     * Cookies are cleared here, while the site page is still open: WPWebDriver
+     * Cookies are cleared here through the DevTools protocol: WPWebDriver
      * clears them in its own `_after`, which runs later on the blank page and
-     * can no longer reach the site's cookies.
+     * can no longer reach the site's cookies, and WebDriver itself only deletes
+     * the cookies visible to the current page. A log-in cookie scoped to the
+     * `/wp/` path survived into the next test, where wp-browser's `loginAs()`
+     * took it as proof the log-in had worked and skipped its retry of a lost
+     * click on the submit button.
      */
     public function _after(TestInterface $test): void
     {
@@ -38,7 +43,7 @@ class Acceptance extends Module
         }
 
         if ($webDriver->_getConfig('clear_cookies')) {
-            $webDriver->webDriver->manage()->deleteAllCookies();
+            (new ChromeDevToolsDriver($webDriver->webDriver))->execute('Network.clearBrowserCookies');
         }
 
         $this->quiesceBrowser($webDriver);
