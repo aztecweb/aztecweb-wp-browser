@@ -110,19 +110,14 @@ class WooCommerceWebDriver extends Module
     {
         $deadline = microtime(true) + self::LOGIN_SETTLE_TIMEOUT;
         $script = 'if (document.readyState !== "complete") { return "loading"; }'
-            . 'if (document.getElementById("loginform") === null) { return "settled"; }'
-            . 'return document.getElementById("login_error") === null ? "form" : "rejected";';
-
-        $lastError = null;
+            . 'return document.getElementById("loginform") === null ? "settled" : "form";';
         $formSince = null;
-        $leftIdleForm = false;
 
         while (microtime(true) < $deadline) {
             try {
                 $state = $this->wpWebDriver()->executeJS($script);
-            } catch (WebDriverException $e) {
+            } catch (WebDriverException) {
                 // The pending redirect is replacing the execution context; poll again.
-                $lastError = $e;
                 $state = null;
             }
 
@@ -132,53 +127,35 @@ class WooCommerceWebDriver extends Module
 
             $formSince = $state === 'form' ? ($formSince ?? microtime(true)) : null;
 
-            if (
-                !$leftIdleForm
-                && $formSince !== null
-                && microtime(true) - $formSince >= self::LOGIN_FORM_IDLE_TIMEOUT
-                && $this->wpWebDriver()->grabCookiesWithPattern('/^wordpress_logged_in_[a-z0-9]{32}$/') !== null
-            ) {
-                $leftIdleForm = true;
+            if ($this->isIdleOnLoginFormWhileLoggedIn($formSince)) {
                 $this->wpWebDriver()->amOnAdminPage('/');
+                $formSince = null;
             }
 
             usleep(self::LOGIN_SETTLE_POLL_INTERVAL);
         }
 
+        $currentUrl = $this->wpWebDriver()->webDriver?->getCurrentURL();
+
         throw new ModuleException(
             $this,
             sprintf(
-                'The login page did not settle within %d seconds. %s',
+                'The login page did not settle within %d seconds. Browser at "%s".',
                 self::LOGIN_SETTLE_TIMEOUT,
-                $this->describeUnsettledLogin($lastError),
+                $currentUrl,
             ),
         );
     }
 
-    /**
-     * Describe where the browser stopped, so a login that never settled can be told apart from a rejected one.
-     */
-    private function describeUnsettledLogin(?WebDriverException $lastError): string
+    private function isIdleOnLoginFormWhileLoggedIn(?float $formSince): bool
     {
-        $webDriver = $this->wpWebDriver()->webDriver;
-        $description = [];
-
-        try {
-            $description[] = sprintf('Browser at "%s".', $webDriver?->getCurrentURL() ?? '');
-            $error = $webDriver?->executeScript(
-                'var error = document.getElementById("login_error");'
-                . 'return error ? error.innerText.trim() : "";',
-            );
-            $description[] = sprintf('Login error: "%s".', is_string($error) && $error !== '' ? $error : 'none');
-        } catch (WebDriverException $e) {
-            $description[] = sprintf('The browser did not answer: %s', $e->getMessage());
+        if ($formSince === null || microtime(true) - $formSince < self::LOGIN_FORM_IDLE_TIMEOUT) {
+            return false;
         }
 
-        if ($lastError !== null) {
-            $description[] = sprintf('Last polling error: %s', $lastError->getMessage());
-        }
+        $loginCookies = $this->wpWebDriver()->grabCookiesWithPattern('/^wordpress_logged_in_[a-z0-9]{32}$/');
 
-        return implode(' ', $description);
+        return $loginCookies !== null;
     }
 
     protected function wpWebDriver(): WPWebDriver
