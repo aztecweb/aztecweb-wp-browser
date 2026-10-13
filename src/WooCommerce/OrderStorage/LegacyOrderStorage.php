@@ -33,12 +33,12 @@ class LegacyOrderStorage extends AbstractLegacyStorage implements OrderStorageIn
      */
     protected function createOrderRecord(array $overrides): int
     {
+        $overrides = $this->mapStatusOverride($overrides);
+
         $orderData = array_merge([
             'post_type' => 'shop_order',
             'post_status' => 'wc-pending',
         ], $overrides);
-
-        $orderData['post_status'] = $this->normalizeStatusValue($orderData['post_status']);
 
         return $this->wpDb->havePostInDatabase($orderData);
     }

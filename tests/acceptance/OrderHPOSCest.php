@@ -70,6 +70,31 @@ class OrderHPOSCest
         ]);
     }
 
+    public function testHaveOrderInDatabaseAcceptsPostStatusKey(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'post_status' => 'processing',
+        ]);
+
+        $I->seeInDatabase('wp_wc_orders', [
+            'id' => $orderId,
+            'status' => 'wc-processing',
+        ]);
+    }
+
+    public function testHaveOrderInDatabasePrefersStatusKeyOverPostStatusKey(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'status' => 'wc-on-hold',
+            'post_status' => 'wc-completed',
+        ]);
+
+        $I->seeInDatabase('wp_wc_orders', [
+            'id' => $orderId,
+            'status' => 'wc-on-hold',
+        ]);
+    }
+
     public function testHaveOrderStatus(AcceptanceTester $I): void
     {
         $orderId = $I->haveOrderInDatabase([

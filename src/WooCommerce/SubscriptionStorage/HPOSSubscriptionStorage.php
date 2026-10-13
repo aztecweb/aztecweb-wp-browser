@@ -26,6 +26,8 @@ class HPOSSubscriptionStorage extends AbstractHPOSStorage implements Subscriptio
 
         $subscriptionId = $this->generateId();
 
+        $overrides = $this->mapStatusOverride($overrides);
+
         $subscriptionData = array_merge([
             'status' => 'wc-active',
             'currency' => 'USD',
@@ -46,7 +48,6 @@ class HPOSSubscriptionStorage extends AbstractHPOSStorage implements Subscriptio
 
         $subscriptionData['id'] = $subscriptionId;
         $subscriptionData['type'] = 'shop_subscription';
-        $subscriptionData['status'] = $this->normalizeStatusValue($subscriptionData['status']);
 
         $this->wpDb->haveInDatabase($this->grabWcOrdersTableName(), $subscriptionData);
 

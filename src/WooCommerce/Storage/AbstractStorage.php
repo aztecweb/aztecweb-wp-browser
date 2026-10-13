@@ -14,6 +14,11 @@ abstract class AbstractStorage implements WooCommerceStorageInterface
      */
     private const META_ID_COLUMNS = ['post_id', 'order_id'];
 
+    /**
+     * Status columns used across the storages, accepted as aliases in row overrides.
+     */
+    private const STATUS_COLUMNS = ['status', 'post_status'];
+
     public function __construct(protected WPDb $wpDb)
     {
     }
@@ -27,7 +32,7 @@ abstract class AbstractStorage implements WooCommerceStorageInterface
      *
      * Non-string values pass through unchanged, so callers can hand over a raw override value.
      */
-    protected function normalizeStatusValue(mixed $status): mixed
+    private function normalizeStatusValue(mixed $status): mixed
     {
         return is_string($status) ? StatusNormalizer::normalize($status) : $status;
     }
@@ -46,6 +51,30 @@ abstract class AbstractStorage implements WooCommerceStorageInterface
         }
 
         return $criteria;
+    }
+
+    /**
+     * Move a status override given under the other storage's column to this storage's column, normalized.
+     *
+     * When both keys are given, the one of this storage wins.
+     *
+     * @param array<string, mixed> $overrides Database row overrides.
+     * @return array<string, mixed> Overrides with the status under this storage's column.
+     */
+    protected function mapStatusOverride(array $overrides): array
+    {
+        $statusColumn = $this->getStatusColumnName();
+
+        foreach (self::STATUS_COLUMNS as $alias) {
+            if ($alias === $statusColumn || !array_key_exists($alias, $overrides)) {
+                continue;
+            }
+
+            $overrides[$statusColumn] ??= $overrides[$alias];
+            unset($overrides[$alias]);
+        }
+
+        return $this->normalizeStatusInCriteria($overrides);
     }
 
     public function getMetaTableName(): string

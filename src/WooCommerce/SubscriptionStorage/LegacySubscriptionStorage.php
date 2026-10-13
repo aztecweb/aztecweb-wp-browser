@@ -24,13 +24,13 @@ class LegacySubscriptionStorage extends AbstractLegacyStorage implements Subscri
         $meta = is_array($overrides['meta'] ?? null) ? $overrides['meta'] : [];
         unset($overrides['meta']);
 
+        $overrides = $this->mapStatusOverride($overrides);
+
         $subscriptionData = array_merge([
             'post_type' => 'shop_subscription',
             'post_status' => 'wc-active',
             'post_title' => 'Subscription',
         ], $overrides);
-
-        $subscriptionData['post_status'] = $this->normalizeStatusValue($subscriptionData['post_status']);
 
         $subscriptionId = $this->wpDb->havePostInDatabase($subscriptionData);
 

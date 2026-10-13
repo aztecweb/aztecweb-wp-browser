@@ -62,6 +62,31 @@ class OrderCest
         ]);
     }
 
+    public function testHaveOrderInDatabaseAcceptsStatusKey(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'status' => 'processing',
+        ]);
+
+        $I->seeOrderInDatabase([
+            'ID' => $orderId,
+            'post_status' => 'wc-processing',
+        ]);
+    }
+
+    public function testHaveOrderInDatabasePrefersPostStatusKeyOverStatusKey(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase([
+            'status' => 'wc-completed',
+            'post_status' => 'wc-on-hold',
+        ]);
+
+        $I->seeOrderInDatabase([
+            'ID' => $orderId,
+            'post_status' => 'wc-on-hold',
+        ]);
+    }
+
     public function testGrabOrderStatus(AcceptanceTester $I): void
     {
         $orderId = $I->haveOrderInDatabase([

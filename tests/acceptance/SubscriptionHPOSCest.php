@@ -53,6 +53,33 @@ class SubscriptionHPOSCest
         ]);
     }
 
+    public function testHaveSubscriptionInDatabaseAcceptsPostStatusKey(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'post_status' => 'on-hold',
+        ]);
+
+        $I->seeInDatabase('wp_wc_orders', [
+            'id' => $subscriptionId,
+            'type' => 'shop_subscription',
+            'status' => 'wc-on-hold',
+        ]);
+    }
+
+    public function testHaveSubscriptionInDatabasePrefersStatusKeyOverPostStatusKey(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'status' => 'wc-on-hold',
+            'post_status' => 'wc-cancelled',
+        ]);
+
+        $I->seeInDatabase('wp_wc_orders', [
+            'id' => $subscriptionId,
+            'type' => 'shop_subscription',
+            'status' => 'wc-on-hold',
+        ]);
+    }
+
     public function testHaveSubscriptionWithCustomer(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase([
