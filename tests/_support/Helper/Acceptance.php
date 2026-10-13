@@ -8,6 +8,7 @@ use Codeception\Exception\ModuleException;
 use Codeception\Module;
 use Codeception\TestInterface;
 use Facebook\WebDriver\Chrome\ChromeDevToolsDriver;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
 use lucatume\WPBrowser\ManagedProcess\PhpBuiltInServer;
 use lucatume\WPBrowser\Module\WPWebDriver;
 use lucatume\WPBrowser\Utils\Ports;
@@ -47,11 +48,17 @@ class Acceptance extends Module
         }
 
         if ($webDriver->_getConfig('clear_cookies')) {
-            (new ChromeDevToolsDriver($webDriver->webDriver))->execute('Network.clearBrowserCookies');
+            $this->clearBrowserCookies($webDriver->webDriver);
         }
 
         $this->quiesceBrowser($webDriver);
-        $this->waitForServerToFinishRequests($webDriver);
+
+        if (!$this->waitForServerToFinishRequests($webDriver)) {
+            throw new ModuleException(
+                $this,
+                "The built-in server did not answer {$this->serverIdleProbeUrl($webDriver)}.",
+            );
+        }
     }
 
     /**
@@ -79,17 +86,19 @@ class Acceptance extends Module
     }
 
     /**
-     * Restart the PHP built-in server, dropping any in-flight request.
+     * Restart the PHP built-in server once it has finished the requests it already received.
+     *
+     * The browser is quiesced first so the live page cannot re-fire AJAX
+     * requests against the restarted server. Killing the server mid-write
+     * leaves a SQLite journal that is rolled back onto the next test's
+     * database, so the restart waits for the pending requests. A server that
+     * does not answer has no request left to finish and is replaced anyway.
      */
     public function restartBuiltInServer(): void
     {
         /** @var WPWebDriver $webDriver */
         $webDriver = $this->getModule('WPWebDriver');
 
-        // Quiesce the browser first so the live page cannot re-fire AJAX
-        // requests against the restarted server, then let the server finish
-        // the requests it already received: killing it mid-write leaves a
-        // SQLite journal that is rolled back onto the next test's database.
         if ($webDriver->webDriver !== null) {
             $this->quiesceBrowser($webDriver);
             $this->waitForServerToFinishRequests($webDriver);
@@ -141,14 +150,43 @@ class Acceptance extends Module
 
     /**
      * Return once the built-in server has answered every request sent before this one.
+     *
+     * @return bool `false` when the server did not answer.
      */
-    private function waitForServerToFinishRequests(WPWebDriver $webDriver): void
+    private function waitForServerToFinishRequests(WPWebDriver $webDriver): bool
     {
-        $url = rtrim((string) $webDriver->_getConfig('url'), '/') . '/wp/wp-includes/images/blank.gif';
         $context = stream_context_create(['http' => ['timeout' => 60]]);
 
-        if (@file_get_contents($url, false, $context) === false) {
-            throw new ModuleException($this, "The built-in server did not answer {$url}.");
+        return @file_get_contents($this->serverIdleProbeUrl($webDriver), false, $context) !== false;
+    }
+
+    /**
+     * Static file the single-worker built-in server serves only after its earlier requests.
+     *
+     * Derived from the `WPWebDriver` `adminPath`, so it follows WordPress
+     * wherever the site installs it.
+     */
+    private function serverIdleProbeUrl(WPWebDriver $webDriver): string
+    {
+        $url = (string) $webDriver->_getConfig('url');
+        $adminPath = (string) $webDriver->_getConfig('adminPath');
+
+        return rtrim($url, '/') . str_replace('wp-admin', 'wp-includes/images/blank.gif', $adminPath);
+    }
+
+    /**
+     * Delete every cookie in the browser, whatever its domain or path.
+     *
+     * A browser session that already died has no cookies left to delete, so
+     * the error is logged instead of failing the test, as WebDriver's own
+     * `_after` does.
+     */
+    private function clearBrowserCookies(RemoteWebDriver $browser): void
+    {
+        try {
+            (new ChromeDevToolsDriver($browser))->execute('Network.clearBrowserCookies');
+        } catch (\Throwable $e) {
+            $this->debug("Error, can't clear the browser cookies after a test: " . $e->getMessage());
         }
     }
 }
