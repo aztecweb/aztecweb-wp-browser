@@ -68,8 +68,8 @@ measurement that settled it is below.
   implemented and removed before any release. Besides waiting for the redirect,
   it had to recover from the form resubmit `loginAs` makes when it reads the
   cookies too early, through heuristics on browser timing whose tests failed
-  intermittently in continuous integration. Correcting another module's step is
-  outside what a Plugin Module adds (ADR-0002).
+  intermittently in continuous integration. A Plugin Module exports only its
+  own additions (ADR-0002), and correcting a wp-browser step is not one.
 
 ## Consequences
 
