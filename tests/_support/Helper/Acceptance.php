@@ -18,6 +18,8 @@ use lucatume\WPBrowser\Utils\Ports;
  */
 class Acceptance extends Module
 {
+    private bool $browserCpuThrottled = false;
+
     /**
      * Stop the browser from talking to WordPress before the next test reloads the database.
      *
@@ -51,6 +53,11 @@ class Acceptance extends Module
             $this->clearBrowserCookies($webDriver->webDriver);
         }
 
+        if ($this->browserCpuThrottled) {
+            $this->setBrowserCpuThrottlingRate($webDriver->webDriver, 1);
+            $this->browserCpuThrottled = false;
+        }
+
         $this->quiesceBrowser($webDriver);
 
         if (!$this->waitForServerToFinishRequests($webDriver)) {
@@ -73,6 +80,27 @@ class Acceptance extends Module
     public function setLegacyOrderStorage(bool $legacy): void
     {
         $this->getModule('WooCommerceWebDriver')->_reconfigure(['legacyOrderStorage' => $legacy]);
+    }
+
+    /**
+     * Slow the browser's CPU down by the given factor until the end of the test.
+     *
+     * Makes the work the browser does after a page loads, such as rendering a
+     * block, last long enough for a test to tell whether a step waits for it.
+     *
+     * @param float $rate Slowdown factor; `1` runs at full speed.
+     */
+    public function throttleBrowserCpu(float $rate): void
+    {
+        /** @var WPWebDriver $webDriver */
+        $webDriver = $this->getModule('WPWebDriver');
+
+        if ($webDriver->webDriver === null) {
+            throw new ModuleException($this, 'There is no browser session to throttle.');
+        }
+
+        $this->setBrowserCpuThrottlingRate($webDriver->webDriver, $rate);
+        $this->browserCpuThrottled = true;
     }
 
     /**
@@ -188,5 +216,13 @@ class Acceptance extends Module
         } catch (\Throwable $e) {
             $this->debug("Error, can't clear the browser cookies after a test: " . $e->getMessage());
         }
+    }
+
+    /**
+     * Set how many times slower than normal the browser's CPU runs.
+     */
+    private function setBrowserCpuThrottlingRate(RemoteWebDriver $browser, float $rate): void
+    {
+        (new ChromeDevToolsDriver($browser))->execute('Emulation.setCPUThrottlingRate', ['rate' => $rate]);
     }
 }

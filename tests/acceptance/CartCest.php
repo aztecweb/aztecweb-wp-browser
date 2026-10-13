@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Aztec\WPBrowser\Tests\Acceptance;
 
 use Aztec\WPBrowser\Tests\Support\AcceptanceTester;
+use Aztec\WPBrowser\WooCommerce\PageObject\CartPageObject;
 
 class CartCest
 {
@@ -18,10 +19,11 @@ class CartCest
         $productId = $I->haveProductInDatabase(['post_title' => 'Rendered Product']);
 
         $I->addProductToCart($productId);
+        $I->throttleBrowserCpu(20);
         $I->amOnCartPage();
 
-        $I->dontSeeElement('.wp-block-woocommerce-cart.is-loading');
-        $I->seeElement('.wc-block-components-product-name');
+        $I->dontSeeElement(CartPageObject::LOADING_CART_SELECTOR);
+        $I->seeElement(CartPageObject::PRODUCT_NAME_SELECTOR);
     }
 
     public function testSeeProductInCart(AcceptanceTester $I): void
