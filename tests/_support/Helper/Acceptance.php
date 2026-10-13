@@ -137,15 +137,19 @@ class Acceptance extends Module
         $docRoot = getenv('WP_DOCROOT') ?: 'public';
         $workers = (int) (getenv('WP_SERVER_WORKERS') ?: 1);
 
-        // Kill the running server
-        if (is_file($pidFile)) {
-            $pid = (int) file_get_contents($pidFile);
-            if ($pid > 0) {
-                exec('kill ' . $pid . ' 2>/dev/null');
-            }
-            // Remove the PID file so PhpBuiltInServer::start() does not early-return.
-            @unlink($pidFile);
+        $pid = is_file($pidFile) ? (int) file_get_contents($pidFile) : 0;
+
+        if ($pid < 1) {
+            throw new ModuleException(
+                $this,
+                "The built-in server's PID file {$pidFile} is missing or empty, so the server cannot be stopped. "
+                    . 'Was another bin/test command run on this checkout during the suite?',
+            );
         }
+
+        exec('kill ' . $pid . ' 2>/dev/null');
+        // Remove the PID file so PhpBuiltInServer::start() does not early-return.
+        @unlink($pidFile);
 
         // Wait for the listening port to be released (kill is asynchronous).
         $deadline = microtime(true) + 5.0;

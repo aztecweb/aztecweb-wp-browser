@@ -32,8 +32,13 @@ fi
 
 # Stale pid files from previous ephemeral containers cause wp-browser service
 # extensions (ChromeDriverController, BuiltInServerController) to skip starting.
-# Remove them before every run — processes from a previous container are always dead.
-rm -f "$REPO_ROOT"/tests/_output/*.pid
+# Remove them before a Codeception run — processes from a previous container
+# are always dead. Leave them for any other command: a suite running in another
+# container on this checkout still needs its built-in server's pid file to
+# restart that server.
+case "$1" in
+    codecept | */codecept) rm -f "$REPO_ROOT"/tests/_output/*.pid ;;
+esac
 
 DOCKER_FLAGS=(--rm -i)
 if [ -t 0 ] && [ -t 1 ]; then
