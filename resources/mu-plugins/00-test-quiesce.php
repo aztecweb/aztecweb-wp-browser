@@ -28,6 +28,10 @@ add_action( 'init', static function () {
     wp_deregister_script( 'heartbeat' );
 }, 1 );
 
+// --- WooCommerce marketplace suggestions: every WooCommerce admin page queues
+// an Action Scheduler action that fetches them from woocommerce.com.
+add_filter( 'woocommerce_allow_marketplace_suggestions', '__return_false' );
+
 // --- Outgoing HTTP: block all external requests. wp-admin update checks
 // otherwise stall every login for tens of seconds, and the slow post-login
 // redirect hides the navigation races these tests are meant to expose.

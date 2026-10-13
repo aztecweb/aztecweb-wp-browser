@@ -319,7 +319,7 @@ the package — ask an organization owner for it.
 ```bash
 cp .env.example .env                         # one-time: suite parameters (gitignored)
 bin/test composer install                    # install deps (also installs the pre-push hook)
-bin/test bash resources/install.sh           # bootstrap the SQLite WordPress site (idempotent)
+bin/test bash resources/install.sh           # (re)build the SQLite WordPress site and its dump from scratch
 bin/test codecept build                      # rebuild actor classes after method signature changes
 bin/test codecept run                        # run all suites
 bin/test codecept run acceptance CouponCest  # run a single Cest
