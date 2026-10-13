@@ -5,12 +5,25 @@ declare(strict_types=1);
 namespace Aztec\WPBrowser\Tests\Acceptance;
 
 use Aztec\WPBrowser\Tests\Support\AcceptanceTester;
+use Aztec\WPBrowser\WooCommerce\PageObject\CartPageObject;
 
 class CartCest
 {
     public function _after(AcceptanceTester $I): void
     {
         $I->restartBuiltInServer();
+    }
+
+    public function testAmOnCartPageWaitsForTheCartBlockToRender(AcceptanceTester $I): void
+    {
+        $productId = $I->haveProductInDatabase(['post_title' => 'Rendered Product']);
+
+        $I->addProductToCart($productId);
+        $I->throttleBrowserCpu(20);
+        $I->amOnCartPage();
+
+        $I->dontSeeElement(CartPageObject::LOADING_CART_SELECTOR);
+        $I->seeElement(CartPageObject::PRODUCT_NAME_SELECTOR);
     }
 
     public function testSeeProductInCart(AcceptanceTester $I): void

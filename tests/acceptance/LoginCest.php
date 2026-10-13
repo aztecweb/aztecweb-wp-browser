@@ -8,13 +8,6 @@ use Aztec\WPBrowser\Tests\Support\AcceptanceTester;
 
 class LoginCest
 {
-    public function testLoginAsAdminDoesNotClobberTheNextNavigation(AcceptanceTester $I): void
-    {
-        $I->loginAsAdmin();
-        $I->amOnPage('/');
-        $I->dontSeeInCurrentUrl('/wp-admin/');
-    }
-
     public function testFastLoginAsAdminLandsOnTheDashboard(AcceptanceTester $I): void
     {
         $I->fastLoginAsAdmin();

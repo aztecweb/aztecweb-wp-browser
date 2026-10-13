@@ -102,7 +102,7 @@ trait CustomerMethods
      * ```php
      * $customerId = $I->haveCustomerInDatabase(['user_login' => 'customer', 'user_pass' => 'pw']);
      * $I->dontHaveCartInDatabase($customerId);
-     * $I->loginAs('customer', 'pw');
+     * $I->fastLoginAs('customer', 'pw');
      * $I->amOnCartPage();
      * $I->dontSeeElement('.cart_item');
      * ```

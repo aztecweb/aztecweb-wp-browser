@@ -22,7 +22,8 @@ cp .env.example .env
 # One-time: install PHP dependencies (also wires up the pre-push hook)
 bin/test composer install
 
-# One-time: bootstrap the SQLite WordPress site (idempotent)
+# One-time: build the SQLite WordPress site and its dump (re-running rebuilds
+# both from scratch, dropping whatever the last test left in the database)
 bin/test bash resources/install.sh
 
 # Run the full suite / a single suite / a single Cest

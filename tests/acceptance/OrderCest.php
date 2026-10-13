@@ -182,21 +182,8 @@ class OrderCest
             'post_status' => 'wc-processing',
         ]);
 
-        // Retry login + navigation: a freshly logged-in admin is intermittently
-        // not recognized as capable on the order screen (WordPress redirects to
-        // the dashboard with "Sorry, you are not allowed to do that"). Both the
-        // legacy and HPOS order-edit URLs contain "action=edit", so its presence
-        // confirms we landed on the order page.
-        $attempts = 0;
-        do {
-            $I->loginAsAdmin();
-            $I->amOnAdminOrderPage($orderId);
-            $currentUrl = $I->grabFromCurrentUrl();
-            $urlStr = is_string($currentUrl) ? $currentUrl : '';
-        } while (
-            strpos($urlStr, 'action=edit') === false
-            && ++$attempts < 3
-        );
+        $I->fastLoginAsAdmin();
+        $I->amOnAdminOrderPage($orderId);
 
         $I->seeInCurrentUrl('post.php?post=' . $orderId . '&action=edit');
 

@@ -42,6 +42,7 @@ modules:
                         - '--disable-gpu'
                         - '--no-sandbox'
                         - '--disable-dev-shm-usage'
+                        - '--enable-features=NetworkServiceInProcess'
         AztecWPBrowser:
             pageObjects: []
 step_decorators:
