@@ -18,10 +18,10 @@ use lucatume\WPBrowser\Module\WPWebDriver;
  * browser. WordPress itself authenticates
  * the credentials and registers the session, so the browser layer needs no
  * database access (ADR-0008) and the module needs no wp-config salts. See
- * ADR-0011.
+ * ADR-0010.
  *
  * Composed into `WooCommerceWebDriver`; never overrides `loginAs`/`loginAsAdmin`
- * (ADR-0002, ADR-0010).
+ * (ADR-0002).
  */
 trait FastLoginMethods
 {

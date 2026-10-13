@@ -3,8 +3,8 @@
 Driving the `wp-login.php` form in the browser (`WPWebDriver::loginAs`/
 `loginAsAdmin`) costs ~2–3 s per test: the module loads the login page, waits for
 three elements, fills the form, clicks submit, and returns as soon as the auth
-cookies are readable — with the post-login redirect still in flight (the race
-ADR-0010 settles). The site's own speed is a separate problem: every wp-admin
+cookies are readable — with the post-login redirect still in flight, so the
+test's next navigation can be overwritten by it. The site's own speed is a separate problem: every wp-admin
 load targets update checks against api.wordpress.org, which stall the login for
 tens of seconds when outgoing HTTP is not blocked. The library's own test site
 blocks it through its test mu-plugin (`resources/mu-plugins/00-test-quiesce.php`),
@@ -39,9 +39,9 @@ the browser layer stays DB-free (ADR-0008). `guzzlehttp/guzzle` is guaranteed to
 consumers: this package requires `lucatume/wp-browser`, which requires
 `codeception/module-phpbrowser`, which requires Guzzle.
 
-This supersedes the "cookie pre-authentication" rejection recorded in ADR-0010.
-That option bundled two different approaches; only the *minting* one is
-unworkable, and the measurement that settled it is below.
+"Cookie pre-authentication" was first rejected as a whole. That option bundled
+two different approaches; only the *minting* one is unworkable, and the
+measurement that settled it is below.
 
 ## Considered Options
 
@@ -60,9 +60,16 @@ unworkable, and the measurement that settled it is below.
 - **Authenticate over HTTP and transfer the cookies** — chosen: fresh session
   per test, no database writes, no wp-config access, ~0.25 s steady-state, and
   WordPress is the only thing doing the authenticating.
-- **Keep only browser-driven `loginAs` and settle it** (ADR-0010) — kept as the
-  wp-browser behavior; the settle remains for consumers who call it. The fast
-  methods are additive and never override it (ADR-0002).
+- **Keep only browser-driven `loginAs`** — rejected: ~2–3 s per test, and its
+  redirect race is wp-browser's to fix. It stays available for tests whose
+  subject is the log-in screen; the fast methods are additive and never
+  override it (ADR-0002).
+- **Correct `loginAs` with a wait in the module's `_afterStep()` hook** —
+  implemented and removed before any release. Besides waiting for the redirect,
+  it had to recover from the form resubmit `loginAs` makes when it reads the
+  cookies too early, through heuristics on browser timing whose tests failed
+  intermittently in continuous integration. Correcting another module's step is
+  outside what a Plugin Module adds (ADR-0002).
 
 ## Consequences
 

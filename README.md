@@ -103,7 +103,7 @@ Use `fastLoginAs($username, $password)` and `fastLoginAsAdmin()` instead of
 auth cookies into the browser, and skip the form and the post-login redirect
 (~0.25 s instead of ~2–3 s, and much more when the redirect lands on a slow
 wp-admin page). Keep `loginAs()` for tests whose subject is the login screen
-itself. See [ADR-0011](docs/adr/0011-fast-login-over-http.md).
+itself. See [ADR-0010](docs/adr/0010-fast-login-over-http.md).
 
 ### 3. Keep wp-admin off the internet
 
@@ -241,10 +241,12 @@ file, and they tend to hold real customers' personal data.
 Slowness hides timing bugs; removing it surfaces them as intermittent failures.
 Two are common in WooCommerce suites:
 
-- **The login redirect races the next navigation.** `WooCommerceWebDriver`
-  already waits for `loginAs()`/`loginAsAdmin()` to settle
-  ([ADR-0010](docs/adr/0010-login-settle-after-step.md)); the `fastLoginAs*()`
-  methods follow no redirect, so they have nothing to settle.
+- **The login redirect races the next navigation.** wp-browser's
+  `loginAs()`/`loginAsAdmin()` return before the post-login redirect lands, so
+  a navigation right after them can be overwritten. The `fastLoginAs*()`
+  methods follow no redirect, so they leave nothing pending; a test that must
+  drive the form waits for the page it expects to land on
+  ([ADR-0010](docs/adr/0010-fast-login-over-http.md)).
 - **The cart leaks between tests.** WooCommerce saves the session and the
   persistent cart on `shutdown`, after the response is sent, so a late write
   can survive the dump restore. When tests share a customer, empty the cart in
