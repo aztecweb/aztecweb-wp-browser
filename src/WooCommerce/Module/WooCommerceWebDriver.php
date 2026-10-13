@@ -104,13 +104,15 @@ class WooCommerceWebDriver extends Module
      * reopens the form, and its submit can be lost: the browser stays on the
      * form, already logged in, with nothing pending. When the form sits idle
      * like that, the module opens the admin, where the post-login redirect
-     * would have landed.
+     * would have landed. A form showing a log-in error is left alone, so a
+     * rejected log-in still fails.
      */
     private function waitForLoginToSettle(): void
     {
         $deadline = microtime(true) + self::LOGIN_SETTLE_TIMEOUT;
         $script = 'if (document.readyState !== "complete") { return "loading"; }'
-            . 'return document.getElementById("loginform") === null ? "settled" : "form";';
+            . 'if (document.getElementById("loginform") === null) { return "settled"; }'
+            . 'return document.getElementById("login_error") === null ? "form" : "rejected";';
         $formSince = null;
 
         while (microtime(true) < $deadline) {
