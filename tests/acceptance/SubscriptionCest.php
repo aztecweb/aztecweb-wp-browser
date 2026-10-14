@@ -50,6 +50,31 @@ class SubscriptionCest
         ]);
     }
 
+    public function testHaveSubscriptionInDatabaseAcceptsStatusKey(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'status' => 'on-hold',
+        ]);
+
+        $I->seeSubscriptionInDatabase([
+            'ID' => $subscriptionId,
+            'post_status' => 'wc-on-hold',
+        ]);
+    }
+
+    public function testHaveSubscriptionInDatabasePrefersPostStatusKeyOverStatusKey(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase([
+            'status' => 'wc-cancelled',
+            'post_status' => 'wc-on-hold',
+        ]);
+
+        $I->seeSubscriptionInDatabase([
+            'ID' => $subscriptionId,
+            'post_status' => 'wc-on-hold',
+        ]);
+    }
+
     public function testHaveSubscriptionWithCustomer(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase([

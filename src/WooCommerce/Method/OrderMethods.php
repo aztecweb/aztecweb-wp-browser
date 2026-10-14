@@ -33,6 +33,7 @@ use lucatume\WPBrowser\Module\WPDb;
  * }
  * @phpstan-type OrderOverrides array{
  *     status?: OrderStatus,
+ *     post_status?: OrderStatus,
  *     customer_id?: int,
  *     currency?: string,
  *     total_amount?: string,
