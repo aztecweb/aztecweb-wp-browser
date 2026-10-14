@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-14
+
 ### Added
 
 - `CustomerMethods::dontHaveCartInDatabase()` removes a customer's WooCommerce session and persistent cart from the database, so a cart written on `shutdown` after the database restore no longer returns at login ([#81](https://github.com/aztecweb/aztecweb-wp-browser/issues/81)).
@@ -79,5 +81,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `codeception.yml` enables `BuiltInServerController` and `ChromeDriverController` plus the `lucatume/wp-browser` dev commands (`dev:start`, `dev:stop`, `dev:restart`, `dev:info`, `wp:db:import`, `wp:db:export`, `run:original`, `run:all`).
 - SQLite-backed acceptance suite: `tests/acceptance.suite.yml` runs against the sqlite-database-integration drop-in with chromedriver on `localhost`, `public/wp-config.php` defines `DB_ENGINE` (default `sqlite`) to engage the plugin from a single switch, and `wp-cli.yml` points at the `public/wp/` core install.
 
-[Unreleased]: https://github.com/aztecweb/aztecweb-wp-browser/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/aztecweb/aztecweb-wp-browser/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/aztecweb/aztecweb-wp-browser/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/aztecweb/aztecweb-wp-browser/releases/tag/v0.1.0
