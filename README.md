@@ -12,7 +12,7 @@ runs unchanged in both modes.
 ## Installation
 
 ```bash
-composer require --dev aztecweb/aztecweb-wp-browser:^0.1.0
+composer require --dev aztecweb/aztecweb-wp-browser:^0.2.0
 ```
 
 Then enable the modules in your acceptance suite (e.g. `tests/acceptance.suite.yml`).
@@ -48,6 +48,27 @@ modules:
         - WPWebDriver
         - \Aztec\WPBrowser\WooCommerce\Module\WooCommerceDb
         - \Aztec\WPBrowser\WooCommerce\Module\WooCommerceWebDriver
+```
+
+`WooCommerceWebDriver` does not read the database, so it learns the store's page
+slugs and order storage from its config (see
+[ADR-0008](docs/adr/0008-webdriver-store-shape-via-config.md)). Set a key only
+when the store differs from the default:
+
+| Key | Default | Set it when |
+|---|---|---|
+| `cartPageSlug` | `/cart` | the cart page has another slug, or `amOnCartPage()` opens the wrong page |
+| `checkoutPageSlug` | `/checkout` | the checkout page has another slug |
+| `myAccountPageSlug` | `/my-account` | the My Account page has another slug |
+| `legacyOrderStorage` | `false` (HPOS) | the store keeps orders in `wp_posts`, or `amOnAdminOrderPage()` opens the HPOS order screen |
+
+```yaml
+modules:
+    config:
+        WooCommerceWebDriver:
+            cartPageSlug: /carrinho
+            checkoutPageSlug: /finalizar-compra
+            legacyOrderStorage: true
 ```
 
 After enabling the modules, rebuild the actor classes:
@@ -276,11 +297,16 @@ and no post-install hook.
 
 ## HPOS support
 
-HPOS (High-Performance Order Storage) is **auto-detected** from the
-`woocommerce_custom_orders_table_enabled` option; no consumer configuration is
-needed. The same order and subscription methods work whether your site uses the
-`wc_orders` tables or the legacy `wp_posts` storage. See
+`WooCommerceDb` **auto-detects** HPOS (High-Performance Order Storage) from the
+`woocommerce_custom_orders_table_enabled` option, so its order and subscription
+methods work whether your site uses the `wc_orders` tables or the legacy
+`wp_posts` storage, with no configuration. See
 [ADR-0005](docs/adr/0005-hpos-detection-encapsulation.md) for details.
+
+`WooCommerceWebDriver` does not detect it: it assumes HPOS, and a store on legacy
+storage has to set `legacyOrderStorage: true` in its config (see
+[Installation](#installation)). The flag is not checked against the store, so a
+wrong value makes `amOnAdminOrderPage()` open the wrong screen.
 
 ## Architecture
 
