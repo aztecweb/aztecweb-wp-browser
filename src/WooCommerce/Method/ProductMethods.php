@@ -197,11 +197,13 @@ trait ProductMethods
      * @param string $key      The meta key to retrieve.
      * @param bool   $single   Whether to return a single value or array of values.
      *
-     * @return mixed The meta value(s).
+     * @return mixed The meta value(s); an empty string when `$single` is true and the key does not exist.
      */
     public function grabProductMetaFromDatabase(int $productId, string $key, bool $single = false): mixed
     {
-        return $this->wpDb()->grabPostMetaFromDatabase($productId, $key, $single);
+        $values = (array) $this->wpDb()->grabPostMetaFromDatabase($productId, $key);
+
+        return $single ? ($values[0] ?? '') : $values;
     }
 
     /**

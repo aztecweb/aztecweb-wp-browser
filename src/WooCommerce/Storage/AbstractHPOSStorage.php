@@ -66,7 +66,7 @@ abstract class AbstractHPOSStorage extends AbstractStorage
             return $metaValues;
         }, []);
 
-        return $single ? $values[0] : $values;
+        return $single ? ($values[0] ?? '') : $values;
     }
 
     protected function haveEntityMetaInDatabase(int $entityId, string $key, mixed $value): int

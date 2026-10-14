@@ -192,7 +192,7 @@ trait SubscriptionMethods
      * @param string $key             Meta key to retrieve
      * @param bool   $single          Whether to return a single value (true) or array of values (false)
      *
-     * @return mixed Meta value or array of meta values
+     * @return mixed Meta value or array of meta values; an empty string when `$single` is true and the key does not exist
      */
     public function grabSubscriptionMetaFromDatabase(int $subscriptionId, string $key, bool $single = false): mixed
     {

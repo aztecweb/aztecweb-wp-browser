@@ -202,6 +202,22 @@ class CustomerCest
         $I->assertSame('value_2', $meta2, "Second meta should be 'value_2'");
     }
 
+    public function testGrabCustomerMetaWithMissingKey(AcceptanceTester $I): void
+    {
+        $customerId = $I->haveCustomerInDatabase(['user_login' => 'grab_missing_meta_user']);
+
+        $I->assertSame(
+            '',
+            $I->grabCustomerMeta($customerId, '_missing_meta_key', true),
+            'A missing key should grab an empty string',
+        );
+        $I->assertSame(
+            [],
+            $I->grabCustomerMeta($customerId, '_missing_meta_key'),
+            'A missing key should grab an empty array',
+        );
+    }
+
     public function testGrabCustomerBillingAddress(AcceptanceTester $I): void
     {
         $customerId = $I->haveCustomerInDatabase([
