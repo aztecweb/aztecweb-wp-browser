@@ -167,6 +167,22 @@ class OrderHPOSCest
         $I->assertSame('bacs', $paymentMethodValue, 'Payment method meta should be bacs');
     }
 
+    public function testGrabOrderMetaWithMissingKey(AcceptanceTester $I): void
+    {
+        $orderId = $I->haveOrderInDatabase();
+
+        $I->assertSame(
+            '',
+            $I->grabOrderMeta($orderId, '_missing_meta_key', true),
+            'A missing key should grab an empty string',
+        );
+        $I->assertSame(
+            [],
+            $I->grabOrderMeta($orderId, '_missing_meta_key'),
+            'A missing key should grab an empty array',
+        );
+    }
+
     public function testOrderWithPaymentDetails(AcceptanceTester $I): void
     {
         $orderId = $I->haveOrderInDatabase([

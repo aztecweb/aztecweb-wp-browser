@@ -181,6 +181,22 @@ class SubscriptionCest
         $I->assertSame('week', $metaValue);
     }
 
+    public function testGrabSubscriptionMetaWithMissingKey(AcceptanceTester $I): void
+    {
+        $subscriptionId = $I->haveSubscriptionInDatabase();
+
+        $I->assertSame(
+            '',
+            $I->grabSubscriptionMetaFromDatabase($subscriptionId, '_missing_meta_key', true),
+            'A missing key should grab an empty string',
+        );
+        $I->assertSame(
+            [],
+            $I->grabSubscriptionMetaFromDatabase($subscriptionId, '_missing_meta_key'),
+            'A missing key should grab an empty array',
+        );
+    }
+
     public function testGrabSubscriptionStatus(AcceptanceTester $I): void
     {
         $subscriptionId = $I->haveSubscriptionInDatabase([

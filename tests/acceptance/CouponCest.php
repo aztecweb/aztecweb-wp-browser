@@ -230,6 +230,22 @@ class CouponCest
         ]);
     }
 
+    public function testGrabCouponMetaWithMissingKey(AcceptanceTester $I): void
+    {
+        $couponId = $I->haveCouponInDatabase(['code' => 'MISSINGMETA']);
+
+        $I->assertSame(
+            '',
+            $I->grabCouponMetaFromDatabase($couponId, '_missing_meta_key', true),
+            'A missing key should grab an empty string',
+        );
+        $I->assertSame(
+            [],
+            $I->grabCouponMetaFromDatabase($couponId, '_missing_meta_key'),
+            'A missing key should grab an empty array',
+        );
+    }
+
     public function testCouponStatusMethods(AcceptanceTester $I): void
     {
         $couponId = $I->haveCouponInDatabase([

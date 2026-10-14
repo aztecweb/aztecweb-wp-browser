@@ -247,6 +247,22 @@ class ProductCest
         $I->assertSame('25', $stock, 'Stock meta should match');
     }
 
+    public function testGrabProductMetaWithMissingKey(AcceptanceTester $I): void
+    {
+        $productId = $I->haveProductInDatabase();
+
+        $I->assertSame(
+            '',
+            $I->grabProductMetaFromDatabase($productId, '_missing_meta_key', true),
+            'A missing key should grab an empty string',
+        );
+        $I->assertSame(
+            [],
+            $I->grabProductMetaFromDatabase($productId, '_missing_meta_key'),
+            'A missing key should grab an empty array',
+        );
+    }
+
     public function testGrabProductCategories(AcceptanceTester $I): void
     {
         $productId = $I->haveProductInDatabase();

@@ -115,7 +115,9 @@ abstract class AbstractStorage implements WooCommerceStorageInterface
 
     protected function grabEntityMeta(int $entityId, string $key, bool $single = false): mixed
     {
-        return $this->wpDb->grabPostMetaFromDatabase($entityId, $key, $single);
+        $values = (array) $this->wpDb->grabPostMetaFromDatabase($entityId, $key);
+
+        return $single ? ($values[0] ?? '') : $values;
     }
 
     protected function haveEntityMetaInDatabase(int $entityId, string $key, mixed $value): int
