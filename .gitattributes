@@ -4,9 +4,9 @@
 # not consumer-facing. See issue #38.
 #
 # Shipped (NOT export-ignored): src/, README.md, LICENSE,
-# composer.json, composer.lock, CHANGELOG.md. The skills/ directory is
-# excluded from the dist tarball: it's installed from the remote skill
-# repo instead of from vendor/.
+# composer.json, composer.lock. CHANGELOG.md is excluded too. The skills/
+# directory is excluded from the dist tarball: it's installed from the remote
+# skill repo instead of from vendor/.
 
 /AGENTS.md export-ignore
 /CHANGELOG.md export-ignore
