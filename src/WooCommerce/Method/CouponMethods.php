@@ -265,11 +265,13 @@ trait CouponMethods
      * @param string $key     The meta key to retrieve.
      * @param bool   $single  Whether to return a single value or array of values.
      *
-     * @return mixed The meta value(s).
+     * @return mixed The meta value(s); an empty string when `$single` is true and the key does not exist.
      */
     public function grabCouponMetaFromDatabase(int $couponId, string $key, bool $single = false): mixed
     {
-        return $this->wpDb()->grabPostMetaFromDatabase($couponId, $key, $single);
+        $values = (array) $this->wpDb()->grabPostMetaFromDatabase($couponId, $key);
+
+        return $single ? ($values[0] ?? '') : $values;
     }
 
     /**
